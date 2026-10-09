@@ -1,0 +1,203 @@
+@use '../abstracts' as *;
+
+// ---------- Menu ----------
+// The panel is `.os-floating.os-menu`, positioned by useFloating in the top layer.
+// Loaded after _floating.scss so these override its resets.
+.#{$prefix}-menu {
+  z-index: z('dropdown');
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  max-width: min(22rem, calc(100vw - 1rem));
+  max-height: calc(100dvh - 1rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.35rem;
+  border: 1px solid token('border-strong');
+  border-radius: radius('lg');
+  background: token('surface');
+  color: token('text');
+  box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 10%, transparent);
+  animation: #{$prefix}-menu-in dur('base') ease('emphasized') both;
+
+  &:focus {
+    outline: none;
+  }
+
+  // Not positioned yet: invisible for one frame (still focusable).
+  &:not([data-side]) {
+    opacity: 0;
+  }
+
+  &[data-appearance='translucent'] {
+    @include glass('surface');
+  }
+
+  &[role='dialog'] {
+    padding: 1rem;
+    min-width: 16rem;
+  }
+}
+
+@keyframes #{$prefix}-menu-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+
+.#{$prefix}-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: $target-size;
+  padding-block: 0.4rem;
+  padding-inline: 0.7rem;
+  border: 0;
+  border-radius: radius('md');
+  background: transparent;
+  color: token('text');
+  font: inherit;
+  font-size: token('text-sm');
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  @include transition(background-color, color);
+
+  &:focus {
+    outline: none;
+  }
+
+  // Items take focus on hover, so focus and hover share one style.
+  &:focus,
+  &:hover {
+    background: token('surface-3');
+  }
+
+  &:focus-visible {
+    outline: 3px solid token('focus');
+    outline-offset: -3px;
+  }
+
+  &[data-active],
+  &[aria-current] {
+    background: token('primary-soft');
+    color: token('primary-text');
+    font-weight: 600;
+  }
+
+  &[aria-disabled='true'] {
+    color: token('text-muted');
+    cursor: not-allowed;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  &[aria-expanded='true'] {
+    background: token('surface-3');
+  }
+}
+
+.#{$prefix}-menu__icon,
+.#{$prefix}-menu__indicator {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.#{$prefix}-menu__indicator {
+  border: 1.5px solid token('border-strong');
+  border-radius: radius('sm');
+
+  [aria-checked='true'] > & {
+    border-color: token('primary');
+    background: token('primary');
+    color: token('on-primary');
+  }
+
+  &[data-radio] {
+    border-radius: 50%;
+  }
+
+  [aria-checked='true'] > &[data-radio] {
+    background: transparent;
+  }
+}
+
+.#{$prefix}-menu__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: token('primary');
+}
+
+.#{$prefix}-menu__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.#{$prefix}-menu__description {
+  color: token('text-muted');
+  font-size: token('text-xs');
+  font-weight: 400;
+
+  [data-active] &,
+  [aria-current] & {
+    color: inherit;
+  }
+}
+
+.#{$prefix}-menu__shortcut {
+  margin-inline-start: auto;
+  padding-inline-start: 1rem;
+  color: token('text-muted');
+  font-family: var(--#{$prefix}-font-mono);
+  font-size: token('text-xs');
+}
+
+.#{$prefix}-menu__chevron {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-inline-start: auto;
+  transform: scaleX(var(--#{$prefix}-dir));
+}
+
+.#{$prefix}-menu__header {
+  padding-block: 0.6rem 0.3rem;
+  padding-inline: 0.7rem;
+  color: token('text-muted');
+  font-family: var(--#{$prefix}-font-mono);
+  font-size: token('text-xs');
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.#{$prefix}-menu__divider {
+  flex-shrink: 0;
+  height: 1px;
+  margin-block: 0.35rem;
+  background: token('border');
+}
+
+.#{$prefix}-menu__text-block {
+  padding: 0.5rem 0.7rem;
+  color: token('text-muted');
+  font-size: token('text-sm');
+}
+
+.#{$prefix}-menu__sub {
+  display: contents;
+}
