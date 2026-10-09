@@ -11,10 +11,27 @@ export function ComponentPage({ doc }: { doc: ComponentDoc }) {
       <p className="docs-lead">{doc.summary}</p>
       {doc.importLine && <Code language="tsx" title="Import" code={doc.importLine} />}
 
-      <h2 id="examples">Examples</h2>
-      {doc.examples.map((ex) => (
-        <Example key={ex.name} {...ex} />
-      ))}
+      {doc.examples.length > 0 && (
+        <>
+          <h2 id="examples">Examples</h2>
+          {doc.examples.map((ex) => (
+            <Example key={ex.name} {...ex} />
+          ))}
+        </>
+      )}
+
+      {doc.snippets && (
+        <>
+          <h2 id="usage">Usage</h2>
+          {doc.snippets.map((s) => (
+            <section key={s.title} className="docs-snippet">
+              <h3>{s.title}</h3>
+              {s.description && <p>{s.description}</p>}
+              <Code language={s.language} title={s.title} code={s.code} />
+            </section>
+          ))}
+        </>
+      )}
 
       {doc.reference && (
         <>

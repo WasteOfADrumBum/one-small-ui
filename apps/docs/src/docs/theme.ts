@@ -5,9 +5,14 @@ const doc: ComponentDoc = {
   order: 190,
   name: 'ThemeProvider & ThemeToggle',
   group: 'Theming',
-  summary: 'Light, dark and system themes, remembered between visits.',
+  summary:
+    'Light, dark and system color modes, remembered between visits. Themes apply globally or per component, and every token is a CSS variable you can change at runtime.',
   importLine: "import { ThemeProvider, ThemeToggle, useTheme } from 'onesmallui';",
-  examples: [{ name: 'theme-basic', title: 'Switching themes' }],
+  examples: [
+    { name: 'theme-basic', title: 'Light, dark and system modes' },
+    { name: 'theme-scoped', title: 'Per-component themes', description: 'Put data-os-theme="light" or "dark" on any element.' },
+    { name: 'theme-runtime', title: 'Runtime customization with CSS variables' },
+  ],
   props: [
     {
       title: 'ThemeProvider',
@@ -24,6 +29,14 @@ const doc: ComponentDoc = {
         { name: 'resolvedTheme', type: "'light' | 'dark'", description: 'What is showing.' },
         { name: 'setMode / toggle', type: 'function', description: 'Change it.' },
       ],
+    },
+  ],
+  snippets: [
+    {
+      title: 'Without React',
+      language: 'markup',
+      code: `<html data-os-theme="dark">        <!-- force dark; omit to follow the OS -->
+<section data-os-theme="light">...</section> <!-- a light island -->`,
     },
   ],
   a11y: ['Both themes pass AAA contrast for every token pair.', 'The toggle announces the theme it will switch to.'],

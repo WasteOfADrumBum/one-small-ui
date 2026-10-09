@@ -35,12 +35,14 @@
     "./scss": "./scss/index.scss",
     "./scss/*": "./scss/*",
     "./tokens.json": "./tokens/themes.json",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./agent/SKILL.md": "./agent/SKILL.md"
   },
   "files": [
     "dist",
     "scss",
     "tokens",
+    "agent",
     "README.md",
     "LICENSE"
   ],

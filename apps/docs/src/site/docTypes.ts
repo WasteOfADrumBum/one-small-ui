@@ -29,6 +29,8 @@ export interface ComponentDoc {
   props?: { title: string; props: PropDoc[] }[];
   /** Reference tables, e.g. utility class lists: rows of cells, first column rendered as code. */
   reference?: { title: string; columns: string[]; rows: string[][] }[];
+  /** Code snippets shown after the examples (install commands, SCSS, HTML). */
+  snippets?: { title: string; language: string; code: string; description?: string }[];
   a11y: string[];
   classes?: string;
 }
