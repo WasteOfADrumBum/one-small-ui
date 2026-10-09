@@ -1,0 +1,138 @@
+// Shared look for form controls. Mixins only (no CSS output), used by the form partials.
+@use '../abstracts' as *;
+
+// Customize validation colors anywhere up the tree:
+//   .checkout { --os-invalid-color: …; --os-valid-color: …; }
+$invalid-color: var(--#{$prefix}-invalid-color, #{token('danger-text')});
+$valid-color: var(--#{$prefix}-valid-color, #{token('success-text')});
+
+/// Control heights per size. Sets `--_h`, `--_px` and the font size.
+@mixin control-sizes {
+  --_h: #{$target-size};
+  --_px: 0.875rem;
+
+  &[data-size='xs'] {
+    --_h: 2rem;
+    --_px: 0.5rem;
+    font-size: token('text-xs');
+  }
+
+  &[data-size='sm'] {
+    --_h: 2.5rem;
+    --_px: 0.75rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    --_h: 3.25rem;
+    --_px: 1rem;
+    font-size: token('text-lg');
+  }
+}
+
+/// Grows the pointer target of a control shorter than 44px (WCAG 2.5.5 AAA) with
+/// strips above and below it. Needs `position: relative` and a mousedown handler
+/// that focuses the control (the components provide one).
+@mixin control-hit-area {
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    height: max(0px, calc((#{$target-size} - var(--_h)) / 2));
+  }
+
+  &::before {
+    bottom: 100%;
+  }
+
+  &::after {
+    top: 100%;
+  }
+}
+
+@mixin control {
+  width: 100%;
+  min-height: var(--_h, #{$target-size});
+  border: 1px solid token('border-strong');
+  border-radius: radius('md');
+  background: token('surface');
+  color: token('text');
+  font: inherit;
+  transition: border-color dur('base') ease('standard'), box-shadow dur('base') ease('standard'),
+    background-color dur('base') ease('standard');
+
+  &:hover {
+    border-color: token('text-muted');
+  }
+}
+
+@mixin control-focus {
+  border-color: token('focus');
+  box-shadow: 0 0 0 3px token('glow'), 0 0 0 1px token('focus');
+  outline: 3px solid transparent; // keeps a visible ring in forced-colors mode
+}
+
+@mixin control-invalid {
+  border-color: $invalid-color;
+  box-shadow: 0 0 0 1px $invalid-color;
+}
+
+@mixin control-valid {
+  border-color: $valid-color;
+  box-shadow: 0 0 0 1px $valid-color;
+}
+
+/// Ghost: transparent with an underline until hover or focus.
+@mixin control-ghost {
+  border-color: transparent;
+  border-block-end-color: token('border-strong');
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  background: transparent;
+
+  &:hover {
+    border-color: token('border-strong');
+    border-radius: radius('md');
+    background: token('surface');
+  }
+}
+
+/// Invalid/valid states for a control, from props (`data-invalid` / `data-valid`),
+/// native constraint validation once touched (`:user-invalid`, `data-touched` on the
+/// Field) or after a submit attempt (`data-validated` on the Form).
+/// `$self` is the styled box, `$native` the real control inside it (or `&` itself).
+@mixin validation-states($native: null) {
+  &[data-invalid] {
+    @include control-invalid;
+  }
+
+  &[data-valid] {
+    @include control-valid;
+  }
+
+  @if $native {
+    // Separate rules: an unknown pseudo-class would drop a whole selector list.
+    &:has(#{$native}:user-invalid) {
+      @include control-invalid;
+    }
+    .#{$prefix}-form[data-validated] &:has(#{$native}:invalid),
+    .#{$prefix}-field[data-touched] &:has(#{$native}:invalid) {
+      @include control-invalid;
+    }
+    .#{$prefix}-form[data-validated] &:has(#{$native}:valid:required) {
+      @include control-valid;
+    }
+  } @else {
+    &:user-invalid {
+      @include control-invalid;
+    }
+    .#{$prefix}-form[data-validated] &:invalid,
+    .#{$prefix}-field[data-touched] &:invalid {
+      @include control-invalid;
+    }
+    .#{$prefix}-form[data-validated] &:valid:required {
+      @include control-valid;
+    }
+  }
+}

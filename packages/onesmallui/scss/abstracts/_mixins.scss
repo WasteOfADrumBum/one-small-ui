@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:meta';
 @use 'variables' as v;
 @use 'functions' as f;
 
@@ -61,5 +62,132 @@
 @mixin reduced-motion {
   @media (prefers-reduced-motion: reduce) {
     @content;
+  }
+}
+
+/// Sets `--_c`, `--_c-hover`, `--_on`, `--_soft` and `--_text` from `data-color`,
+/// for every theme color. Components then style with those private variables.
+@mixin color-vars($attr: 'data-color') {
+  @each $c in v.$theme-colors {
+    &[#{$attr}='#{$c}'] {
+      --_c: #{f.token($c)};
+      --_c-hover: #{f.token('#{$c}-hover')};
+      --_on: #{f.token('on-#{$c}')};
+      --_soft: #{f.token('#{$c}-soft')};
+      --_text: #{f.token('#{$c}-text')};
+    }
+  }
+}
+
+// ---------- Utility API ----------
+
+/// Generates prefixed atomic classes from a map of utilities, with responsive,
+/// container-query and print variants. Every built-in utility is made with it; it is
+/// also public:
+///
+///   @use 'onesmallui/scss/abstracts' as os;
+///   @layer os.utilities {
+///     @include os.utilities((
+///       'cursor': ('props': cursor, 'values': ('help': help, 'wait': wait), 'name': 'cursor', 'responsive': true),
+///     ));
+///   }
+///   // → .os-cursor-help, .os-cursor-wait, .md\:os-cursor-help, …
+///
+/// Each utility is a map:
+/// - `props`: a property, or a list of properties that all receive the value.
+/// - `values`: a map of class suffix => value (or a plain list, used as both). A value
+///   that is itself a map emits each of its pairs (multi-property classes).
+///   The suffix `''` produces the bare stem (`.os-border`).
+/// - `name`: class stem (`'p'` → `.os-p-4`). With `'bare': true` the suffix alone is the class.
+/// - `responsive`: also emit `sm:` … `2xl:` variants (mobile first).
+/// - `container`: also emit `cq-sm:` … variants that respond to the nearest `.os-cq` container.
+/// - `print`: also emit `print:` variants.
+/// - `child`: selector appended to the class, e.g. `'> * + *'` for spacing between children.
+/// - `var`: read the value from `var(--os-<var>-<suffix>)` instead of the map value.
+@mixin utilities($utilities, $breakpoints: v.$responsive-breakpoints) {
+  @include -utility-rules($utilities);
+  @if -utilities-have($utilities, 'responsive') {
+    @each $bp in $breakpoints {
+      @include up($bp) {
+        @include -utility-rules($utilities, 'responsive', f.bp-class($bp));
+      }
+    }
+  }
+  @if -utilities-have($utilities, 'container') {
+    @each $name, $width in v.$container-breakpoints {
+      @container (min-width: #{$width}) {
+        @include -utility-rules($utilities, 'container', 'cq-#{$name}');
+      }
+    }
+  }
+  @if -utilities-have($utilities, 'print') {
+    @media print {
+      @include -utility-rules($utilities, 'print', 'print');
+    }
+  }
+}
+
+/// One utility: `@include os.utility('cursor', ('props': cursor, 'values': ('help': help)))`.
+@mixin utility($key, $config) {
+  @include utilities(($key: $config));
+}
+
+@function -utilities-have($utilities, $flag) {
+  @each $_, $util in $utilities {
+    @if $util and map.get($util, $flag) {
+      @return true;
+    }
+  }
+  @return false;
+}
+
+@function -utility-class($util, $key) {
+  @if map.get($util, 'bare') {
+    @return '#{v.$prefix}-#{$key}';
+  }
+  @if $key == '' or $key == null {
+    @return '#{v.$prefix}-#{map.get($util, 'name')}';
+  }
+  @return '#{v.$prefix}-#{map.get($util, 'name')}-#{$key}';
+}
+
+@mixin -utility-rules($utilities, $flag: null, $variant: null) {
+  @each $_, $util in $utilities {
+    @if $util and ($flag == null or map.get($util, $flag)) {
+      $values: map.get($util, 'values');
+      @if meta.type-of($values) == 'list' {
+        $as-map: ();
+        @each $v in $values {
+          $as-map: map.merge($as-map, ($v: $v));
+        }
+        $values: $as-map;
+      }
+      $child: map.get($util, 'child');
+      @each $key, $value in $values {
+        $name: -utility-class($util, $key);
+        @if $variant {
+          $name: '#{$variant}\\:#{$name}';
+        }
+        $selector: '.#{$name}';
+        @if $child {
+          $selector: '.#{$name} #{$child}';
+        }
+        #{$selector} {
+          @if meta.type-of($value) == 'map' {
+            @each $prop, $v in $value {
+              #{$prop}: $v;
+            }
+          } @else {
+            @each $prop in map.get($util, 'props') {
+              @if map.get($util, 'var') {
+                #{$prop}: var(--#{v.$prefix}-#{map.get($util, 'var')}-#{$key});
+              } @else {
+                #{$prop}: $value;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -1,15 +1,39 @@
-import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
+import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { Spinner } from './Spinner';
-import type { Color, Size } from './types';
+import type { Color, ExtendedSize } from './types';
 
-export type ButtonVariant = 'solid' | 'soft' | 'outline' | 'ghost';
+/**
+ * - `solid` filled · `soft` tinted (Bootstrap "subtle") · `outline` border only
+ * - `ghost` no background until hover (Bootstrap "text") · `link` looks like a hyperlink
+ * - `glow` decorative neon gradient (Bootstrap "styled") · `base` unstyled foundation for custom buttons
+ */
+export type ButtonVariant = 'solid' | 'soft' | 'outline' | 'ghost' | 'link' | 'glow' | 'base';
+export type ButtonShape = 'default' | 'pill' | 'square';
+
+/** Defaults a ButtonGroup passes to the buttons inside it. */
+export interface ButtonDefaults {
+  variant?: ButtonVariant;
+  color?: Color;
+  size?: ExtendedSize;
+  shape?: ButtonShape;
+}
+export const ButtonDefaultsContext = createContext<ButtonDefaults>({});
 
 interface ButtonOwnProps {
   variant?: ButtonVariant;
   color?: Color;
-  size?: Size;
+  size?: ExtendedSize;
+  /** `pill` fully rounded, `square` no rounding. */
+  shape?: ButtonShape;
+  /** Shows the pressed/current look, e.g. the current item in a group of links. */
+  active?: boolean;
+  /**
+   * Makes it a toggle button: sets `aria-pressed` so assistive tech announces on/off.
+   * Pair with `onClick` to flip your state.
+   */
+  pressed?: boolean;
   /** Shows a spinner, sets `aria-busy` and blocks clicks. */
   loading?: boolean;
   /** Text announced while loading. */
@@ -35,10 +59,14 @@ export type ButtonProps = ButtonOwnProps &
  * can also use the classes directly on any element.
  */
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(function Button(props, ref) {
+  const defaults = useContext(ButtonDefaultsContext);
   const {
-    variant = 'solid',
-    color = 'primary',
-    size = 'md',
+    variant = defaults.variant ?? 'solid',
+    color = defaults.color ?? 'primary',
+    size = defaults.size ?? 'md',
+    shape = defaults.shape ?? 'default',
+    active,
+    pressed,
     loading = false,
     loadingText,
     leftIcon,
@@ -55,6 +83,8 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     'data-variant': variant,
     'data-color': color,
     'data-size': size,
+    'data-shape': shape === 'default' ? undefined : shape,
+    'data-active': active || pressed || undefined,
     'data-loading': loading || undefined,
     'data-full-width': fullWidth || undefined,
     'data-icon-only': iconOnly || undefined,
@@ -85,7 +115,13 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
   if ('href' in rest && rest.href !== undefined) {
     const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
-      <a ref={ref as Ref<HTMLAnchorElement>} {...anchorProps} {...shared} aria-disabled={loading || undefined}>
+      <a
+        ref={ref as Ref<HTMLAnchorElement>}
+        aria-current={active ? 'page' : undefined}
+        {...anchorProps}
+        {...shared}
+        aria-disabled={loading || undefined}
+      >
         {content}
       </a>
     );
@@ -98,6 +134,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       type={type}
       disabled={disabled}
       aria-disabled={loading || undefined}
+      aria-pressed={pressed}
       onClick={(e) => {
         if (loading) {
           e.preventDefault();

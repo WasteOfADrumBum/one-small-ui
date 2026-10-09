@@ -27,6 +27,8 @@
   --#{$prefix}-font-display: #{$font-display};
   --#{$prefix}-font-mono: #{$font-mono};
   --#{$prefix}-target-size: #{$target-size};
+  // 1 in left-to-right text, -1 in right-to-left. Multiply horizontal transforms by it.
+  --#{$prefix}-dir: 1;
   --#{$prefix}-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08), 0 1px 1px rgb(0 0 0 / 0.04);
   --#{$prefix}-shadow-md: 0 6px 20px -6px rgb(0 0 0 / 0.18), 0 2px 6px rgb(0 0 0 / 0.06);
   --#{$prefix}-shadow-lg: 0 24px 60px -18px rgb(0 0 0 / 0.35), 0 8px 20px -8px rgb(0 0 0 / 0.15);
@@ -58,10 +60,37 @@
   }
 }
 
-@include reduced-motion {
+[dir='rtl'] {
+  --#{$prefix}-dir: -1;
+}
+
+[dir='ltr'] {
+  --#{$prefix}-dir: 1;
+}
+
+// Motion: durations collapse to ~0 when the OS asks for reduced motion, when
+// `$enable-transitions` is false, or at runtime with `data-os-motion="off"` on
+// any element (usually <html>). `data-os-motion="on"` opts back in.
+@mixin no-motion {
+  @each $key, $value in $durations {
+    --#{$prefix}-duration-#{$key}: 0.01ms;
+  }
+}
+
+@if $enable-transitions == false {
   :root {
-    @each $key, $value in $durations {
-      --#{$prefix}-duration-#{$key}: 0.01ms;
+    @include no-motion;
+  }
+}
+
+@if $enable-reduced-motion {
+  @include reduced-motion {
+    :root:not([data-#{$prefix}-motion='on']) {
+      @include no-motion;
     }
   }
+}
+
+[data-#{$prefix}-motion='off'] {
+  @include no-motion;
 }

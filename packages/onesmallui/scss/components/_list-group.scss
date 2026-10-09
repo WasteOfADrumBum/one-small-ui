@@ -1,0 +1,223 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-list-group {
+  --_px: 1rem;
+  --_py: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid token('border');
+  border-radius: radius('lg');
+  background: token('surface');
+  color: token('text');
+  overflow: hidden;
+  counter-reset: os-list-group;
+  // Don't stretch to a grid row's height.
+  block-size: fit-content;
+
+  &[data-size='sm'] {
+    --_px: 0.75rem;
+    --_py: 0.5rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-flush] {
+    border-inline: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+}
+
+.#{$prefix}-list-group__item {
+  @include color-vars;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: $target-size;
+  padding-block: var(--_py);
+  padding-inline: var(--_px);
+  border-block-start: 1px solid token('border');
+
+  &:first-child {
+    border-block-start: 0;
+  }
+
+  // Links and buttons fill the row and carry the padding.
+  &[data-actionable] {
+    padding: 0;
+  }
+
+  &[data-color] {
+    background: var(--_soft);
+    color: var(--_text);
+  }
+
+  &[data-active] {
+    z-index: 1;
+    background: token('primary');
+    color: token('on-primary');
+
+    &[data-color] {
+      background: var(--_c);
+      color: var(--_on);
+    }
+  }
+
+  &[data-disabled] {
+    color: token('text-muted');
+  }
+
+  // Form controls in rows: the whole row is the hit area.
+  > .#{$prefix}-check,
+  > .#{$prefix}-radio,
+  > .#{$prefix}-switch {
+    flex: 1;
+  }
+}
+
+.#{$prefix}-list-group__action {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: $target-size;
+  margin: 0;
+  padding-block: var(--_py);
+  padding-inline: var(--_px);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  @include transition(background-color, color);
+  @include focus-ring;
+
+  &:focus-visible {
+    outline-offset: -3px;
+    z-index: 2;
+  }
+
+  [data-active] > & {
+    cursor: default;
+
+    &:focus-visible {
+      outline-color: currentColor;
+    }
+  }
+
+  :not([data-active], [data-color]) > &:hover {
+    background: token('surface-2');
+  }
+
+  [data-color]:not([data-active]) > &:hover {
+    background: color-mix(in srgb, var(--_soft) 70%, #{token('surface-3')});
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    color: token('text-muted');
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.#{$prefix}-list-group__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.#{$prefix}-list-group__end {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+// Numbered lists use a counter so links and buttons get numbers too.
+.#{$prefix}-list-group[data-numbered] > .#{$prefix}-list-group__item {
+  counter-increment: os-list-group;
+
+  .#{$prefix}-list-group__content::before {
+    content: counter(os-list-group) '. ';
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+}
+
+// Horizontal: always, or from a breakpoint up.
+@mixin horizontal {
+  flex-direction: row;
+
+  > .#{$prefix}-list-group__item {
+    flex: 1 1 auto;
+    border-block-start: 0;
+    border-inline-start: 1px solid token('border');
+
+    &:first-child {
+      border-inline-start: 0;
+    }
+  }
+}
+
+.#{$prefix}-list-group[data-horizontal='always'] {
+  @include horizontal;
+}
+
+@each $bp in ('sm', 'md', 'lg', 'xl') {
+  .#{$prefix}-list-group[data-horizontal='#{$bp}'] {
+    @include up($bp) {
+      @include horizontal;
+    }
+  }
+}
+
+// Used as a tab list: <TabList className="os-list-group"> with <Tab className="os-list-group__item">.
+.#{$prefix}-tabs__list.#{$prefix}-list-group {
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid token('border');
+  width: auto;
+  min-width: 12rem;
+
+  > .#{$prefix}-tabs__indicator {
+    display: none;
+  }
+
+  > .#{$prefix}-list-group__item {
+    justify-content: flex-start;
+    width: 100%;
+    border-radius: 0;
+    color: token('text');
+    font-size: token('text-base');
+    font-weight: 500;
+    text-align: start;
+    white-space: normal;
+
+    &:focus-visible {
+      outline-offset: -3px;
+    }
+
+    &:hover:not(:disabled, [aria-selected='true']) {
+      background: token('surface-2');
+    }
+
+    &[aria-selected='true'] {
+      background: token('primary');
+      color: token('on-primary');
+
+      &:focus-visible {
+        outline-color: currentColor;
+      }
+    }
+  }
+}

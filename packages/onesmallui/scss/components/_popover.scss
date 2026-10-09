@@ -1,0 +1,116 @@
+@use '../abstracts' as *;
+
+// Tooltip and Popover. Loaded after _floating.scss so these override the
+// .os-floating resets (padding, border, background).
+
+// ---------- Tooltip ----------
+.#{$prefix}-tooltip {
+  display: inline-flex;
+}
+
+.#{$prefix}-tooltip-provider {
+  display: contents;
+}
+
+.#{$prefix}-tooltip__content {
+  z-index: z('tooltip');
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 1rem));
+  padding: 0.45rem 0.7rem;
+  border: 1px solid token('border-strong');
+  border-radius: radius('sm');
+  background: token('surface');
+  color: token('text');
+  font-size: token('text-sm');
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: start;
+  white-space: normal;
+  box-shadow: var(--#{$prefix}-shadow-md);
+  pointer-events: auto; // hoverable (WCAG 1.4.13)
+
+  // Default tone: inverted, high contrast.
+  &[data-tone='inverse'] {
+    border-color: token('text');
+    background: token('text');
+    color: token('bg');
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
+
+  &[data-state='closed'] {
+    display: none;
+  }
+
+  &[data-state='open'] {
+    animation: #{$prefix}-fade-in dur('base') ease('standard') both;
+  }
+
+  // Not positioned yet: invisible for a frame instead of flashing at 0,0.
+  &:not([data-side]) {
+    opacity: 0;
+  }
+
+  .#{$prefix}-floating__arrow {
+    width: 0.6rem;
+    height: 0.6rem;
+
+    [data-side='top'] > & { bottom: -0.3rem; }
+    [data-side='bottom'] > & { top: -0.3rem; }
+    [data-side='left'] > & { right: -0.3rem; }
+    [data-side='right'] > & { left: -0.3rem; }
+  }
+}
+
+// ---------- Popover ----------
+.#{$prefix}-popover {
+  z-index: z('dropdown');
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 1rem));
+  border: 1px solid token('border-strong');
+  border-radius: radius('lg');
+  background: token('surface');
+  color: token('text');
+  box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 10%, transparent);
+  animation: #{$prefix}-scale-in dur('base') ease('emphasized') both;
+
+  &:not([data-side]) {
+    opacity: 0;
+  }
+}
+
+.#{$prefix}-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-block: 0.25rem 0;
+  padding-inline: 1rem 0.25rem;
+  border-block-end: 1px solid token('border');
+}
+
+.#{$prefix}-popover__title {
+  margin: 0;
+  padding-block: 0.5rem;
+  font-weight: 700;
+}
+
+.#{$prefix}-popover__body {
+  padding: 0.75rem 1rem 1rem;
+  color: token('text-muted');
+  font-size: token('text-sm');
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+}
+
+// Translucent appearance (the shared rule in _floating loses to the backgrounds above).
+.#{$prefix}-tooltip__content[data-appearance='translucent'],
+.#{$prefix}-popover[data-appearance='translucent'] {
+  @include glass('surface');
+}
+

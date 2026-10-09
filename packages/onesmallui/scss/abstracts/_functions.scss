@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:string';
 @use 'variables' as v;
 
 /// Returns `var(--os-<name>)`.
@@ -29,4 +30,14 @@
 
 @function z($key) {
   @return map.get(v.$z-index, $key);
+}
+
+/// Escapes a breakpoint name for use at the start of a class, so `2xl:` works:
+/// `.#{bp-class('2xl')}\:os-flex` → `.\32 xl\:os-flex`.
+@function bp-class($bp) {
+  $first: string.slice($bp, 1, 1);
+  @if string.index('0123456789', $first) {
+    @return '\\3#{$first} #{string.slice($bp, 2)}';
+  }
+  @return $bp;
 }

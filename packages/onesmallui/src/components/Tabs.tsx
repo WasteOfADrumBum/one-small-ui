@@ -1,5 +1,7 @@
 import {
+  cloneElement,
   createContext,
+  isValidElement,
   forwardRef,
   useContext,
   useId,
@@ -7,6 +9,8 @@ import {
   useRef,
   type HTMLAttributes,
   type KeyboardEvent,
+  type MouseEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
@@ -18,6 +22,7 @@ interface TabsContextValue {
   value: string;
   setValue: (v: string) => void;
   orientation: 'horizontal' | 'vertical';
+  activation: 'automatic' | 'manual';
 }
 const TabsContext = createContext<TabsContextValue | null>(null);
 const useTabs = () => {
@@ -32,8 +37,21 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChang
   defaultValue: string;
   onValueChange?: (value: string) => void;
   orientation?: 'horizontal' | 'vertical';
-  variant?: 'line' | 'pill';
+  /**
+   * Trigger style: `line` (glowing indicator on a track), `pill`, `underline`
+   * (indicator only, no track), `list` (list-group style rows) or `button` (each tab is a button).
+   */
+  variant?: TabsVariant;
+  /**
+   * `automatic` (default): arrow keys select as they move focus.
+   * `manual`: arrow keys move focus; Enter or Space selects. Use when panels are slow to render.
+   */
+  activation?: 'automatic' | 'manual';
+  /** Fade panels in when they change. Default true. */
+  fade?: boolean;
 }
+
+export type TabsVariant = 'line' | 'pill' | 'underline' | 'list' | 'button';
 
 /** Tabs following the WAI-ARIA tabs pattern: arrow keys, Home and End move between tabs. */
 export function Tabs({
@@ -42,6 +60,8 @@ export function Tabs({
   onValueChange,
   orientation = 'horizontal',
   variant = 'line',
+  activation = 'automatic',
+  fade = true,
   className,
   children,
   ...rest
@@ -49,8 +69,14 @@ export function Tabs({
   const baseId = `os-tabs-${useId().replace(/:/g, '')}`;
   const [current, setCurrent] = useControllableState(value, defaultValue, onValueChange);
   return (
-    <TabsContext.Provider value={{ baseId, value: current, setValue: setCurrent, orientation }}>
-      <div className={cx(cls('tabs'), className)} data-orientation={orientation} data-variant={variant} {...rest}>
+    <TabsContext.Provider value={{ baseId, value: current, setValue: setCurrent, orientation, activation }}>
+      <div
+        className={cx(cls('tabs'), className)}
+        data-orientation={orientation}
+        data-variant={variant}
+        data-fade={fade ? undefined : 'false'}
+        {...rest}
+      >
         {children}
       </div>
     </TabsContext.Provider>
@@ -63,7 +89,7 @@ export interface TabListProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const TabList = forwardRef<HTMLDivElement, TabListProps>(function TabList({ className, children, ...rest }, ref) {
-  const { value, orientation } = useTabs();
+  const { value, orientation, activation } = useTabs();
   const inner = useRef<HTMLDivElement | null>(null);
 
   // Slide the glowing indicator under the active tab.
@@ -99,7 +125,7 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(function TabList
     if (target) {
       e.preventDefault();
       target.focus();
-      target.click();
+      if (activation === 'automatic') target.click();
     }
   };
 
@@ -126,14 +152,41 @@ export interface TabProps extends Omit<HTMLAttributes<HTMLButtonElement>, 'value
   value: string;
   disabled?: boolean;
   icon?: ReactNode;
+  /**
+   * Render your own element (e.g. a `<Button>`) as the tab: the child receives
+   * the tab's role, ids, ARIA state, tabindex and click handler.
+   */
+  asChild?: boolean;
 }
 
 export const Tab = forwardRef<HTMLButtonElement, TabProps>(function Tab(
-  { value, disabled, icon, className, children, onClick, ...rest },
+  { value, disabled, icon, asChild, className, children, onClick, ...rest },
   ref,
 ) {
   const { baseId, value: active, setValue } = useTabs();
   const selected = active === value;
+  if (asChild && isValidElement(children)) {
+    const child = children as ReactElement<Record<string, unknown>>;
+    const childClick = child.props.onClick as ((e: MouseEvent<HTMLButtonElement>) => void) | undefined;
+    return cloneElement(child, {
+      ref,
+      role: 'tab',
+      id: `${baseId}-tab-${safe(value)}`,
+      'aria-selected': selected,
+      'aria-controls': `${baseId}-panel-${safe(value)}`,
+      tabIndex: selected ? 0 : -1,
+      disabled,
+      'data-state': selected ? 'active' : 'inactive',
+      'data-tab': '',
+      className: cx(child.props.className as string | undefined, className),
+      onClick: (e: MouseEvent<HTMLButtonElement>) => {
+        childClick?.(e);
+        setValue(value);
+        onClick?.(e);
+      },
+      ...rest,
+    });
+  }
   return (
     <button
       ref={ref}

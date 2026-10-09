@@ -1,0 +1,197 @@
+// Long-form content from Markdown, MDX or a CMS: <article class="os-prose">…</article>.
+// Every inner selector is wrapped in :where(), so utilities and your own classes
+// win without a fight, and anything inside `.os-not-prose` is left alone.
+// Sizes: data-size="sm" | "lg".
+@use '../abstracts' as *;
+
+$_p: '.#{$prefix}-prose';
+
+@mixin _in($selector) {
+  #{$_p} :where(#{$selector}):not(:where(.#{$prefix}-not-prose, .#{$prefix}-not-prose *)) {
+    @content;
+  }
+}
+
+#{$_p} {
+  max-width: $prose-max-width;
+  color: token('text');
+  font-size: token('text-base');
+  line-height: 1.75;
+  overflow-wrap: break-word;
+
+  &[data-size='sm'] {
+    font-size: token('text-sm');
+    line-height: 1.7;
+  }
+
+  &[data-size='lg'] {
+    font-size: token('text-lg');
+    line-height: 1.8;
+  }
+}
+
+// Flow: paragraphs and blocks share one rhythm.
+@include _in('p, ul, ol, dl, blockquote, figure, pre, table, hr, address') {
+  margin-block: 1.25em;
+}
+
+@include _in('p') {
+  max-width: none;
+}
+
+// Headings
+@include _in('h1, h2, h3, h4, h5, h6') {
+  margin-block: 1.8em 0.6em;
+  font-weight: 700;
+  line-height: $line-height-tight;
+  color: token('text');
+  scroll-margin-block-start: 5rem;
+}
+
+@include _in('h1') { margin-block-start: 0; font-size: 2.25em; }
+@include _in('h2') { font-size: 1.6em; }
+@include _in('h3') { font-size: 1.3em; }
+@include _in('h4') { font-size: 1.1em; }
+@include _in('h5, h6') { font-size: 1em; }
+@include _in('h6') { color: token('text-muted'); }
+
+@include _in(':is(h1, h2, h3, h4, h5, h6) + *') {
+  margin-block-start: 0;
+}
+
+// Inline text
+@include _in('a') {
+  color: token('primary-text');
+  font-weight: 500;
+}
+
+@include _in('strong, b') {
+  font-weight: 700;
+}
+
+@include _in(':is(h1, h2, h3, h4, h5, h6, a, th) code') {
+  color: inherit;
+}
+
+// Lists
+@include _in('ul') {
+  list-style: disc;
+  padding-inline-start: 1.5em;
+}
+
+@include _in('ol') {
+  list-style: decimal;
+  padding-inline-start: 1.5em;
+}
+
+@include _in('li') {
+  margin-block: 0.4em;
+  padding-inline-start: 0.25em;
+}
+
+#{$_p} :where(li):not(:where(.#{$prefix}-not-prose *))::marker {
+  color: token('text-muted');
+}
+
+@include _in(':is(ul, ol) :is(ul, ol)') {
+  margin-block: 0.4em;
+}
+
+@include _in('dt') {
+  margin-block-start: 1em;
+}
+
+@include _in('dd') {
+  margin-block: 0.25em 0;
+  padding-inline-start: 1.5em;
+}
+
+// Quotes
+@include _in('blockquote') {
+  margin-inline: 0;
+  padding-inline-start: 1.25em;
+  border-inline-start: 4px solid token('primary');
+  font-size: 1.1em;
+}
+
+@include _in('blockquote > :first-child') {
+  margin-block-start: 0;
+}
+
+@include _in('blockquote > :last-child') {
+  margin-block-end: 0;
+}
+
+// Code
+@include _in('pre') {
+  padding: 1em 1.25em;
+  overflow-x: auto;
+  border: 1px solid token('border');
+  border-radius: radius('md');
+  background-color: token('surface-2');
+  font-size: 0.875em;
+  line-height: 1.6;
+}
+
+@include _in('pre code') {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+// Media
+@include _in('img, video, picture, svg') {
+  max-width: 100%;
+  height: auto;
+}
+
+@include _in('img, video') {
+  border-radius: radius('md');
+}
+
+@include _in('figure > img, figure > picture, figure > video') {
+  margin-inline: auto;
+}
+
+@include _in('figcaption') {
+  margin-block-start: 0.6em;
+  font-size: 0.875em;
+  color: token('text-muted');
+}
+
+// Tables
+@include _in('table') {
+  width: 100%;
+  font-size: 0.9375em;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+@include _in('caption') {
+  padding-block-end: 0.5em;
+  font-weight: 600;
+}
+
+@include _in('th, td') {
+  padding: 0.6em 0.75em;
+  border-block-end: 1px solid token('border');
+  vertical-align: top;
+}
+
+@include _in('thead th') {
+  border-block-end: 2px solid token('border-strong');
+  vertical-align: bottom;
+}
+
+@include _in('hr') {
+  margin-block: 2.5em;
+}
+
+// Last, so the first and last blocks never add outer space.
+#{$_p} > :first-child {
+  margin-block-start: 0;
+}
+
+#{$_p} > :last-child {
+  margin-block-end: 0;
+}

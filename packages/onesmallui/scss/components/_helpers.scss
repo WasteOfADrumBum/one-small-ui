@@ -1,0 +1,156 @@
+// Helpers: small single-purpose classes that combine several properties
+// (Bootstrap "Helpers"). They sit in the components layer, so utilities override them.
+@use 'sass:map';
+@use '../abstracts' as *;
+
+// ---------- Focus ring ----------
+// The library focus ring for custom interactive elements. Recolor with data-color
+// (uses the AAA `-text` shade) or --os-focus-ring-color / -width / -offset.
+.#{$prefix}-focus-ring {
+  @include color-vars;
+
+  &[data-color] {
+    --#{$prefix}-focus-ring-color: var(--_text);
+  }
+
+  &:focus-visible {
+    outline: var(--#{$prefix}-focus-ring-width, 3px) solid var(--#{$prefix}-focus-ring-color, #{token('focus')});
+    outline-offset: var(--#{$prefix}-focus-ring-offset, 2px);
+    box-shadow: 0 0 0 calc(var(--#{$prefix}-focus-ring-width, 3px) * 2) token('glow');
+  }
+}
+
+// ---------- Hover lift ----------
+.#{$prefix}-hover-lift {
+  transition: transform dur('base') ease('standard'), box-shadow dur('base') ease('standard');
+
+  &:hover,
+  &:focus-within {
+    transform: translateY(-2px);
+    box-shadow: var(--#{$prefix}-shadow-md);
+  }
+
+  @include reduced-motion {
+    &:hover,
+    &:focus-within {
+      transform: none;
+    }
+  }
+}
+
+// ---------- Icon link ----------
+// <a class="os-icon-link os-icon-link-hover" href="…">Next <svg aria-hidden="true">…</svg></a>
+.#{$prefix}-icon-link {
+  display: inline-flex;
+  gap: 0.375em;
+  align-items: center;
+  text-underline-offset: 0.25em;
+  backface-visibility: hidden;
+
+  > svg {
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    transition: transform dur('base') ease('standard');
+  }
+}
+
+// Nudges the trailing icon toward the reading direction (flips in RTL).
+.#{$prefix}-icon-link-hover:is(:hover, :focus-visible) > svg:last-child {
+  transform: translateX(calc(0.25em * var(--#{$prefix}-dir)));
+}
+
+// ---------- Position helpers ----------
+.#{$prefix}-fixed-top,
+.#{$prefix}-fixed-bottom {
+  position: fixed;
+  inset-inline: 0;
+  z-index: z('sticky');
+}
+
+.#{$prefix}-fixed-top { top: 0; }
+.#{$prefix}-fixed-bottom { bottom: 0; }
+
+// `.os-sticky-top`, `.os-sticky-bottom`, and responsive `md:os-sticky-top` …
+@include utilities((
+  'sticky': (
+    'values': (
+      'top': (position: sticky, top: 0, z-index: z('sticky')),
+      'bottom': (position: sticky, bottom: 0, z-index: z('sticky')),
+    ),
+    'name': 'sticky',
+    'responsive': true,
+  ),
+));
+
+// ---------- Stacks ----------
+.#{$prefix}-hstack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: stretch;
+}
+
+.#{$prefix}-vstack {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+// ---------- Text truncation ----------
+@for $n from 1 through 6 {
+  .#{$prefix}-line-clamp-#{$n} {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $n;
+    line-clamp: $n;
+    overflow: hidden;
+  }
+}
+
+.#{$prefix}-line-clamp-none {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+  overflow: visible;
+}
+
+// ---------- Vertical rule ----------
+// Decorative divider for flex rows: <div class="os-vr" aria-hidden="true"></div>
+.#{$prefix}-vr {
+  display: inline-block;
+  align-self: stretch;
+  flex-shrink: 0;
+  width: 1px;
+  min-height: 1em;
+  background-color: token('border-strong');
+}
+
+// ---------- Visually hidden ----------
+// Bootstrap-named aliases of `.os-sr-only` and `.os-focusable-sr`.
+.#{$prefix}-visually-hidden,
+.#{$prefix}-visually-hidden-focusable:not(:focus):not(:focus-within) {
+  @include visually-hidden;
+}
+
+// ---------- Clearfix and ratio box ----------
+.#{$prefix}-clearfix::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+// Fills an aspect-ratio box with its child (iframes, embeds): pair with `.os-ratio-16x9`.
+.#{$prefix}-ratio {
+  position: relative;
+  width: 100%;
+
+  > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
