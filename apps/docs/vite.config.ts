@@ -12,6 +12,7 @@ export default defineConfig({
     alias: [
       { find: /^onesmallui\/scss$/, replacement: lib('scss/index.scss') },
       { find: /^onesmallui\/scss\/(.*)$/, replacement: lib('scss/$1') },
+      { find: /^onesmallui\/dom$/, replacement: lib('src/dom/index.ts') },
       { find: /^onesmallui$/, replacement: lib('src/index.ts') },
     ],
   },
