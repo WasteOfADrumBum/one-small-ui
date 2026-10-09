@@ -63,3 +63,17 @@
     @content;
   }
 }
+
+/// Sets `--_c`, `--_c-hover`, `--_on`, `--_soft` and `--_text` from `data-color`,
+/// for every theme color. Components then style with those private variables.
+@mixin color-vars($attr: 'data-color') {
+  @each $c in v.$theme-colors {
+    &[#{$attr}='#{$c}'] {
+      --_c: #{f.token($c)};
+      --_c-hover: #{f.token('#{$c}-hover')};
+      --_on: #{f.token('on-#{$c}')};
+      --_soft: #{f.token('#{$c}-soft')};
+      --_text: #{f.token('#{$c}-text')};
+    }
+  }
+}

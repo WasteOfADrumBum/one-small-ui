@@ -68,7 +68,7 @@ $responsive-utilities: (
   ),
   'text-align': (
     'props': text-align,
-    'values': ('left': left, 'center': center, 'right': right),
+    'values': ('start': start, 'center': center, 'end': end, 'left': left, 'right': right, 'justify': justify),
     'name': 'text',
   ),
   'font-size': ('props': font-size, 'values': $font-sizes, 'name': 'text', 'var': 'text'),
@@ -88,7 +88,7 @@ $static-utilities: (
   'min-height': ('props': min-height, 'values': ('screen': 100dvh), 'name': 'min-h'),
   'max-width': (
     'props': max-width,
-    'values': ('prose': 75ch, 'sm': 480px, 'md': 768px, 'lg': 1024px, 'xl': $container-max, 'full': 100%),
+    'values': ('prose': 75ch, 'sm': 576px, 'md': 768px, 'lg': 1024px, 'xl': $container-max, 'full': 100%),
     'name': 'max-w',
   ),
   'font-weight': (
@@ -157,7 +157,7 @@ $static-utilities: (
       $name: class-name($util, $key);
       $selector: $name;
       @if $bp {
-        $selector: '#{$bp}\\:#{$name}';
+        $selector: '#{bp-class($bp)}\\:#{$name}';
       }
       .#{$selector} {
         @each $prop in map.get($util, 'props') {

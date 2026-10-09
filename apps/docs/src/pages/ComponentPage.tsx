@@ -9,12 +9,49 @@ export function ComponentPage({ doc }: { doc: ComponentDoc }) {
       <p className="docs-eyebrow">{doc.group}</p>
       <h1>{doc.name}</h1>
       <p className="docs-lead">{doc.summary}</p>
-      <Code language="tsx" title="Import" code={doc.importLine} />
+      {doc.importLine && <Code language="tsx" title="Import" code={doc.importLine} />}
 
       <h2 id="examples">Examples</h2>
       {doc.examples.map((ex) => (
         <Example key={ex.name} {...ex} />
       ))}
+
+      {doc.reference && (
+        <>
+          <h2 id="reference">Reference</h2>
+          {doc.reference.map((r) => (
+            <div key={r.title} className="docs-props">
+              <table>
+                <caption>{r.title}</caption>
+                <thead>
+                  <tr>
+                    {r.columns.map((c) => (
+                      <th key={c} scope="col">
+                        {c}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {r.rows.map((row) => (
+                    <tr key={row[0]}>
+                      {row.map((cell, i) =>
+                        i === 0 ? (
+                          <th key={i} scope="row">
+                            <code>{cell}</code>
+                          </th>
+                        ) : (
+                          <td key={i}>{cell}</td>
+                        ),
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </>
+      )}
 
       {doc.props && (
         <>

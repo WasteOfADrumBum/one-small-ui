@@ -1,6 +1,6 @@
 @use '../abstracts' as *;
 
-$statuses: primary, accent, success, warning, danger, info;
+$statuses: $theme-colors;
 
 html.#{$prefix}-scroll-locked {
   overflow: hidden;

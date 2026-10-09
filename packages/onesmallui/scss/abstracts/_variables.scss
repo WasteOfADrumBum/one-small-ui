@@ -7,10 +7,13 @@
 // Class-name prefix: `.os-btn`, `.os-card`, utilities like `.os-flex`.
 $prefix: 'os' !default;
 
+// Every themed color role. Each has `<c>`, `<c>-hover`, `on-<c>`, `<c>-soft` and `<c>-text` tokens.
+$theme-colors: primary, secondary, accent, success, warning, danger, info, inverse !default;
+
 // Breakpoints (mobile first). Utilities get responsive variants: `.md:os-flex`.
 $breakpoints: (
   'xs': 0,
-  'sm': 480px,
+  'sm': 576px,
   'md': 768px,
   'lg': 1024px,
   'xl': 1280px,
@@ -19,7 +22,7 @@ $breakpoints: (
 ) !default;
 
 // Breakpoints that get responsive utility variants (`md:os-flex`).
-$responsive-breakpoints: ('sm', 'md', 'lg', 'xl') !default;
+$responsive-breakpoints: ('sm', 'md', 'lg', 'xl', '2xl') !default;
 
 // Spacing scale (rem). Used by padding/margin/gap utilities: `.os-p-4`, `.os-gap-2`.
 $spacers: (
@@ -84,6 +87,15 @@ $easings: (
   'emphasized': cubic-bezier(0.3, 0, 0, 1.2),
   'exit': cubic-bezier(0.4, 0, 1, 1),
 ) !default;
+
+// Feature switches
+// Wrap the CSS in cascade layers (os.tokens < os.reset < os.base < os.components < os.utilities),
+// so your own unlayered CSS always wins without specificity battles.
+$enable-layers: true !default;
+// Set false to render every component without transitions or animations.
+$enable-transitions: true !default;
+// Honour prefers-reduced-motion by collapsing durations (strongly recommended).
+$enable-reduced-motion: true !default;
 
 // Layering
 $z-index: (

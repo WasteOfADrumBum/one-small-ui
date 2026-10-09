@@ -137,7 +137,7 @@ export function Theming() {
           <tbody>
             {[
               ['$prefix', "'os'", 'Class and CSS variable prefix'],
-              ['$breakpoints', 'sm 480, md 768, lg 1024, xl 1280, 2xl 1536, 3xl 1920', 'Media queries and responsive utilities'],
+              ['$breakpoints', 'sm 576, md 768, lg 1024, xl 1280, 2xl 1536, 3xl 1920', 'Media queries and responsive utilities'],
               ['$spacers', '0 → 24 on a 0.25rem scale', 'Spacing utilities and layout gaps'],
               ['$font-sizes', 'Fluid clamp() scale xs → 5xl', 'Type scale'],
               ['$radius-base', '10px', 'Every radius is derived from it'],

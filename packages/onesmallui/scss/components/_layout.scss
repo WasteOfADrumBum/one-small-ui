@@ -42,7 +42,7 @@
 
 // Layout components fill in every breakpoint from the last one you set, so each
 // query only needs to fall back to the base value.
-@each $bp in ('sm', 'md', 'lg', 'xl') {
+@each $bp in $responsive-breakpoints {
   @include up($bp) {
     .#{$prefix}-stack {
       --_dir: var(--#{$prefix}-stack-dir-#{$bp}, var(--#{$prefix}-stack-dir, column));

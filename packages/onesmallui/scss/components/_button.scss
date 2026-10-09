@@ -1,6 +1,6 @@
 @use '../abstracts' as *;
 
-$colors: primary, accent, success, warning, danger, info;
+$colors: $theme-colors;
 
 .#{$prefix}-btn {
   --_bg: #{token('primary')};

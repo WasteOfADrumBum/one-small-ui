@@ -49,7 +49,7 @@ export function Utilities() {
         </table>
       </div>
       <h2 id="breakpoints">Breakpoints</h2>
-      <p>Mobile first. sm 480px, md 768px, lg 1024px, xl 1280px (2xl 1536px and 3xl 1920px for media queries and hooks).</p>
+      <p>Mobile first. sm 576px, md 768px, lg 1024px, xl 1280px, 2xl 1536px (3xl 1920px for media queries and hooks).</p>
     </article>
   );
 }
