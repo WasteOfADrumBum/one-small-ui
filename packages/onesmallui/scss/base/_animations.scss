@@ -1,0 +1,65 @@
+@use '../abstracts' as *;
+
+// Keyframes shared by components and available as utility classes.
+@keyframes #{$prefix}-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes #{$prefix}-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes #{$prefix}-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes #{$prefix}-slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes #{$prefix}-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes #{$prefix}-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes #{$prefix}-shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes #{$prefix}-scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes #{$prefix}-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--#{$prefix}-glow); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+$animations: (
+  'fade-in': #{$prefix}-fade-in token('duration-slow') token('ease-standard') both,
+  'fade-up': #{$prefix}-fade-up token('duration-slow') token('ease-standard') both,
+  'scale-in': #{$prefix}-scale-in token('duration-base') token('ease-emphasized') both,
+  'slide-in-right': #{$prefix}-slide-in-right token('duration-slow') token('ease-standard') both,
+  'spin': #{$prefix}-spin 0.9s linear infinite,
+  'pulse': #{$prefix}-pulse 2s token('ease-standard') infinite,
+);
+
+@each $name, $value in $animations {
+  .#{$prefix}-animate-#{$name} {
+    animation: $value;
+  }
+}
+
+// Respect prefers-reduced-motion everywhere (WCAG 2.3.3 Animation from Interactions, AAA).
+@include reduced-motion {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

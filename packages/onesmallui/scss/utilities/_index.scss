@@ -1,0 +1,221 @@
+// Tailwind-style atomic utilities with Bootstrap-like naming, all prefixed.
+//   <div class="os-flex os-items-center os-gap-4 md:os-grid md:os-grid-cols-3">
+// Responsive variants use `<breakpoint>:` before the class (mobile first).
+@use 'sass:map';
+@use 'sass:string';
+@use '../abstracts' as *;
+
+// name => (property, values-map)
+$responsive-utilities: (
+  'display': (
+    'props': display,
+    'values': (
+      'block': block,
+      'inline-block': inline-block,
+      'inline': inline,
+      'flex': flex,
+      'inline-flex': inline-flex,
+      'grid': grid,
+      'contents': contents,
+      'hidden': none,
+    ),
+    'bare': true,
+  ),
+  'flex-direction': (
+    'props': flex-direction,
+    'values': ('row': row, 'col': column, 'row-reverse': row-reverse, 'col-reverse': column-reverse),
+    'name': 'flex',
+  ),
+  'flex-wrap': (
+    'props': flex-wrap,
+    'values': ('wrap': wrap, 'nowrap': nowrap),
+    'name': 'flex',
+  ),
+  'align-items': (
+    'props': align-items,
+    'values': ('start': flex-start, 'center': center, 'end': flex-end, 'stretch': stretch, 'baseline': baseline),
+    'name': 'items',
+  ),
+  'justify-content': (
+    'props': justify-content,
+    'values': ('start': flex-start, 'center': center, 'end': flex-end, 'between': space-between, 'around': space-around, 'evenly': space-evenly),
+    'name': 'justify',
+  ),
+  'gap': ('props': gap, 'values': $spacers, 'name': 'gap'),
+  'padding': ('props': padding, 'values': $spacers, 'name': 'p'),
+  'padding-x': ('props': (padding-inline), 'values': $spacers, 'name': 'px'),
+  'padding-y': ('props': (padding-block), 'values': $spacers, 'name': 'py'),
+  'margin': ('props': margin, 'values': map.merge($spacers, ('auto': auto)), 'name': 'm'),
+  'margin-x': ('props': (margin-inline), 'values': map.merge($spacers, ('auto': auto)), 'name': 'mx'),
+  'margin-y': ('props': (margin-block), 'values': $spacers, 'name': 'my'),
+  'grid-cols': (
+    'props': grid-template-columns,
+    'values': (
+      '1': repeat(1, minmax(0, 1fr)), '2': repeat(2, minmax(0, 1fr)), '3': repeat(3, minmax(0, 1fr)),
+      '4': repeat(4, minmax(0, 1fr)), '5': repeat(5, minmax(0, 1fr)), '6': repeat(6, minmax(0, 1fr)),
+      '12': repeat(12, minmax(0, 1fr)),
+    ),
+    'name': 'grid-cols',
+  ),
+  'col-span': (
+    'props': grid-column,
+    'values': (
+      '1': string.unquote('span 1 / span 1'), '2': string.unquote('span 2 / span 2'), '3': string.unquote('span 3 / span 3'), '4': string.unquote('span 4 / span 4'),
+      '5': string.unquote('span 5 / span 5'), '6': string.unquote('span 6 / span 6'), '8': string.unquote('span 8 / span 8'), '12': string.unquote('span 12 / span 12'),
+      'full': string.unquote('1 / -1'),
+    ),
+    'name': 'col-span',
+  ),
+  'text-align': (
+    'props': text-align,
+    'values': ('left': left, 'center': center, 'right': right),
+    'name': 'text',
+  ),
+  'font-size': ('props': font-size, 'values': $font-sizes, 'name': 'text', 'var': 'text'),
+  'width': ('props': width, 'values': ('full': 100%, 'auto': auto, 'fit': fit-content), 'name': 'w'),
+);
+
+$static-utilities: (
+  'padding-top': ('props': padding-top, 'values': $spacers, 'name': 'pt'),
+  'padding-right': ('props': padding-right, 'values': $spacers, 'name': 'pr'),
+  'padding-bottom': ('props': padding-bottom, 'values': $spacers, 'name': 'pb'),
+  'padding-left': ('props': padding-left, 'values': $spacers, 'name': 'pl'),
+  'margin-top': ('props': margin-top, 'values': $spacers, 'name': 'mt'),
+  'margin-bottom': ('props': margin-bottom, 'values': $spacers, 'name': 'mb'),
+  'flex-grow': ('props': flex, 'values': ('1': 1 1 0%, 'auto': 1 1 auto, 'none': none), 'name': 'flex'),
+  'shrink': ('props': flex-shrink, 'values': ('0': 0), 'name': 'shrink'),
+  'height': ('props': height, 'values': ('full': 100%, 'screen': 100dvh, 'auto': auto), 'name': 'h'),
+  'min-height': ('props': min-height, 'values': ('screen': 100dvh), 'name': 'min-h'),
+  'max-width': (
+    'props': max-width,
+    'values': ('prose': 75ch, 'sm': 480px, 'md': 768px, 'lg': 1024px, 'xl': $container-max, 'full': 100%),
+    'name': 'max-w',
+  ),
+  'font-weight': (
+    'props': font-weight,
+    'values': ('normal': 400, 'medium': 500, 'semibold': 600, 'bold': 700),
+    'name': 'font',
+  ),
+  'font-family': (
+    'props': font-family,
+    'values': ('sans': var(--#{$prefix}-font-sans), 'display': var(--#{$prefix}-font-display), 'mono': var(--#{$prefix}-font-mono)),
+    'name': 'font',
+  ),
+  'text-transform': ('props': text-transform, 'values': ('upper': uppercase, 'lower': lowercase), 'name': 'text'),
+  'tracking': ('props': letter-spacing, 'values': ('tight': -0.02em, 'normal': 0, 'wide': 0.08em, 'wider': 0.16em), 'name': 'tracking'),
+  'leading': ('props': line-height, 'values': ('tight': $line-height-tight, 'normal': $line-height-base), 'name': 'leading'),
+  'color': (
+    'props': color,
+    'values': (
+      'default': token('text'), 'muted': token('text-muted'), 'primary': token('primary-text'),
+      'accent': token('accent-text'), 'success': token('success-text'), 'warning': token('warning-text'),
+      'danger': token('danger-text'), 'info': token('info-text'),
+    ),
+    'name': 'text',
+  ),
+  'background': (
+    'props': background-color,
+    'values': (
+      'bg': token('bg'), 'surface': token('surface'), 'surface-2': token('surface-2'), 'surface-3': token('surface-3'),
+      'primary': token('primary'), 'primary-soft': token('primary-soft'), 'accent-soft': token('accent-soft'),
+      'success-soft': token('success-soft'), 'warning-soft': token('warning-soft'), 'danger-soft': token('danger-soft'),
+      'info-soft': token('info-soft'),
+    ),
+    'name': 'bg',
+  ),
+  'radius': (
+    'props': border-radius,
+    'values': ('none': 0, 'sm': radius('sm'), 'md': radius('md'), 'lg': radius('lg'), 'xl': radius('xl'), 'full': radius('full')),
+    'name': 'rounded',
+  ),
+  'shadow': (
+    'props': box-shadow,
+    'values': ('none': none, 'sm': var(--#{$prefix}-shadow-sm), 'md': var(--#{$prefix}-shadow-md), 'lg': var(--#{$prefix}-shadow-lg), 'glow': (0 0 24px token('glow'))),
+    'name': 'shadow',
+  ),
+  'position': ('props': position, 'values': ('relative': relative, 'absolute': absolute, 'fixed': fixed, 'sticky': sticky), 'bare': true),
+  'overflow': ('props': overflow, 'values': ('hidden': hidden, 'auto': auto), 'name': 'overflow'),
+  'object-fit': ('props': object-fit, 'values': ('cover': cover, 'contain': contain), 'name': 'object'),
+  'cursor': ('props': cursor, 'values': ('pointer': pointer, 'grab': grab), 'name': 'cursor'),
+  'transition': (
+    'props': transition,
+    'values': ('all': all token('duration-base') token('ease-standard'), 'none': none),
+    'name': 'transition',
+  ),
+);
+
+@function class-name($util, $key) {
+  @if map.get($util, 'bare') {
+    @return '#{$prefix}-#{$key}';
+  }
+  @return '#{$prefix}-#{map.get($util, 'name')}-#{$key}';
+}
+
+@mixin emit($utilities, $bp: null) {
+  @each $_, $util in $utilities {
+    @each $key, $value in map.get($util, 'values') {
+      $name: class-name($util, $key);
+      $selector: $name;
+      @if $bp {
+        $selector: '#{$bp}\\:#{$name}';
+      }
+      .#{$selector} {
+        @each $prop in map.get($util, 'props') {
+          @if map.get($util, 'var') {
+            #{$prop}: var(--#{$prefix}-#{map.get($util, 'var')}-#{$key});
+          } @else {
+            #{$prop}: $value;
+          }
+        }
+      }
+    }
+  }
+}
+
+@include emit($static-utilities);
+@include emit($responsive-utilities);
+
+// Responsive variants: sm:, md:, lg:, xl:
+@each $bp in $responsive-breakpoints {
+  @include up($bp) {
+    @include emit($responsive-utilities, $bp);
+  }
+}
+
+// Visually hidden until focused, for skip links and screen-reader-only text.
+.#{$prefix}-focusable-sr:not(:focus):not(:focus-within) {
+  @include visually-hidden;
+}
+
+// Common surfaces
+.#{$prefix}-glass {
+  @include glass('surface');
+  border: 1px solid token('border');
+}
+
+.#{$prefix}-gradient-text {
+  background: linear-gradient(100deg, token('primary-text'), token('accent-text'));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.#{$prefix}-grid-bg {
+  background-image: linear-gradient(token('grid-line') 1px, transparent 1px),
+    linear-gradient(90deg, token('grid-line') 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.#{$prefix}-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Makes a link cover its nearest positioned ancestor (e.g. a card).
+.#{$prefix}-stretched-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}

@@ -1,0 +1,11 @@
+// OneSmallUI (1SmUI) — full stylesheet.
+//
+// Use the compiled CSS:          import 'onesmallui/styles.css';
+// Or compile with your overrides: @use 'onesmallui/scss' with ($prefix: 'os', $radius-base: 6px);
+// Only need the tools?            @use 'onesmallui/scss/abstracts' as os;
+@forward 'abstracts';
+@use 'themes';
+@use 'base/reset';
+@use 'base/animations';
+@use 'components';
+@use 'utilities';

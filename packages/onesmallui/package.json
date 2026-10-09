@@ -1,0 +1,85 @@
+{
+  "name": "onesmallui",
+  "version": "0.1.0",
+  "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA accessible React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
+  "keywords": [
+    "react",
+    "ui",
+    "components",
+    "design-system",
+    "scss",
+    "typescript",
+    "accessibility",
+    "wcag",
+    "dark-mode",
+    "drag-and-drop",
+    "dropzone"
+  ],
+  "license": "MIT",
+  "author": "Joshua Small",
+  "type": "module",
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/onesmallui.css",
+    "./styles.min.css": "./dist/onesmallui.min.css",
+    "./scss": "./scss/index.scss",
+    "./scss/*": "./scss/*",
+    "./tokens.json": "./tokens/themes.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "scss",
+    "tokens",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "tokens": "node ../../scripts/build-tokens.mjs",
+    "build:js": "vite build && tsc -p tsconfig.build.json",
+    "build:css": "sass --no-source-map --load-path=node_modules scss/index.scss dist/onesmallui.css && sass --no-source-map --style=compressed scss/index.scss dist/onesmallui.min.css",
+    "build": "npm run tokens && rm -rf dist && npm run build:js && npm run build:css",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "axe-core": "^4.10.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sass": "^1.89.0",
+    "typescript": "~5.9.2",
+    "vitest": "^3.2.0",
+    "vite": "^8.3.0",
+    "@vitejs/plugin-react": "^6.1.0"
+  },
+  "homepage": "https://one-small-ui.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WasteOfADrumBum/one-small-ui.git",
+    "directory": "packages/onesmallui"
+  },
+  "bugs": {
+    "url": "https://github.com/WasteOfADrumBum/one-small-ui/issues"
+  }
+}

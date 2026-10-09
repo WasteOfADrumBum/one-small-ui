@@ -1,0 +1,103 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid token('border');
+  border-radius: radius('lg');
+  background: token('surface');
+  color: token('text');
+  overflow: hidden;
+  transition: transform dur('slow') ease('standard'), box-shadow dur('slow') ease('standard'),
+    border-color dur('base') ease('standard');
+
+  &[data-variant='glass'] {
+    @include glass('surface');
+  }
+
+  &[data-variant='outline'] {
+    background: transparent;
+    border-color: token('border-strong');
+  }
+
+  &[data-variant='elevated'] {
+    border-color: transparent;
+    box-shadow: var(--#{$prefix}-shadow-md);
+  }
+
+  &[data-interactive] {
+    cursor: pointer;
+
+    &:hover,
+    &:focus-within {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, token('primary-text') 55%, token('border'));
+      box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 30%, transparent),
+        0 10px 40px -12px token('glow');
+    }
+  }
+
+  // A thin light that sweeps along the top edge.
+  &[data-glow]::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, token('primary'), token('accent'), transparent);
+    background-size: 200% 100%;
+    animation: #{$prefix}-shimmer 4s linear infinite;
+    opacity: 0.9;
+  }
+}
+
+.#{$prefix}-card__header,
+.#{$prefix}-card__body,
+.#{$prefix}-card__footer {
+  padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+}
+
+.#{$prefix}-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0;
+
+  > :is(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    font-size: token('text-lg');
+  }
+}
+
+.#{$prefix}-card__body {
+  flex: 1;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.#{$prefix}-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0;
+}
+
+.#{$prefix}-card__media {
+  overflow: hidden;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform dur('slower') ease('standard');
+  }
+
+  [data-interactive]:hover & img {
+    transform: scale(1.04);
+  }
+}

@@ -1,0 +1,56 @@
+@use 'sass:map';
+@use '../abstracts' as *;
+
+.#{$prefix}-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+
+  &[data-size='sm'] { max-width: map.get($breakpoints, 'md'); }
+  &[data-size='md'] { max-width: map.get($breakpoints, 'lg'); }
+  &[data-size='lg'] { max-width: map.get($breakpoints, 'xl'); }
+  &[data-size='xl'] { max-width: $container-max + 80px; }
+  &[data-size='full'] { max-width: none; }
+}
+
+// Responsive props are passed as CSS variables (--os-cols, --os-cols-md, ...),
+// each breakpoint falling back to the one below it.
+.#{$prefix}-stack {
+  --_dir: var(--#{$prefix}-stack-dir, column);
+  --_gap: var(--#{$prefix}-stack-gap, 1rem);
+  display: flex;
+  flex-direction: var(--_dir);
+  gap: var(--_gap);
+  min-width: 0;
+
+  &[data-wrap] {
+    flex-wrap: wrap;
+  }
+}
+
+.#{$prefix}-grid-layout {
+  --_cols: var(--#{$prefix}-cols, 1);
+  --_gap: var(--#{$prefix}-grid-gap, 1rem);
+  display: grid;
+  grid-template-columns: repeat(var(--_cols), minmax(0, 1fr));
+  gap: var(--_gap);
+
+  &[data-auto-fit] {
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--#{$prefix}-min-item), 100%), 1fr));
+  }
+}
+
+// Layout components fill in every breakpoint from the last one you set, so each
+// query only needs to fall back to the base value.
+@each $bp in ('sm', 'md', 'lg', 'xl') {
+  @include up($bp) {
+    .#{$prefix}-stack {
+      --_dir: var(--#{$prefix}-stack-dir-#{$bp}, var(--#{$prefix}-stack-dir, column));
+      --_gap: var(--#{$prefix}-stack-gap-#{$bp}, var(--#{$prefix}-stack-gap, 1rem));
+    }
+    .#{$prefix}-grid-layout {
+      --_cols: var(--#{$prefix}-cols-#{$bp}, var(--#{$prefix}-cols, 1));
+      --_gap: var(--#{$prefix}-grid-gap-#{$bp}, var(--#{$prefix}-grid-gap, 1rem));
+    }
+  }
+}

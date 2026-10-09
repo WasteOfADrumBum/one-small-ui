@@ -1,0 +1,65 @@
+@use 'sass:map';
+@use 'variables' as v;
+@use 'functions' as f;
+
+/// Mobile-first media query: `@include up(md) { ... }`
+@mixin up($bp) {
+  $min: map.get(v.$breakpoints, $bp);
+  @if $min == 0 or $min == null {
+    @content;
+  } @else {
+    @media (min-width: $min) {
+      @content;
+    }
+  }
+}
+
+/// Max-width media query: `@include down(md) { ... }`
+@mixin down($bp) {
+  $max: map.get(v.$breakpoints, $bp);
+  @media (max-width: calc(#{$max} - 0.02px)) {
+    @content;
+  }
+}
+
+/// High-visibility focus ring (WCAG 2.4.13 Focus Appearance, AAA):
+/// 3px solid outline with 2px offset, at least 3:1 against adjacent colors.
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 3px solid f.token('focus');
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px f.token('glow');
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@mixin transition($props...) {
+  transition-property: $props;
+  transition-duration: f.dur('base');
+  transition-timing-function: f.ease('standard');
+}
+
+/// Frosted-glass surface used by cards, dialogs and the docs chrome.
+@mixin glass($level: 'surface') {
+  background: color-mix(in srgb, f.token($level) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+/// Disable motion and transparency effects for users who ask for it.
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
