@@ -1,0 +1,67 @@
+// Emits theme tokens as CSS custom properties.
+// Light is the default; dark applies via `data-os-theme="dark"` on any element
+// (usually <html>) or automatically from the OS when no theme is forced.
+@use 'sass:map';
+@use '../abstracts' as *;
+
+@mixin emit-colors($theme) {
+  @each $key, $value in $theme {
+    --#{$prefix}-#{$key}: #{$value};
+  }
+}
+
+:root {
+  @each $key, $value in $radii {
+    --#{$prefix}-radius-#{$key}: #{$value};
+  }
+  @each $key, $value in $durations {
+    --#{$prefix}-duration-#{$key}: #{$value};
+  }
+  @each $key, $value in $easings {
+    --#{$prefix}-ease-#{$key}: #{$value};
+  }
+  @each $key, $value in $font-sizes {
+    --#{$prefix}-text-#{$key}: #{$value};
+  }
+  --#{$prefix}-font-sans: #{$font-sans};
+  --#{$prefix}-font-display: #{$font-display};
+  --#{$prefix}-font-mono: #{$font-mono};
+  --#{$prefix}-target-size: #{$target-size};
+  --#{$prefix}-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08), 0 1px 1px rgb(0 0 0 / 0.04);
+  --#{$prefix}-shadow-md: 0 6px 20px -6px rgb(0 0 0 / 0.18), 0 2px 6px rgb(0 0 0 / 0.06);
+  --#{$prefix}-shadow-lg: 0 24px 60px -18px rgb(0 0 0 / 0.35), 0 8px 20px -8px rgb(0 0 0 / 0.15);
+}
+
+:root,
+[data-#{$prefix}-theme='light'] {
+  color-scheme: light;
+  @include emit-colors($theme-light);
+}
+
+[data-#{$prefix}-theme='dark'] {
+  color-scheme: dark;
+  @include emit-colors($theme-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-#{$prefix}-theme='light']) {
+    color-scheme: dark;
+    @include emit-colors($theme-dark);
+  }
+}
+
+// Users who ask for more contrast get solid borders everywhere.
+@media (prefers-contrast: more) {
+  :root {
+    --#{$prefix}-border: var(--#{$prefix}-border-strong);
+    --#{$prefix}-glow: transparent;
+  }
+}
+
+@include reduced-motion {
+  :root {
+    @each $key, $value in $durations {
+      --#{$prefix}-duration-#{$key}: 0.01ms;
+    }
+  }
+}

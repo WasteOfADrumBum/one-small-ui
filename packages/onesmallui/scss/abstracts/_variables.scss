@@ -1,0 +1,102 @@
+// OneSmallUI design variables. Every value is `!default`, so you can override
+// any of them when you load the library:
+//   @use 'onesmallui/scss' with ($prefix: 'ui', $radius-base: 6px);
+
+@use 'sass:map';
+
+// Class-name prefix: `.os-btn`, `.os-card`, utilities like `.os-flex`.
+$prefix: 'os' !default;
+
+// Breakpoints (mobile first). Utilities get responsive variants: `.md:os-flex`.
+$breakpoints: (
+  'xs': 0,
+  'sm': 480px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+  '2xl': 1536px,
+  '3xl': 1920px,
+) !default;
+
+// Breakpoints that get responsive utility variants (`md:os-flex`).
+$responsive-breakpoints: ('sm', 'md', 'lg', 'xl') !default;
+
+// Spacing scale (rem). Used by padding/margin/gap utilities: `.os-p-4`, `.os-gap-2`.
+$spacers: (
+  '0': 0,
+  'px': 1px,
+  '0-5': 0.125rem,
+  '1': 0.25rem,
+  '2': 0.5rem,
+  '3': 0.75rem,
+  '4': 1rem,
+  '5': 1.25rem,
+  '6': 1.5rem,
+  '8': 2rem,
+  '10': 2.5rem,
+  '12': 3rem,
+  '16': 4rem,
+  '20': 5rem,
+  '24': 6rem,
+) !default;
+
+// Typography
+$font-sans: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+  'Helvetica Neue', Arial, sans-serif !default;
+$font-display: 'Orbitron', 'Space Grotesk', ui-sans-serif, system-ui, sans-serif !default;
+$font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !default;
+
+// Fluid type scale: clamp(min, preferred, max). Text never drops below 16px for body.
+$font-sizes: (
+  'xs': clamp(0.8125rem, 0.78rem + 0.1vw, 0.875rem),
+  'sm': clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem),
+  'base': clamp(1rem, 0.97rem + 0.15vw, 1.0625rem),
+  'lg': clamp(1.125rem, 1.08rem + 0.25vw, 1.25rem),
+  'xl': clamp(1.25rem, 1.18rem + 0.4vw, 1.5rem),
+  '2xl': clamp(1.5rem, 1.35rem + 0.75vw, 2rem),
+  '3xl': clamp(1.875rem, 1.6rem + 1.3vw, 2.75rem),
+  '4xl': clamp(2.25rem, 1.8rem + 2.2vw, 3.75rem),
+  '5xl': clamp(2.75rem, 2rem + 3.6vw, 5rem),
+) !default;
+$line-height-base: 1.6 !default;
+$line-height-tight: 1.2 !default;
+
+// Shape
+$radius-base: 10px !default;
+$radii: (
+  'none': 0,
+  'sm': calc($radius-base * 0.5),
+  'md': $radius-base,
+  'lg': calc($radius-base * 1.6),
+  'xl': calc($radius-base * 2.4),
+  'full': 9999px,
+) !default;
+
+// Motion
+$durations: (
+  'fast': 120ms,
+  'base': 200ms,
+  'slow': 360ms,
+  'slower': 600ms,
+) !default;
+$easings: (
+  'standard': cubic-bezier(0.2, 0, 0, 1),
+  'emphasized': cubic-bezier(0.3, 0, 0, 1.2),
+  'exit': cubic-bezier(0.4, 0, 1, 1),
+) !default;
+
+// Layering
+$z-index: (
+  'dropdown': 1000,
+  'sticky': 1100,
+  'overlay': 1300,
+  'modal': 1400,
+  'toast': 1500,
+  'tooltip': 1600,
+) !default;
+
+// Minimum interactive target size. 44px satisfies WCAG 2.5.5 Target Size (AAA).
+$target-size: 44px !default;
+
+// Container max widths
+$container-max: 1280px !default;

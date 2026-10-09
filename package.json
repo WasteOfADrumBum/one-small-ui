@@ -1,0 +1,26 @@
+{
+  "name": "onesmallui-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA React + SCSS component library.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w onesmallui && npm run build -w @onesmallui/docs",
+    "build:lib": "npm run build -w onesmallui",
+    "dev": "npm run build:lib && npm run dev -w @onesmallui/docs",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test -w onesmallui",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "test:a11y": "node scripts/a11y-audit.mjs"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.3",
+    "playwright": "^1.56.0"
+  }
+}

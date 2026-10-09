@@ -1,0 +1,32 @@
+@use 'sass:map';
+@use 'variables' as v;
+
+/// Returns `var(--os-<name>)`.
+@function token($name) {
+  @return var(--#{v.$prefix}-#{$name});
+}
+
+/// Builds a prefixed class name (without the dot).
+@function cls($name) {
+  @return #{v.$prefix}-#{$name};
+}
+
+@function space($key) {
+  @return map.get(v.$spacers, $key);
+}
+
+@function radius($key) {
+  @return var(--#{v.$prefix}-radius-#{$key});
+}
+
+@function dur($key) {
+  @return var(--#{v.$prefix}-duration-#{$key});
+}
+
+@function ease($key) {
+  @return var(--#{v.$prefix}-ease-#{$key});
+}
+
+@function z($key) {
+  @return map.get(v.$z-index, $key);
+}

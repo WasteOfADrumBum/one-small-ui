@@ -1,0 +1,415 @@
+@use '../abstracts' as *;
+
+// ---------- Field ----------
+.#{$prefix}-field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.#{$prefix}-field__label {
+  font-size: token('text-sm');
+  font-weight: 600;
+  color: token('text');
+  padding: 0;
+}
+
+.#{$prefix}-field__required {
+  color: token('danger-text');
+}
+
+.#{$prefix}-field__hint {
+  margin: 0;
+  font-size: token('text-sm');
+  color: token('text-muted');
+}
+
+.#{$prefix}-field__error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: token('text-sm');
+  font-weight: 600;
+  color: token('danger-text');
+  animation: #{$prefix}-fade-up dur('base') ease('standard') both;
+
+  svg {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// ---------- Shared control look ----------
+%control {
+  width: 100%;
+  min-height: $target-size;
+  border: 1px solid token('border-strong');
+  border-radius: radius('md');
+  background: token('surface');
+  color: token('text');
+  transition: border-color dur('base') ease('standard'), box-shadow dur('base') ease('standard'),
+    background-color dur('base') ease('standard');
+
+  &:hover {
+    border-color: token('text-muted');
+  }
+}
+
+%control-focus {
+  border-color: token('focus');
+  box-shadow: 0 0 0 3px token('glow'), 0 0 0 1px token('focus');
+  outline: 3px solid transparent; // keeps a visible ring in forced-colors mode
+}
+
+%control-invalid {
+  border-color: token('danger-text');
+  box-shadow: 0 0 0 1px token('danger-text');
+}
+
+// ---------- Input ----------
+.#{$prefix}-input {
+  @extend %control;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.875rem;
+
+  &:focus-within {
+    @extend %control-focus;
+  }
+
+  &[data-invalid] {
+    @extend %control-invalid;
+  }
+
+  &[data-disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &[data-size='sm'] {
+    min-height: 2.5rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    min-height: 3.25rem;
+    font-size: token('text-lg');
+  }
+}
+
+.#{$prefix}-input__control {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  min-height: inherit;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+
+  &::placeholder {
+    color: token('text-muted');
+    opacity: 1;
+  }
+}
+
+.#{$prefix}-input__adornment {
+  display: inline-flex;
+  align-items: center;
+  color: token('text-muted');
+  font-size: token('text-sm');
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+}
+
+// ---------- Textarea ----------
+.#{$prefix}-textarea {
+  @extend %control;
+  display: block;
+  padding: 0.75rem 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+
+  &:focus-visible {
+    @extend %control-focus;
+  }
+
+  &::placeholder {
+    color: token('text-muted');
+    opacity: 1;
+  }
+
+  &[aria-invalid='true'] {
+    @extend %control-invalid;
+  }
+
+  &[data-auto-resize] {
+    resize: none;
+    overflow-y: auto;
+  }
+}
+
+// ---------- Select ----------
+.#{$prefix}-select {
+  position: relative;
+  display: flex;
+
+  &[data-invalid] .#{$prefix}-select__control {
+    @extend %control-invalid;
+  }
+}
+
+.#{$prefix}-select__control {
+  @extend %control;
+  appearance: none;
+  padding: 0 2.5rem 0 0.875rem;
+  cursor: pointer;
+
+  &:focus-visible {
+    @extend %control-focus;
+  }
+
+  [data-size='sm'] > & {
+    min-height: 2.5rem;
+    font-size: token('text-sm');
+  }
+
+  [data-size='lg'] > & {
+    min-height: 3.25rem;
+    font-size: token('text-lg');
+  }
+}
+
+.#{$prefix}-select__chevron {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: token('text-muted');
+}
+
+// ---------- Checkbox / Radio ----------
+.#{$prefix}-check {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: $target-size;
+  padding-block: 0.6rem;
+
+  &[data-disabled] {
+    opacity: 0.6;
+
+    .#{$prefix}-check__label {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// The native input sits on top of the visual box, so clicks, focus and
+// screen readers all hit the real control.
+.#{$prefix}-check__input {
+  position: absolute;
+  top: 0;
+  left: -0.6rem;
+  width: $target-size;
+  height: $target-size;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.#{$prefix}-check__box {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-top: 0.1rem;
+  border: 2px solid token('border-strong');
+  border-radius: radius('sm');
+  background: token('surface');
+  color: token('on-primary');
+  transition: background-color dur('base') ease('standard'), border-color dur('base') ease('standard'),
+    box-shadow dur('base') ease('standard');
+
+  svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    transition: stroke-dashoffset dur('slow') ease('standard');
+  }
+}
+
+.#{$prefix}-check__input:hover + .#{$prefix}-check__box {
+  border-color: token('primary-text');
+}
+
+.#{$prefix}-check__input:focus-visible + .#{$prefix}-check__box {
+  outline: 3px solid token('focus');
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px token('glow');
+}
+
+.#{$prefix}-check__input:checked + .#{$prefix}-check__box,
+.#{$prefix}-check__input[data-indeterminate] + .#{$prefix}-check__box {
+  border-color: token('primary');
+  background: token('primary');
+  box-shadow: 0 0 12px -2px token('primary');
+}
+
+.#{$prefix}-check__input:checked:not([data-indeterminate]) + .#{$prefix}-check__box .#{$prefix}-check__tick,
+.#{$prefix}-check__input[data-indeterminate] + .#{$prefix}-check__box .#{$prefix}-check__dash {
+  stroke-dashoffset: 0;
+}
+
+.#{$prefix}-check__text {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.#{$prefix}-check__label {
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.#{$prefix}-check__description {
+  font-size: token('text-sm');
+  color: token('text-muted');
+}
+
+// Radio
+.#{$prefix}-radio__dot {
+  border-radius: 50%;
+
+  &::after {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: token('on-primary');
+    transform: scale(0);
+    transition: transform dur('base') ease('emphasized');
+  }
+}
+
+.#{$prefix}-check__input:checked + .#{$prefix}-radio__dot::after {
+  transform: scale(1);
+}
+
+.#{$prefix}-radio-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    margin-bottom: 0.25rem;
+  }
+
+  &[data-orientation='horizontal'] .#{$prefix}-radio-group__options {
+    @include up(sm) {
+      flex-direction: row;
+      flex-wrap: wrap;
+      column-gap: 1.75rem;
+    }
+  }
+}
+
+.#{$prefix}-radio-group__options {
+  display: flex;
+  flex-direction: column;
+}
+
+// ---------- Switch ----------
+.#{$prefix}-switch {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: $target-size;
+  padding-block: 0.55rem;
+
+  &[data-label-position='start'] {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+
+  &[data-disabled] {
+    opacity: 0.6;
+  }
+}
+
+.#{$prefix}-switch__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.#{$prefix}-switch__track {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.875rem;
+  height: 1.625rem;
+  border: 2px solid token('border-strong');
+  border-radius: radius('full');
+  background: token('surface-3');
+  transition: background-color dur('base') ease('standard'), border-color dur('base') ease('standard'),
+    box-shadow dur('base') ease('standard');
+}
+
+.#{$prefix}-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: token('text-muted');
+  transition: transform dur('slow') ease('emphasized'), background-color dur('base') ease('standard');
+}
+
+.#{$prefix}-switch__input:focus-visible ~ .#{$prefix}-switch__track {
+  outline: 3px solid token('focus');
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px token('glow');
+}
+
+.#{$prefix}-switch__input:checked ~ .#{$prefix}-switch__track {
+  border-color: token('primary');
+  background: token('primary');
+  box-shadow: 0 0 14px -2px token('primary');
+
+  .#{$prefix}-switch__thumb {
+    transform: translateX(1.25rem);
+    background: token('on-primary');
+  }
+}

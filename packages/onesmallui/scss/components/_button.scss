@@ -1,0 +1,286 @@
+@use '../abstracts' as *;
+
+$colors: primary, accent, success, warning, danger, info;
+
+.#{$prefix}-btn {
+  --_bg: #{token('primary')};
+  --_bg-hover: #{token('primary-hover')};
+  --_fg: #{token('on-primary')};
+  --_soft: #{token('primary-soft')};
+  --_text: #{token('primary-text')};
+  --_h: 2.75rem;
+  --_px: 1.125rem;
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--_h);
+  padding: 0 var(--_px);
+  border: 1px solid transparent;
+  border-radius: radius('md');
+  font-family: token('font-sans');
+  font-size: token('text-sm');
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color dur('base') ease('standard'), border-color dur('base') ease('standard'),
+    color dur('base') ease('standard'), box-shadow dur('slow') ease('standard'),
+    transform dur('fast') ease('standard');
+  @include focus-ring;
+
+  // Expand the hit area of small buttons to 44px (WCAG 2.5.5, AAA).
+  &::after {
+    content: '';
+    position: absolute;
+    inset: min(0px, calc((var(--_h) - #{$target-size}) / 2));
+  }
+
+  &:active:not(:disabled, [aria-disabled='true']) {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  &[data-loading] {
+    cursor: progress;
+    opacity: 1;
+  }
+
+  @each $c in $colors {
+    &[data-color='#{$c}'] {
+      --_bg: #{token($c)};
+      --_bg-hover: #{token('#{$c}-hover')};
+      --_fg: #{token('on-#{$c}')};
+      --_soft: #{token('#{$c}-soft')};
+      --_text: #{token('#{$c}-text')};
+    }
+  }
+
+  &[data-color='neutral'] {
+    --_bg: #{token('text')};
+    --_bg-hover: #{token('text-muted')};
+    --_fg: #{token('bg')};
+    --_soft: #{token('surface-3')};
+    --_text: #{token('text')};
+  }
+
+  // Variants
+  &[data-variant='solid'] {
+    background: var(--_bg);
+    color: var(--_fg);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 1px 2px rgb(0 0 0 / 0.2);
+
+    // Light sheen that sweeps across on hover.
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.28) 50%, transparent 70%);
+      background-size: 250% 100%;
+      background-position: 120% 0;
+      transition: background-position dur('slower') ease('standard');
+    }
+
+    &:hover:not(:disabled, [aria-disabled='true']) {
+      background: var(--_bg-hover);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 0 0 1px var(--_bg), 0 8px 28px -6px var(--_bg);
+
+      &::before {
+        background-position: -20% 0;
+      }
+    }
+  }
+
+  &[data-variant='soft'] {
+    background: var(--_soft);
+    color: var(--_text);
+    border-color: color-mix(in srgb, var(--_text) 25%, transparent);
+
+    &:hover:not(:disabled, [aria-disabled='true']) {
+      border-color: var(--_text);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--_text) 14%, transparent);
+    }
+  }
+
+  &[data-variant='outline'] {
+    background: transparent;
+    color: var(--_text);
+    border-color: var(--_text);
+
+    &:hover:not(:disabled, [aria-disabled='true']) {
+      background: var(--_soft);
+      box-shadow: 0 0 18px -4px color-mix(in srgb, var(--_text) 55%, transparent);
+    }
+  }
+
+  &[data-variant='ghost'] {
+    background: transparent;
+    color: var(--_text);
+
+    &:hover:not(:disabled, [aria-disabled='true']) {
+      background: var(--_soft);
+    }
+  }
+
+  // Sizes
+  &[data-size='sm'] {
+    --_h: 2.25rem;
+    --_px: 0.875rem;
+    font-size: token('text-xs');
+    border-radius: radius('sm');
+  }
+
+  &[data-size='lg'] {
+    --_h: 3.25rem;
+    --_px: 1.5rem;
+    font-size: token('text-base');
+    border-radius: radius('lg');
+  }
+
+  &[data-full-width] {
+    display: flex;
+    width: 100%;
+  }
+
+  &[data-icon-only] {
+    width: var(--_h);
+    padding: 0;
+  }
+}
+
+.#{$prefix}-btn svg {
+  flex-shrink: 0;
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.#{$prefix}-btn[data-icon-only] svg {
+  width: 1.35em;
+  height: 1.35em;
+}
+
+.#{$prefix}-btn__icon {
+  display: inline-flex;
+
+  svg {
+    width: 1.15em;
+    height: 1.15em;
+  }
+}
+
+.#{$prefix}-btn__spinner {
+  --_spinner-size: 1em;
+}
+
+// Close / dismiss buttons are always a 44px target.
+.#{$prefix}-close-btn {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: $target-size;
+  height: $target-size;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: radius('md');
+  background: transparent;
+  color: token('text-muted');
+  cursor: pointer;
+  @include transition(background-color, color, border-color, transform);
+  @include focus-ring;
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &:hover {
+    background: token('surface-3');
+    color: token('text');
+    border-color: token('border');
+    transform: rotate(90deg);
+  }
+}
+
+// Theme toggle
+.#{$prefix}-theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: $target-size;
+  height: $target-size;
+  padding: 0;
+  border: 1px solid token('border');
+  border-radius: radius('full');
+  background: token('surface');
+  color: token('text');
+  cursor: pointer;
+  @include transition(background-color, border-color, box-shadow);
+  @include focus-ring;
+
+  &:hover {
+    border-color: token('primary-text');
+    box-shadow: 0 0 16px token('glow');
+  }
+
+  svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    overflow: visible;
+    transition: transform dur('slower') ease('emphasized');
+  }
+
+  circle {
+    fill: currentColor;
+  }
+
+  line {
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .#{$prefix}-theme-toggle__core {
+    transition: r dur('slow') ease('standard');
+  }
+
+  .#{$prefix}-theme-toggle__mask {
+    transition: cx dur('slow') ease('standard');
+  }
+
+  .#{$prefix}-theme-toggle__rays {
+    transform-origin: center;
+    transition: opacity dur('slow') ease('standard'), transform dur('slow') ease('standard');
+  }
+
+  &[data-theme='dark'] {
+    svg {
+      transform: rotate(-30deg);
+    }
+
+    .#{$prefix}-theme-toggle__core {
+      r: 8;
+    }
+
+    .#{$prefix}-theme-toggle__mask {
+      cx: 16;
+    }
+
+    .#{$prefix}-theme-toggle__rays {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+}

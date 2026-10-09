@@ -1,0 +1,90 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-code {
+  position: relative;
+  border: 1px solid token('border');
+  border-radius: radius('lg');
+  background: token('surface-2');
+  overflow: hidden;
+}
+
+.#{$prefix}-code__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  padding: 0 0.35rem 0 1rem;
+  border-bottom: 1px solid token('border');
+  background: token('surface-3');
+}
+
+.#{$prefix}-code__title {
+  font-family: token('font-mono');
+  font-size: token('text-xs');
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: token('text-muted');
+}
+
+.#{$prefix}-code__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border: 1px solid token('border');
+  border-radius: radius('sm');
+  background: token('surface');
+  color: token('text');
+  font-size: token('text-xs');
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  @include transition(border-color, color, background-color, box-shadow);
+  @include focus-ring;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    border-color: token('primary-text');
+    color: token('primary-text');
+  }
+
+  &[data-copied] {
+    border-color: token('success-text');
+    color: token('success-text');
+    box-shadow: 0 0 12px -2px token('success-text');
+  }
+}
+
+.#{$prefix}-code__pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  tab-size: 2;
+  color: token('text');
+  @include focus-ring;
+
+  &:focus-visible {
+    outline-offset: -3px;
+  }
+
+  code {
+    font-family: token('font-mono');
+    background: none;
+    padding: 0;
+  }
+}

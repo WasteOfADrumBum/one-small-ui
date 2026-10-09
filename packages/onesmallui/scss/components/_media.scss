@@ -1,0 +1,93 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-aspect {
+  position: relative;
+  overflow: hidden;
+  border-radius: radius('md');
+
+  > :is(img, video, iframe, canvas, picture, embed, object) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+  }
+}
+
+.#{$prefix}-image {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, token('surface-3') 25%, token('surface-2') 50%, token('surface-3') 75%);
+  background-size: 200% 100%;
+
+  &[data-rounded] {
+    border-radius: radius('lg');
+  }
+
+  &[data-state='loading'] {
+    animation: #{$prefix}-shimmer 1.6s linear infinite;
+  }
+
+  &[data-state='loaded'] {
+    background: none;
+  }
+
+  picture {
+    display: contents;
+  }
+}
+
+.#{$prefix}-image__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(8px);
+  transform: scale(1.02);
+  transition: opacity dur('slower') ease('standard'), filter dur('slower') ease('standard'),
+    transform dur('slower') ease('standard');
+
+  [data-fit='contain'] & {
+    object-fit: contain;
+  }
+
+  [data-state='loaded'] & {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+.#{$prefix}-image__fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 8rem;
+  color: token('text-muted');
+  background: token('surface-2');
+}
+
+.#{$prefix}-figure {
+  margin: 0;
+}
+
+.#{$prefix}-figure__caption {
+  margin-top: 0.6rem;
+  font-size: token('text-sm');
+  color: token('text-muted');
+}
+
+.#{$prefix}-video {
+  overflow: hidden;
+  border: 1px solid token('border');
+  border-radius: radius('lg');
+  background: #000;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
