@@ -35,7 +35,11 @@ interface PolymorphicProps extends HTMLAttributes<HTMLElement> {
 }
 
 export interface ContainerProps extends PolymorphicProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /**
+   * Fixed max width, `'full'` for none, or `'responsive'` to step the max width at
+   * every breakpoint (like `.os-container` / Bootstrap's `.container`).
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'responsive';
 }
 
 /** Centers content with a max width and responsive side padding. */

@@ -1,4 +1,7 @@
+@use 'sass:list';
 @use 'sass:map';
+@use 'sass:math';
+@use 'sass:string';
 @use '../abstracts' as *;
 
 .#{$prefix}-container {
@@ -11,6 +14,119 @@
   &[data-size='lg'] { max-width: map.get($breakpoints, 'xl'); }
   &[data-size='xl'] { max-width: $container-max + 80px; }
   &[data-size='full'] { max-width: none; }
+}
+
+// ---------- Responsive containers ----------
+// `.os-container` (no data-size, or data-size="responsive") steps its max width at
+// every breakpoint. `.os-container-<bp>` stays 100% wide until <bp>, then steps.
+// `.os-container-fluid` is always full width.
+.#{$prefix}-container-fluid {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+}
+
+@each $bp, $_ in $container-max-widths {
+  .#{$prefix}-container-#{$bp} {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  }
+}
+
+$_stepped: ('.#{$prefix}-container:not([data-size])', '.#{$prefix}-container[data-size="responsive"]');
+@each $bp, $max in $container-max-widths {
+  $_stepped: list.append($_stepped, '.#{$prefix}-container-#{$bp}', $separator: comma);
+  @include up($bp) {
+    #{$_stepped} {
+      max-width: $max;
+    }
+  }
+}
+
+// ---------- 12-column flexbox grid ----------
+// <div class="os-row os-g-4"><div class="os-col-12 md:os-col-6">…</div></div>
+// Gutters are padding on the columns plus a negative margin on the row, set by
+// `--os-gutter-x` / `--os-gutter-y` (the `.os-g-*`, `.os-gx-*`, `.os-gy-*` classes).
+.#{$prefix}-row {
+  --#{$prefix}-gutter-x: #{$grid-gutter};
+  --#{$prefix}-gutter-y: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin-block-start: calc(-1 * var(--#{$prefix}-gutter-y));
+  margin-inline: calc(-0.5 * var(--#{$prefix}-gutter-x));
+
+  > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-inline: calc(var(--#{$prefix}-gutter-x) * 0.5);
+    margin-block-start: var(--#{$prefix}-gutter-y);
+  }
+}
+
+$_cols: ('auto': (flex: 0 0 auto, width: auto));
+@for $i from 1 through $grid-columns {
+  $_cols: map.merge($_cols, ('#{$i}': (flex: 0 0 auto, width: math.percentage(math.div($i, $grid-columns)))));
+}
+$_row-cols: ('auto': (flex: 0 0 auto, width: auto));
+@for $i from 1 through 6 {
+  $_row-cols: map.merge($_row-cols, ('#{$i}': (flex: 0 0 auto, width: math.percentage(math.div(1, $i)))));
+}
+$_offsets: ();
+@for $i from 0 through $grid-columns - 1 {
+  $_offsets: map.merge($_offsets, ('#{$i}': math.percentage(math.div($i, $grid-columns))));
+}
+$_g: ();
+$_gx: ();
+$_gy: ();
+@each $k, $v in $gutters {
+  $_g: map.merge($_g, ($k: (--#{$prefix}-gutter-x: $v, --#{$prefix}-gutter-y: $v)));
+  $_gx: map.merge($_gx, ($k: (--#{$prefix}-gutter-x: $v)));
+  $_gy: map.merge($_gy, ($k: (--#{$prefix}-gutter-y: $v)));
+}
+$_g-cols: ();
+$_g-starts: ();
+@for $i from 1 through $grid-columns {
+  $_g-cols: map.merge($_g-cols, ('#{$i}': string.unquote('auto / span #{$i}')));
+  @if $i < $grid-columns {
+    $_g-starts: map.merge($_g-starts, ('#{$i}': $i));
+  }
+}
+
+// Order matters: equal-width `.os-col`, then row-cols, then explicit widths, so a
+// column's own size always beats its row's default at the same breakpoint.
+@include utilities((
+  'col-equal': ('values': ('': (flex: 1 0 0%)), 'name': 'col', 'responsive': true, 'container': true),
+  'row-cols': ('values': $_row-cols, 'name': 'row-cols', 'child': '> *', 'responsive': true),
+  'col': ('values': $_cols, 'name': 'col', 'responsive': true, 'container': true),
+  'offset': ('props': margin-inline-start, 'values': $_offsets, 'name': 'offset', 'responsive': true),
+  'g': ('values': $_g, 'name': 'g', 'responsive': true),
+  'gx': ('values': $_gx, 'name': 'gx'),
+  'gy': ('values': $_gy, 'name': 'gy'),
+  'g-col': ('props': grid-column, 'values': $_g-cols, 'name': 'g-col', 'responsive': true),
+  'g-start': ('props': grid-column-start, 'values': $_g-starts, 'name': 'g-start'),
+));
+
+// ---------- CSS Grid alternative ----------
+// <div class="os-cssgrid"><div class="os-g-col-6 md:os-g-col-4">…</div></div>
+// Override `--os-columns`, `--os-rows` or `--os-gap` inline to change the template.
+.#{$prefix}-cssgrid {
+  display: grid;
+  grid-template-rows: repeat(var(--#{$prefix}-rows, 1), 1fr);
+  grid-template-columns: repeat(var(--#{$prefix}-columns, #{$grid-columns}), minmax(0, 1fr));
+  gap: var(--#{$prefix}-gap, #{$grid-gutter});
+
+  > * {
+    min-width: 0;
+  }
+}
+
+// ---------- Container queries ----------
+// Make an element a size container; its descendants can then use `cq-sm:`, `cq-md:`,
+// `cq-lg:`, `cq-xl:` variants (display, flex direction, grid columns, `.os-col-*`).
+.#{$prefix}-cq {
+  container-type: inline-size;
 }
 
 // Responsive props are passed as CSS variables (--os-cols, --os-cols-md, ...),

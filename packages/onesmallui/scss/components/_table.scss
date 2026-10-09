@@ -1,0 +1,247 @@
+// Tables: <table class="os-table" data-striped="rows" data-hover>.
+// Options are data attributes (the Table component sets them from props):
+//   data-color="<theme color>"  on the table, a row or a cell: soft tinted background
+//   data-striped="rows|columns", data-hover, data-bordered, data-borderless
+//   data-size="sm" (compact), data-variant="card", data-caption="bottom"
+//   data-stacked="sm|md|lg"     below that breakpoint rows become cards (cells need data-label)
+//   tr/td[data-state="active"]  highlighted row or cell; tbody[data-divider] thicker group rule
+// Each cell paints `--_state` (hover/active) and `--_accent` (stripes) as inset shadows
+// over its `--_bg`, so states layer on top of colored rows instead of replacing them.
+@use 'sass:map';
+@use '../abstracts' as *;
+
+.#{$prefix}-table {
+  --_pad-y: 0.75rem;
+  --_pad-x: 1rem;
+  --_border: #{token('border')};
+  --_stripe: color-mix(in srgb, #{token('text')} 5%, transparent);
+  --_hover: color-mix(in srgb, #{token('text')} 9%, transparent);
+  --_active: color-mix(in srgb, #{token('text')} 13%, transparent);
+  // Reset per table so a nested table never inherits its parent cell's paint.
+  --_bg: transparent;
+  --_accent: transparent;
+  --_state: transparent;
+  --_mark: transparent;
+  width: 100%;
+  margin-block-end: 1rem;
+  border-collapse: collapse;
+  border-color: var(--_border);
+  color: token('text');
+  font-variant-numeric: tabular-nums;
+  vertical-align: top;
+
+  > :not(caption) > * > * {
+    padding: var(--_pad-y) var(--_pad-x);
+    border-color: var(--_border);
+    border-block-end-width: 1px;
+    background-color: var(--_bg);
+    box-shadow: inset calc(4px * var(--#{$prefix}-dir)) 0 0 var(--_mark), inset 0 0 0 9999px var(--_state),
+      inset 0 0 0 9999px var(--_accent);
+  }
+
+  > thead {
+    vertical-align: bottom;
+
+    > tr > * {
+      border-block-end-width: 2px;
+      border-block-end-color: token('border-strong');
+      font-weight: 600;
+    }
+  }
+
+  > tbody {
+    vertical-align: inherit;
+  }
+
+  > tfoot > tr > * {
+    border-block-start: 2px solid token('border-strong');
+    border-block-end-width: 0;
+    font-weight: 600;
+  }
+
+  > caption {
+    padding-block: 0.5rem;
+    font-weight: 600;
+    color: token('text');
+
+  }
+
+  &[data-caption='bottom'] > caption {
+    caption-side: bottom;
+    font-weight: 400;
+    font-size: token('text-sm');
+    color: token('text-muted');
+  }
+
+  // Thicker rule between row groups.
+  > tbody[data-divider] {
+    border-block-start: 2px solid token('border-strong');
+  }
+
+  // Theme colors: whole table, a row group, a row or a single cell.
+  @each $c in $theme-colors {
+    &[data-color='#{$c}'],
+    > tbody[data-color='#{$c}'],
+    > * > tr[data-color='#{$c}'],
+    > * > tr > [data-color='#{$c}'] {
+      --_c: #{token($c)};
+      --_soft: #{token('#{$c}-soft')};
+    }
+  }
+
+  &[data-color],
+  > tbody[data-color] > tr > *,
+  > * > tr[data-color] > *,
+  > * > tr > [data-color] {
+    --_bg: var(--_soft);
+    --_border: color-mix(in srgb, var(--_c) 35%, var(--_soft));
+  }
+
+  &[data-color] > :not(caption) > * > * {
+    --_bg: var(--_soft);
+  }
+
+  // Striped rows / columns, hover and active.
+  &[data-striped='rows'] > tbody > tr:nth-of-type(odd) > *,
+  &[data-striped='columns'] > :not(caption) > tr > :nth-child(even) {
+    --_accent: var(--_stripe);
+  }
+
+  &[data-hover] > tbody > tr:hover > * {
+    --_state: var(--_hover);
+  }
+
+  > * > tr[data-state='active'] > *,
+  > * > tr > [data-state='active'] {
+    --_state: var(--_active);
+  }
+
+  // A bar on the leading edge, so "active" never relies on a tint alone.
+  > * > tr[data-state='active'] > :first-child {
+    --_mark: #{token('primary')};
+  }
+
+  // Bordered / borderless.
+  &[data-bordered] > :not(caption) > * > * {
+    border-width: 1px;
+  }
+
+  &[data-bordered] > :not(caption) > * {
+    border-width: 1px 0;
+  }
+
+  &[data-borderless] > :not(caption) > * > * {
+    border-width: 0;
+  }
+
+  &[data-borderless] > :not(caption) > * {
+    border-width: 0;
+  }
+
+  // Compact.
+  &[data-size='sm'] {
+    --_pad-y: 0.35rem;
+    --_pad-x: 0.6rem;
+    font-size: token('text-sm');
+  }
+
+  // Card-like: a framed surface with rounded corners.
+  &[data-variant='card'] {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--_border);
+    border-radius: radius('lg');
+    background-color: token('surface');
+    box-shadow: var(--#{$prefix}-shadow-sm);
+    overflow: hidden;
+
+    > caption {
+      padding-inline: var(--_pad-x);
+      padding-block-start: 0.75rem;
+      background-color: token('surface');
+    }
+
+    > :not(caption) > :last-child > * {
+      border-block-end-width: 0;
+    }
+
+    > thead > tr > * {
+      background-color: token('surface-2');
+    }
+  }
+
+  // Nested tables sit flush inside their cell.
+  & & {
+    margin-block-end: 0;
+  }
+}
+
+// Horizontal scrolling wrapper. Give it tabindex="0", role="region" and an
+// aria-label (or aria-labelledby the caption) so keyboard users can scroll it.
+.#{$prefix}-table-responsive {
+  overflow-x: auto;
+  margin-block-end: 1rem;
+  border-radius: radius('sm');
+  -webkit-overflow-scrolling: touch;
+  @include focus-ring;
+
+  > .#{$prefix}-table {
+    margin-block-end: 0;
+  }
+}
+
+// Stacked tables: below the breakpoint each row is a card and every cell shows
+// its column name from `data-label`. The header row stays for screen readers.
+@each $bp in ('sm', 'md', 'lg') {
+  @include down($bp) {
+    .#{$prefix}-table[data-stacked='#{$bp}'] {
+      &,
+      > tbody,
+      > tfoot,
+      > * > tr,
+      > * > tr > * {
+        display: block;
+      }
+
+      > caption {
+        display: block;
+      }
+
+      > thead {
+        @include visually-hidden;
+      }
+
+      > * > tr {
+        margin-block-end: 0.75rem;
+        border: 1px solid var(--_border);
+        border-radius: radius('md');
+        overflow: hidden;
+      }
+
+      > * > tr > * {
+        display: grid;
+        grid-template-columns: minmax(6rem, 40%) minmax(0, 1fr);
+        gap: 1rem;
+        border-width: 0 0 1px;
+
+        &:last-child {
+          border-block-end-width: 0;
+        }
+
+        &[data-label]::before {
+          content: attr(data-label);
+          content: attr(data-label) / '';
+          font-weight: 600;
+        }
+
+        &:not([data-label]) {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      > tfoot > tr > * {
+        border-block-start: 0;
+      }
+    }
+  }
+}

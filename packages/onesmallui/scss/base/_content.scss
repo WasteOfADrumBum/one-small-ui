@@ -1,2 +1,180 @@
-// Typography, tables, prose and other content styles (Bootstrap "Content").
+// Typography, lists, quotes and images (Bootstrap "Content"). Elements get calm
+// defaults in base/_reset; the classes here opt into extra styling. Tables live in
+// components/_table, long-form article styling in components/_prose.
+@use 'sass:map';
 @use '../abstracts' as *;
+
+// ---------- Headings ----------
+// `.os-h1` … `.os-h6` look like the element without changing the document outline.
+$_heading-sizes: ('1': '4xl', '2': '3xl', '3': '2xl', '4': 'xl', '5': 'lg', '6': 'base');
+
+@each $level, $size in $_heading-sizes {
+  .#{$prefix}-h#{$level} {
+    margin-block: 0 0.5em;
+    font-size: token('text-#{$size}');
+    font-weight: 700;
+    line-height: $line-height-tight;
+    letter-spacing: -0.01em;
+  }
+}
+
+// Fluid display headings for heroes and landing pages.
+@each $n, $size in $display-sizes {
+  .#{$prefix}-display-#{$n} {
+    margin-block: 0 0.5em;
+    font-family: token('font-display');
+    font-size: $size;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+}
+
+.#{$prefix}-lead {
+  font-size: token('text-xl');
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+// ---------- Inline text ----------
+mark,
+.#{$prefix}-mark {
+  padding: 0.05em 0.25em;
+  border-radius: radius('sm');
+  background-color: token('warning');
+  color: token('on-warning');
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+
+  @media (forced-colors: active) {
+    background-color: Mark;
+    color: MarkText;
+  }
+}
+
+.#{$prefix}-small {
+  font-size: 0.875em;
+}
+
+.#{$prefix}-initialism {
+  font-size: 0.875em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+del,
+s {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.08em;
+}
+
+ins,
+u {
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+ins {
+  text-decoration-style: double;
+}
+
+// ---------- Blockquotes ----------
+.#{$prefix}-blockquote {
+  margin-block: 0 1rem;
+  margin-inline: 0;
+  padding-inline-start: 1.25rem;
+  border-inline-start: 4px solid token('primary');
+  font-size: token('text-lg');
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+
+  // Centered or end-aligned quotes usually drop the rule.
+  &[data-variant='plain'] {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+
+  // Nested quotes keep the size of their parent and indent once more.
+  & & {
+    margin-block: 0.75rem;
+    font-size: 1em;
+    border-inline-start-color: token('border-strong');
+  }
+}
+
+.#{$prefix}-blockquote-footer {
+  margin-block: -0.25rem 1rem;
+  font-size: token('text-sm');
+  color: token('text-muted');
+
+  &::before {
+    content: '\2014\00A0';
+    content: '\2014\00A0' / '';
+  }
+}
+
+// ---------- Lists ----------
+// Removing bullets also removes list semantics in Safari/VoiceOver: add role="list".
+.#{$prefix}-list-unstyled {
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.#{$prefix}-list-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.#{$prefix}-list-inline-item {
+  display: inline-block;
+}
+
+// Description list with terms beside their descriptions from sm up.
+.#{$prefix}-dl-horizontal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 1.5rem;
+
+  > div {
+    display: contents;
+  }
+
+  dd {
+    margin-inline-start: 0;
+  }
+
+  @include up('sm') {
+    grid-template-columns: minmax(6rem, max-content) minmax(0, 1fr);
+
+    dt {
+      grid-column: 1;
+      margin-block-end: 0.5rem;
+    }
+
+    dd {
+      grid-column: 2;
+    }
+  }
+}
+
+// ---------- Images ----------
+.#{$prefix}-img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.#{$prefix}-img-thumbnail {
+  max-width: 100%;
+  height: auto;
+  padding: 0.25rem;
+  border: 1px solid token('border');
+  border-radius: radius('md');
+  background-color: token('surface');
+  box-shadow: var(--#{$prefix}-shadow-sm);
+}
