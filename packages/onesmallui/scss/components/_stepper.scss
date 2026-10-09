@@ -1,0 +1,284 @@
+@use '../abstracts' as *;
+
+// Public custom properties: --os-stepper-gap, --os-stepper-step-min.
+.#{$prefix}-stepper {
+  --_ind: 2.25rem;
+  --_gap: var(--#{$prefix}-stepper-gap, 1rem);
+  --_tp: 0.25rem;
+  --_tpx: 0.25rem;
+  --_line: 2px;
+  @include color-vars;
+  min-width: 0;
+  border-radius: radius('md');
+  @include focus-ring;
+
+  &[data-variant='dot'] {
+    --_ind: 1rem;
+    // Centers the small dot on the first line of the title.
+    --_im: 0.25rem;
+  }
+
+  &[data-orientation='horizontal'] {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-block: 0.25rem;
+  }
+}
+
+.#{$prefix}-stepper__list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  [data-orientation='vertical'] > & {
+    flex-direction: column;
+  }
+}
+
+.#{$prefix}-stepper__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  // The connector to the next step.
+  &:not([data-last])::after {
+    content: '';
+    background: token('border-strong');
+    border-radius: radius('full');
+  }
+
+  &[data-status='complete']:not([data-last])::after {
+    background: var(--_c);
+  }
+}
+
+.#{$prefix}-stepper__trigger {
+  display: flex;
+  gap: 0.75rem;
+  min-height: $target-size;
+  padding: var(--_tp) var(--_tpx);
+  border: 0;
+  border-radius: radius('md');
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+
+  &:is(a, button) {
+    cursor: pointer;
+    @include focus-ring;
+
+    &:hover .#{$prefix}-stepper__title {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+      cursor: not-allowed;
+      opacity: 0.6;
+
+      .#{$prefix}-stepper__title {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.#{$prefix}-stepper__indicator {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--_ind);
+  height: var(--_ind);
+  border: 2px solid token('border-strong');
+  border-radius: 50%;
+  background: token('surface');
+  color: token('text-muted');
+  font-size: token('text-sm');
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  @include transition(background-color, border-color, color, box-shadow);
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  [data-status='complete'] & {
+    border-color: var(--_c);
+    background: var(--_c);
+    color: var(--_on);
+  }
+
+  [data-status='current'] & {
+    border-color: var(--_c);
+    background: var(--_c);
+    color: var(--_on);
+    box-shadow: 0 0 0 4px var(--_soft), 0 0 14px -2px var(--_c);
+  }
+
+  [data-status='error'] & {
+    border-color: token('danger');
+    background: token('danger');
+    color: token('on-danger');
+  }
+
+  // Outline: only completed steps are filled.
+  [data-variant='outline'] [data-status='current'] & {
+    background: token('surface');
+    color: var(--_text);
+  }
+
+  [data-variant='outline'] [data-status='complete'] & {
+    background: token('surface');
+    color: var(--_text);
+  }
+
+  // Dot: a small marker, numbers hidden.
+  [data-variant='dot'] & {
+    margin-block-start: var(--_im);
+
+    svg {
+      width: 0.6rem;
+      height: 0.6rem;
+    }
+  }
+}
+
+.#{$prefix}-stepper__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  padding-block-start: max(0px, calc((var(--_ind) - 1.5em) / 2));
+}
+
+.#{$prefix}-stepper__title {
+  color: token('text');
+  font-weight: 600;
+  line-height: 1.5;
+
+  [data-status='upcoming'] & {
+    color: token('text-muted');
+  }
+
+  [data-status='current'] & {
+    color: var(--_text);
+  }
+
+  [data-status='error'] & {
+    color: token('danger-text');
+  }
+}
+
+.#{$prefix}-stepper__description {
+  color: token('text-muted');
+  font-size: token('text-sm');
+}
+
+.#{$prefix}-stepper__content {
+  min-width: 0;
+  color: token('text-muted');
+  font-size: token('text-sm');
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+// ---------- Horizontal, labels centered under the indicator ----------
+.#{$prefix}-stepper[data-orientation='horizontal'][data-align='center'] {
+  .#{$prefix}-stepper__step {
+    flex: 1 1 0;
+    align-items: center;
+    min-width: var(--#{$prefix}-stepper-step-min, 8rem);
+    padding-inline: calc(var(--_gap) / 2);
+    text-align: center;
+
+    &:not([data-last])::after {
+      position: absolute;
+      top: calc(var(--_tp) + var(--_im, 0px) + var(--_ind) / 2 - var(--_line) / 2);
+      inset-inline-start: calc(50% + var(--_ind) / 2 + 0.5rem);
+      inset-inline-end: calc(-50% + var(--_ind) / 2 + 0.5rem);
+      height: var(--_line);
+    }
+  }
+
+  .#{$prefix}-stepper__trigger {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .#{$prefix}-stepper__text {
+    padding-block-start: 0;
+  }
+}
+
+// ---------- Horizontal, labels beside the indicator ----------
+.#{$prefix}-stepper[data-orientation='horizontal'][data-align='start'] {
+  .#{$prefix}-stepper__list {
+    gap: var(--_gap);
+  }
+
+  .#{$prefix}-stepper__step {
+    display: grid;
+    grid-template-columns: auto minmax(2rem, 1fr);
+    column-gap: var(--_gap);
+    flex: 1 1 auto;
+
+    &[data-last] {
+      grid-template-columns: auto;
+      flex: 0 0 auto;
+    }
+
+    &:not([data-last])::after {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: start;
+      height: var(--_line);
+      margin-block-start: calc(var(--_tp) + var(--_im, 0px) + var(--_ind) / 2 - var(--_line) / 2);
+    }
+  }
+
+  .#{$prefix}-stepper__trigger {
+    align-items: flex-start;
+    white-space: nowrap;
+  }
+
+  .#{$prefix}-stepper__content {
+    grid-column: 1 / -1;
+    padding-inline-start: calc(var(--_tpx) + var(--_ind) + 0.75rem);
+  }
+}
+
+// ---------- Vertical (wizards on small screens, timelines) ----------
+.#{$prefix}-stepper[data-orientation='vertical'] {
+  .#{$prefix}-stepper__step {
+    &:not([data-last]) {
+      padding-block-end: var(--_gap);
+    }
+
+    &:not([data-last])::after {
+      position: absolute;
+      inset-inline-start: calc(var(--_tpx) + var(--_ind) / 2 - var(--_line) / 2);
+      top: calc(var(--_tp) + var(--_im, 0px) + var(--_ind) + 0.35rem);
+      bottom: 0.1rem;
+      width: var(--_line);
+    }
+  }
+
+  .#{$prefix}-stepper__trigger {
+    align-items: flex-start;
+  }
+
+  .#{$prefix}-stepper__content {
+    padding-inline-start: calc(var(--_tpx) + var(--_ind) + 0.75rem);
+  }
+}

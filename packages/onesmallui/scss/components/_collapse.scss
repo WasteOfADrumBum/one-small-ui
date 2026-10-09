@@ -1,0 +1,41 @@
+@use '../abstracts' as *;
+
+// Size animation without measuring: grid tracks animate 0fr -> 1fr
+// (the same technique as the accordion).
+.#{$prefix}-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows dur('slow') ease('standard'), grid-template-columns dur('slow') ease('standard'),
+    opacity dur('slow') ease('standard');
+  opacity: 0;
+
+  &[data-state='open'] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  &[data-orientation='horizontal'] {
+    grid-template-rows: 1fr;
+    grid-template-columns: 0fr;
+    width: fit-content;
+    max-width: 100%;
+
+    &[data-state='open'] {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Fully hidden once closed, so it takes no space and is skipped by find-in-page.
+  &[data-state='closed'] {
+    visibility: hidden;
+    transition-property: grid-template-rows, grid-template-columns, opacity, visibility;
+    transition-duration: dur('slow'), dur('slow'), dur('slow'), 0s;
+    transition-delay: 0s, 0s, 0s, dur('slow');
+  }
+}
+
+.#{$prefix}-collapse__inner {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
