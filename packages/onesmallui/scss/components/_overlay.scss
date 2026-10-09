@@ -6,244 +6,7 @@ html.#{$prefix}-scroll-locked {
   overflow: hidden;
 }
 
-// ---------- Modal / Drawer ----------
-.#{$prefix}-modal {
-  --_w: 32rem;
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  width: min(var(--_w), calc(100vw - 2rem));
-  max-width: none;
-  max-height: min(85dvh, 56rem);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: token('text');
-  overflow: visible;
-
-  &::backdrop {
-    background: token('overlay');
-    backdrop-filter: blur(6px);
-    animation: #{$prefix}-fade-in dur('slow') ease('standard') both;
-  }
-
-  &[data-size='sm'] { --_w: 24rem; }
-  &[data-size='lg'] { --_w: 48rem; }
-  &[data-size='xl'] { --_w: 64rem; }
-  &[data-size='full'] {
-    --_w: 100vw;
-    width: 100vw;
-    height: 100dvh;
-    max-height: none;
-
-    .#{$prefix}-modal__panel {
-      height: 100%;
-      border-radius: 0;
-    }
-  }
-
-  &[open] .#{$prefix}-modal__panel {
-    animation: #{$prefix}-scale-in dur('slow') ease('emphasized') both;
-  }
-
-  &[data-state='closing'] {
-    .#{$prefix}-modal__panel {
-      animation: #{$prefix}-modal-out 220ms ease('exit') both;
-    }
-
-    &::backdrop {
-      animation: #{$prefix}-modal-fade-out 220ms ease('exit') both;
-    }
-  }
-
-  // Drawers
-  &[data-placement='left'],
-  &[data-placement='right'] {
-    margin: 0;
-    width: min(var(--_w), 100vw);
-    height: 100dvh;
-    max-height: none;
-
-    .#{$prefix}-modal__panel {
-      height: 100%;
-      border-radius: 0;
-    }
-  }
-
-  &[data-placement='right'] {
-    margin-left: auto;
-
-    &[open] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-drawer-right;
-    }
-    &[data-state='closing'] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-drawer-right-out;
-    }
-  }
-
-  &[data-placement='left'] {
-    margin-right: auto;
-
-    &[open] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-drawer-left;
-    }
-    &[data-state='closing'] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-drawer-left-out;
-    }
-  }
-
-  &[data-placement='bottom'] {
-    margin: auto auto 0;
-    width: min(var(--_w), 100vw);
-
-    .#{$prefix}-modal__panel {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    &[open] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-sheet-up;
-    }
-    &[data-state='closing'] .#{$prefix}-modal__panel {
-      animation-name: #{$prefix}-sheet-down;
-    }
-  }
-}
-
-@keyframes #{$prefix}-modal-out {
-  to { opacity: 0; transform: scale(0.96); }
-}
-@keyframes #{$prefix}-modal-fade-out {
-  to { opacity: 0; }
-}
-@keyframes #{$prefix}-drawer-right {
-  from { transform: translateX(100%); }
-}
-@keyframes #{$prefix}-drawer-right-out {
-  to { transform: translateX(100%); }
-}
-@keyframes #{$prefix}-drawer-left {
-  from { transform: translateX(-100%); }
-}
-@keyframes #{$prefix}-drawer-left-out {
-  to { transform: translateX(-100%); }
-}
-@keyframes #{$prefix}-sheet-up {
-  from { transform: translateY(100%); }
-}
-@keyframes #{$prefix}-sheet-down {
-  to { transform: translateY(100%); }
-}
-
-.#{$prefix}-modal__panel {
-  display: flex;
-  flex-direction: column;
-  max-height: inherit;
-  border: 1px solid token('border');
-  border-radius: radius('xl');
-  background: token('surface');
-  box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 12%, transparent),
-    0 30px 80px -30px token('glow');
-  overflow: hidden;
-}
-
-.#{$prefix}-modal__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 0 1.5rem;
-}
-
-.#{$prefix}-modal__title {
-  margin: 0.5rem 0 0;
-  font-size: token('text-xl');
-}
-
-.#{$prefix}-modal__description {
-  margin: 0.35rem 0 0;
-  color: token('text-muted');
-  font-size: token('text-sm');
-}
-
-.#{$prefix}-modal__body {
-  flex: 1;
-  padding: 1rem 1.5rem 1.5rem;
-  overflow-y: auto;
-}
-
-.#{$prefix}-modal__footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid token('border');
-  background: token('surface-2');
-}
-
-// ---------- Tooltip ----------
-.#{$prefix}-tooltip {
-  position: relative;
-  display: inline-flex;
-}
-
-.#{$prefix}-tooltip__content {
-  position: absolute;
-  z-index: z('tooltip');
-  width: max-content;
-  max-width: min(18rem, 80vw);
-  padding: 0.45rem 0.7rem;
-  border: 1px solid token('border-strong');
-  border-radius: radius('sm');
-  background: token('text');
-  color: token('bg');
-  font-size: token('text-sm');
-  font-weight: 500;
-  line-height: 1.4;
-  box-shadow: var(--#{$prefix}-shadow-md);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity dur('base') ease('standard'), transform dur('base') ease('standard'),
-    visibility 0s linear dur('base');
-
-  [data-state='open'] > & {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translate(var(--_tx, 0), var(--_ty, 0));
-    transition-delay: 0s;
-  }
-
-  [data-placement='top'] > & {
-    bottom: calc(100% + 0.5rem);
-    left: 50%;
-    --_tx: -50%;
-    transform: translate(-50%, 4px);
-  }
-
-  [data-placement='bottom'] > & {
-    top: calc(100% + 0.5rem);
-    left: 50%;
-    --_tx: -50%;
-    transform: translate(-50%, -4px);
-  }
-
-  [data-placement='left'] > & {
-    right: calc(100% + 0.5rem);
-    top: 50%;
-    --_ty: -50%;
-    transform: translate(4px, -50%);
-  }
-
-  [data-placement='right'] > & {
-    left: calc(100% + 0.5rem);
-    top: 50%;
-    --_ty: -50%;
-    transform: translate(-4px, -50%);
-  }
-}
+// Dialog and Drawer live in _dialog.scss; Menu in _menu.scss; Tooltip and Popover in _popover.scss.
 
 // ---------- Toast ----------
 .#{$prefix}-toast-viewport {
@@ -254,14 +17,23 @@ html.#{$prefix}-scroll-locked {
   pointer-events: none;
   max-width: 100vw;
 
-  &[data-placement^='top'] { top: 0; }
-  &[data-placement^='bottom'] { bottom: 0; }
-  &[data-placement$='right'] { right: 0; }
-  &[data-placement$='left'] { left: 0; }
-  &[data-placement='top'],
-  &[data-placement='bottom'] {
-    left: 50%;
-    transform: translateX(-50%);
+  &[data-placement^='top'] { inset-block-start: 0; }
+  &[data-placement^='bottom'] { inset-block-end: 0; }
+  &[data-placement^='middle'] {
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+  }
+  &[data-placement$='right'] { inset-inline-end: 0; }
+  &[data-placement$='left'] { inset-inline-start: 0; }
+  &[data-placement$='center'] {
+    inset-inline: 0;
+    justify-content: center;
+  }
+
+  &[data-placement='inline'] {
+    position: static;
+    padding: 0;
+    pointer-events: auto;
   }
 }
 
@@ -281,37 +53,85 @@ html.#{$prefix}-scroll-locked {
 
 .#{$prefix}-toast {
   --_text: #{token('info-text')};
+  --_c: #{token('info')};
+  --_on: #{token('on-info')};
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.9rem 0.6rem 0.9rem 1.1rem;
+  padding-block: 0.9rem;
+  padding-inline: 1.1rem 0.6rem;
   border: 1px solid token('border');
   border-radius: radius('lg');
   background: token('surface');
+  color: token('text');
   box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, var(--_text) 25%, transparent);
   overflow: hidden;
   pointer-events: auto;
-  animation: #{$prefix}-slide-in-right dur('slow') ease('emphasized') both;
+  animation: #{$prefix}-toast-in dur('slow') ease('emphasized') both;
 
   @each $c in $statuses {
     &[data-color='#{$c}'] {
       --_text: #{token('#{$c}-text')};
+      --_c: #{token($c)};
+      --_on: #{token('on-#{$c}')};
     }
   }
 
   &[data-state='closing'] {
     animation: #{$prefix}-toast-out 220ms ease('exit') both;
   }
+
+  &[data-instant] {
+    animation: none;
+  }
+
+  // Solid: filled with the theme color; every part uses the matching on- color.
+  &[data-variant='solid'] {
+    border-color: var(--_c);
+    background: var(--_c);
+    color: var(--_on);
+    --#{$prefix}-focus: var(--_on);
+
+    .#{$prefix}-toast__accent { display: none; }
+    .#{$prefix}-toast__description,
+    .#{$prefix}-toast__time,
+    .#{$prefix}-close-btn {
+      color: inherit;
+    }
+    .#{$prefix}-close-btn:hover {
+      background: transparent;
+      border-color: currentColor;
+    }
+    .#{$prefix}-toast__action {
+      border-color: currentColor;
+      color: inherit;
+
+      &:hover {
+        background: transparent;
+        text-decoration: underline;
+      }
+    }
+    .#{$prefix}-toast__timer { background: currentColor; }
+  }
+
+  &[data-appearance='translucent'] {
+    @include glass('surface');
+  }
+}
+
+@keyframes #{$prefix}-toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
 }
 
 @keyframes #{$prefix}-toast-out {
-  to { opacity: 0; transform: translateX(24px) scale(0.98); }
+  to { opacity: 0; transform: scale(0.96); }
 }
 
 .#{$prefix}-toast__accent {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset-block: 0;
+  inset-inline-start: 0;
   width: 3px;
   background: var(--_text);
   box-shadow: 0 0 12px var(--_text);
@@ -323,9 +143,37 @@ html.#{$prefix}-scroll-locked {
   padding-top: 0.15rem;
 }
 
+.#{$prefix}-toast__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.#{$prefix}-toast__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--_text);
+
+  [data-variant='solid'] & {
+    color: inherit;
+  }
+
+  svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+
 .#{$prefix}-toast__title {
+  flex: 1;
   margin: 0;
   font-weight: 700;
+}
+
+.#{$prefix}-toast__time {
+  flex-shrink: 0;
+  color: token('text-muted');
+  font-size: token('text-xs');
 }
 
 .#{$prefix}-toast__description {
@@ -354,13 +202,17 @@ html.#{$prefix}-scroll-locked {
 
 .#{$prefix}-toast__timer {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   height: 2px;
   width: 100%;
   background: var(--_text);
   transform-origin: left;
   animation: #{$prefix}-toast-timer linear forwards;
+
+  [dir='rtl'] & {
+    transform-origin: right;
+  }
 }
 
 @keyframes #{$prefix}-toast-timer {
