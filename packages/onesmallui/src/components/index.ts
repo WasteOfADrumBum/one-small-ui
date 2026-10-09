@@ -26,3 +26,5 @@ export * from './Textarea';
 export * from './Toast';
 export * from './Tooltip';
 export * from './VisuallyHidden';
+export * from './Blockquote';
+export * from './Table';
