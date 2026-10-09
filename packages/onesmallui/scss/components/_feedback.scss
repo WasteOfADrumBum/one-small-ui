@@ -3,13 +3,22 @@
 $statuses: $theme-colors;
 
 // ---------- Spinner ----------
+// Public custom properties: --os-spinner-size, --os-spinner-thickness,
+// --os-spinner-speed, --os-spinner-color.
 .#{$prefix}-spinner {
   --_spinner-size: 1.5rem;
+  --_spinner-color: #{token('primary-text')};
   display: inline-grid;
   place-items: center;
-  width: var(--_spinner-size);
-  height: var(--_spinner-size);
-  color: token('primary-text');
+  flex-shrink: 0;
+  width: var(--#{$prefix}-spinner-size, var(--_spinner-size));
+  height: var(--#{$prefix}-spinner-size, var(--_spinner-size));
+  color: var(--#{$prefix}-spinner-color, var(--_spinner-color));
+  vertical-align: middle;
+
+  &[data-size='xs'] {
+    --_spinner-size: 0.75rem;
+  }
 
   &[data-size='sm'] {
     --_spinner-size: 1rem;
@@ -18,16 +27,44 @@ $statuses: $theme-colors;
   &[data-size='lg'] {
     --_spinner-size: 2.5rem;
   }
+
+  &[data-size='xl'] {
+    --_spinner-size: 3.5rem;
+  }
+}
+
+.#{$prefix}-btn .#{$prefix}-spinner {
+  --_spinner-size: 1.1em;
+  --_spinner-color: currentColor;
+}
+
+.#{$prefix}-spinner {
+  @each $c in $statuses {
+    &[data-color='#{$c}'] {
+      --_spinner-color: #{token('#{$c}-text')};
+    }
+  }
+
+  &[data-color='current'] {
+    --_spinner-color: currentColor;
+  }
 }
 
 .#{$prefix}-spinner__ring {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
+  border: var(--#{$prefix}-spinner-thickness, 2px) solid color-mix(in srgb, currentColor 22%, transparent);
   border-top-color: currentColor;
-  animation: #{$prefix}-spin 0.8s linear infinite;
+  animation: #{$prefix}-spin var(--#{$prefix}-spinner-speed, 0.8s) linear infinite;
   box-shadow: 0 0 10px -2px currentColor;
+
+  [data-variant='grow'] > & {
+    border: 0;
+    background: currentColor;
+    box-shadow: 0 0 12px -2px currentColor;
+    animation: #{$prefix}-spinner-grow var(--#{$prefix}-spinner-speed, 0.9s) ease-in-out infinite;
+  }
 
   @include reduced-motion {
     animation: #{$prefix}-pulse 1.6s ease-in-out infinite !important;
@@ -36,9 +73,19 @@ $statuses: $theme-colors;
   }
 }
 
-.#{$prefix}-btn .#{$prefix}-spinner {
-  --_spinner-size: 1.1em;
-  color: currentColor;
+@keyframes #{$prefix}-spinner-grow {
+  0% {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
 }
 
 // ---------- Badge ----------
@@ -90,6 +137,84 @@ $statuses: $theme-colors;
     font-size: 0.75rem;
     padding: 0.1em 0.5em;
   }
+
+  &[data-size='lg'] {
+    font-size: token('text-sm');
+    padding: 0.3em 0.8em;
+  }
+
+  // Follows the parent's font size: inside an <h2>, a button or a paragraph.
+  &[data-size='inherit'] {
+    font-size: 0.7em;
+    padding: 0.25em 0.6em;
+  }
+
+  &[data-shape='rounded'] {
+    border-radius: radius('sm');
+  }
+
+  // Pinned to a corner of the nearest positioned parent.
+  &[data-placement] {
+    position: absolute;
+    z-index: 1;
+    min-width: 1.6em;
+    justify-content: center;
+    box-shadow: 0 0 0 2px token('surface');
+    pointer-events: none;
+  }
+
+  &[data-placement^='top'] {
+    inset-block-start: 0;
+  }
+
+  &[data-placement^='bottom'] {
+    inset-block-end: 0;
+  }
+
+  &[data-placement='top-end'] {
+    inset-inline-end: 0;
+    transform: translate(calc(50% * var(--#{$prefix}-dir)), -50%);
+  }
+
+  &[data-placement='top-start'] {
+    inset-inline-start: 0;
+    transform: translate(calc(-50% * var(--#{$prefix}-dir)), -50%);
+  }
+
+  &[data-placement='bottom-end'] {
+    inset-inline-end: 0;
+    transform: translate(calc(50% * var(--#{$prefix}-dir)), 50%);
+  }
+
+  &[data-placement='bottom-start'] {
+    inset-inline-start: 0;
+    transform: translate(calc(-50% * var(--#{$prefix}-dir)), 50%);
+  }
+
+  // A bare notification dot.
+  &[data-dot-only] {
+    width: 0.8rem;
+    height: 0.8rem;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--_solid);
+
+    &[data-pulse] {
+      animation: #{$prefix}-glow-pulse 1.8s ease-in-out infinite;
+    }
+  }
+}
+
+.#{$prefix}-badge-anchor {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+:where(:has(> .#{$prefix}-badge[data-placement])) {
+  position: relative;
 }
 
 .#{$prefix}-badge__dot {
@@ -112,7 +237,8 @@ $statuses: $theme-colors;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 1rem 1rem 1rem 1.25rem;
+  padding-block: 1rem;
+  padding-inline: 1.25rem 1rem;
   border: 1px solid color-mix(in srgb, var(--_text) 30%, transparent);
   border-radius: radius('lg');
   background: var(--_soft);
@@ -123,7 +249,8 @@ $statuses: $theme-colors;
   &::before {
     content: '';
     position: absolute;
-    inset: 0 auto 0 0;
+    inset-block: 0;
+    inset-inline-start: 0;
     width: 4px;
     background: var(--_text);
     box-shadow: 0 0 12px var(--_text);
@@ -136,8 +263,14 @@ $statuses: $theme-colors;
     }
   }
 
-  .#{$prefix}-close-btn {
-    margin: -0.6rem -0.5rem -0.6rem auto;
+  > .#{$prefix}-close-btn {
+    margin-block: -0.6rem;
+    margin-inline: auto -0.5rem;
+    color: var(--_text);
+
+    &:hover {
+      color: token('text');
+    }
   }
 }
 
@@ -164,26 +297,51 @@ $statuses: $theme-colors;
   color: var(--_text);
 }
 
+.#{$prefix}-alert__heading {
+  margin: 0 0 0.5rem;
+  font-size: token('text-lg');
+  font-weight: 700;
+  line-height: $line-height-tight;
+  color: var(--_text);
+}
+
 .#{$prefix}-alert__body {
   font-size: token('text-sm');
 
   > :last-child {
     margin-bottom: 0;
   }
+
+  hr {
+    margin-block: 0.75rem;
+    border: 0;
+    border-block-start: 1px solid color-mix(in srgb, var(--_text) 35%, transparent);
+  }
+}
+
+// Links keep their underline so they are not identified by color alone (1.4.1).
+.#{$prefix}-alert__link {
+  color: var(--_text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  border-radius: 2px;
+  @include focus-ring;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
 }
 
 // ---------- Progress ----------
 .#{$prefix}-progress {
-  --_bar: #{token('primary')};
+  --_c: #{token('primary')};
+  --_on: #{token('on-primary')};
   --_h: 0.5rem;
   display: grid;
   gap: 0.4rem;
-
-  @each $c in $statuses {
-    &[data-color='#{$c}'] {
-      --_bar: #{token($c)};
-    }
-  }
+  @include color-vars;
 
   &[data-size='sm'] {
     --_h: 0.25rem;
@@ -191,6 +349,15 @@ $statuses: $theme-colors;
 
   &[data-size='lg'] {
     --_h: 0.875rem;
+  }
+
+  // Tall enough to hold a text label.
+  &[data-inside] {
+    --_h: 1.375rem;
+
+    &[data-size='lg'] {
+      --_h: 1.75rem;
+    }
   }
 }
 
@@ -203,7 +370,8 @@ $statuses: $theme-colors;
 
 .#{$prefix}-progress__track {
   position: relative;
-  height: var(--_h);
+  display: flex;
+  height: var(--#{$prefix}-progress-height, var(--_h));
   border-radius: radius('full');
   background: token('surface-3');
   box-shadow: inset 0 0 0 1px token('border');
@@ -211,33 +379,142 @@ $statuses: $theme-colors;
 }
 
 .#{$prefix}-progress__bar {
-  display: block;
+  @include color-vars;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
   height: 100%;
+  min-width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--_bar) 70%, transparent), var(--_bar));
-  box-shadow: 0 0 12px var(--_bar);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--_c) 70%, transparent), var(--_c));
+  box-shadow: 0 0 12px var(--_c);
+  overflow: hidden;
   transition: width dur('slow') ease('standard');
 
   [data-indeterminate] > & {
     width: 40%;
     animation: #{$prefix}-scan 1.4s ease('standard') infinite;
   }
+
+  // Solid fill wherever text sits on the bar, so on-<color> keeps 7:1.
+  [data-inside] & {
+    background: var(--_c);
+  }
+
+  &[data-striped] {
+    background-color: var(--_c);
+    background-image: linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--_on) 18%, transparent) 25%,
+      transparent 25%,
+      transparent 50%,
+      color-mix(in srgb, var(--_on) 18%, transparent) 50%,
+      color-mix(in srgb, var(--_on) 18%, transparent) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 1rem 1rem;
+  }
+
+  &[data-animated] {
+    animation: #{$prefix}-progress-stripes 1s linear infinite;
+  }
 }
 
-// ---------- Skeleton ----------
+.#{$prefix}-progress__value {
+  padding-inline: 0.5rem;
+  color: var(--_on);
+  font-size: token('text-xs');
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+// Stacked segments share one track.
+.#{$prefix}-progress-stack .#{$prefix}-progress__bar {
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--_c);
+
+  &:not(:last-child) {
+    border-inline-end: 2px solid token('surface');
+  }
+}
+
+.#{$prefix}-progress__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: token('text-sm');
+
+  li {
+    @include color-vars;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.#{$prefix}-progress__swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: radius('sm');
+  background: var(--_c);
+}
+
+.#{$prefix}-progress__legend-value {
+  color: token('text-muted');
+}
+
+@keyframes #{$prefix}-progress-stripes {
+  from {
+    background-position: 1rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+// ---------- Skeleton / Placeholder ----------
 .#{$prefix}-skeleton-group {
   display: grid;
   gap: 0.5rem;
+}
+
+.#{$prefix}-skeleton,
+.#{$prefix}-placeholder {
+  --_base: #{token('surface-3')};
+  --_hi: #{token('surface-2')};
+  @include color-vars;
+  border-radius: radius('sm');
+  background: linear-gradient(90deg, var(--_base) 25%, var(--_hi) 50%, var(--_base) 75%);
+  background-size: 200% 100%;
+  animation: #{$prefix}-shimmer 1.6s linear infinite;
+
+  &[data-color] {
+    --_base: color-mix(in srgb, var(--_c) 35%, #{token('surface')});
+    --_hi: color-mix(in srgb, var(--_c) 18%, #{token('surface')});
+  }
+
+  &[data-animation='pulse'] {
+    background: var(--_base);
+    animation: #{$prefix}-pulse 1.8s ease-in-out infinite;
+  }
+
+  &[data-animation='none'] {
+    background: var(--_base);
+    animation: none;
+  }
 }
 
 .#{$prefix}-skeleton {
   display: block;
   width: 100%;
   height: 1rem;
-  border-radius: radius('sm');
-  background: linear-gradient(90deg, token('surface-3') 25%, token('surface-2') 50%, token('surface-3') 75%);
-  background-size: 200% 100%;
-  animation: #{$prefix}-shimmer 1.6s linear infinite;
 
   &[data-shape='text'] {
     height: 0.9em;
@@ -256,6 +533,26 @@ $statuses: $theme-colors;
   }
 }
 
+// Inline, em-sized: stands in for words inside headings, paragraphs and buttons.
+.#{$prefix}-placeholder {
+  display: inline-block;
+  min-height: 1em;
+  vertical-align: middle;
+  cursor: wait;
+
+  &[data-size='xs'] {
+    min-height: 0.6em;
+  }
+
+  &[data-size='sm'] {
+    min-height: 0.8em;
+  }
+
+  &[data-size='lg'] {
+    min-height: 1.2em;
+  }
+}
+
 // ---------- Avatar ----------
 .#{$prefix}-avatar {
   --_size: 2.5rem;
@@ -271,14 +568,28 @@ $statuses: $theme-colors;
   font-weight: 700;
   font-size: calc(var(--_size) * 0.38);
   box-shadow: 0 0 0 2px token('surface'), 0 0 0 3px token('border');
+  @include color-vars;
+
+  &[data-color] {
+    background: var(--_soft);
+    color: var(--_text);
+  }
 
   &[data-shape='square'] {
     border-radius: radius('md');
   }
 
+  &[data-size='xs'] { --_size: 1.5rem; }
   &[data-size='sm'] { --_size: 2rem; }
   &[data-size='lg'] { --_size: 3.5rem; }
   &[data-size='xl'] { --_size: 5rem; }
+  &[data-size='2xl'] { --_size: 6.5rem; }
+
+  &[data-overflow] {
+    background: token('surface-3');
+    color: token('text');
+    font-size: calc(var(--_size) * 0.32);
+  }
 }
 
 .#{$prefix}-avatar__img {
@@ -291,7 +602,7 @@ $statuses: $theme-colors;
 .#{$prefix}-avatar__status {
   position: absolute;
   inset-inline-end: 0;
-  bottom: 0;
+  inset-block-end: 0;
   width: 28%;
   height: 28%;
   min-width: 0.6rem;
@@ -303,4 +614,24 @@ $statuses: $theme-colors;
   &[data-status='away'] { background: token('warning'); }
   &[data-status='busy'] { background: token('danger'); }
   &[data-status='offline'] { background: token('border-strong'); }
+}
+
+// Overlapping stack. Each avatar's ring separates it from the one beneath.
+.#{$prefix}-avatar-group {
+  --_overlap: -0.25;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-inline-start: 3px;
+
+  &[data-spacing='tight'] { --_overlap: -0.4; }
+  &[data-spacing='loose'] { --_overlap: -0.1; }
+
+  > .#{$prefix}-avatar + .#{$prefix}-avatar {
+    margin-inline-start: calc(var(--_size) * var(--_overlap));
+  }
+
+  > .#{$prefix}-avatar:hover {
+    z-index: 1;
+  }
 }
