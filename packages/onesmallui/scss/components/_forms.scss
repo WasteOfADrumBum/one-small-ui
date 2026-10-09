@@ -1,10 +1,16 @@
 @use '../abstracts' as *;
+@use 'form-mixins' as fm;
 
 // ---------- Field ----------
 .#{$prefix}-field {
   display: grid;
   gap: 0.4rem;
   min-width: 0;
+}
+
+// The body only matters for horizontal, inline and floating layouts.
+.#{$prefix}-field__body {
+  display: contents;
 }
 
 .#{$prefix}-field__label {
@@ -24,14 +30,15 @@
   color: token('text-muted');
 }
 
-.#{$prefix}-field__error {
+.#{$prefix}-field__error,
+.#{$prefix}-field__success {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   margin: 0;
   font-size: token('text-sm');
   font-weight: 600;
-  color: token('danger-text');
+  color: fm.$invalid-color;
   animation: #{$prefix}-fade-up dur('base') ease('standard') both;
 
   svg {
@@ -41,47 +48,206 @@
   }
 }
 
-// ---------- Shared control look ----------
-%control {
-  width: 100%;
-  min-height: $target-size;
-  border: 1px solid token('border-strong');
-  border-radius: radius('md');
-  background: token('surface');
-  color: token('text');
-  transition: border-color dur('base') ease('standard'), box-shadow dur('base') ease('standard'),
-    background-color dur('base') ease('standard');
+.#{$prefix}-field__success {
+  color: fm.$valid-color;
+}
 
-  &:hover {
-    border-color: token('text-muted');
+@mixin field-horizontal {
+  @include up(sm) {
+    grid-template-columns: var(--#{$prefix}-field-label-width, 10rem) minmax(0, 1fr);
+    align-items: start;
+    column-gap: 1rem;
+
+    > .#{$prefix}-field__label {
+      // Center the first line of the label on a default-height control.
+      padding-block-start: calc((#{$target-size} - 1.5em) / 2);
+    }
+
+    > .#{$prefix}-field__body {
+      display: grid;
+      gap: 0.4rem;
+      min-width: 0;
+    }
   }
 }
 
-%control-focus {
-  border-color: token('focus');
-  box-shadow: 0 0 0 3px token('glow'), 0 0 0 1px token('focus');
-  outline: 3px solid transparent; // keeps a visible ring in forced-colors mode
+.#{$prefix}-field[data-layout='horizontal'] {
+  @include field-horizontal;
 }
 
-%control-invalid {
-  border-color: token('danger-text');
-  box-shadow: 0 0 0 1px token('danger-text');
+.#{$prefix}-field[data-layout='inline'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 0.75rem;
+
+  > .#{$prefix}-field__label {
+    padding-block-start: calc((#{$target-size} - 1.5em) / 2);
+  }
+
+  > .#{$prefix}-field__body {
+    display: grid;
+    gap: 0.4rem;
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+}
+
+// Feedback as a bubble anchored under the control.
+.#{$prefix}-field[data-feedback='tooltip'] {
+  position: relative;
+
+  .#{$prefix}-field__live {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    z-index: 5;
+    max-width: 100%;
+  }
+
+  .#{$prefix}-field__error,
+  .#{$prefix}-field__success {
+    position: relative;
+    margin-block-start: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: radius('sm');
+    background: token('danger');
+    color: token('on-danger');
+    box-shadow: var(--#{$prefix}-shadow-md);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block-start: -0.3rem;
+      inset-inline-start: 1rem;
+      width: 0.6rem;
+      height: 0.6rem;
+      background: inherit;
+      rotate: 45deg;
+    }
+  }
+
+  .#{$prefix}-field__success {
+    background: token('success');
+    color: token('on-success');
+  }
+}
+
+// ---------- Floating labels ----------
+.#{$prefix}-field__float {
+  position: relative;
+  display: grid;
+  min-width: 0;
+}
+
+.#{$prefix}-field[data-layout='floating'] {
+  --_float-h: 3.5rem;
+
+  .#{$prefix}-field__float > .#{$prefix}-field__label {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: calc(0.875rem + 1px);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: var(--_float-h);
+    max-width: calc(100% - 3rem);
+    overflow: hidden;
+    font-size: token('text-base');
+    font-weight: 400;
+    color: token('text-muted');
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    transform-origin: calc(50% - 50% * var(--#{$prefix}-dir, 1)) 50%;
+    transition: transform dur('base') ease('standard'), color dur('base') ease('standard');
+  }
+
+  &:has(.#{$prefix}-input__adornment[data-position='start'], .#{$prefix}-select__adornment)
+    .#{$prefix}-field__float
+    > .#{$prefix}-field__label {
+    inset-inline-start: 2.75rem;
+  }
+
+  .#{$prefix}-input,
+  .#{$prefix}-select__control,
+  .#{$prefix}-combobox__control,
+  .#{$prefix}-datepicker__button {
+    --_h: var(--_float-h);
+  }
+
+  .#{$prefix}-input {
+    align-items: stretch;
+  }
+
+  .#{$prefix}-input__adornment {
+    align-self: center;
+  }
+
+  .#{$prefix}-input__control {
+    padding-block: 1.375rem 0.375rem;
+  }
+
+  .#{$prefix}-textarea {
+    padding-block-start: 1.75rem;
+  }
+
+  .#{$prefix}-select__control,
+  .#{$prefix}-combobox__control,
+  .#{$prefix}-datepicker__button {
+    padding-block-start: 1.125rem;
+  }
+
+  // Placeholders appear only once the label has moved out of the way.
+  :is(input, textarea)::placeholder {
+    color: transparent;
+  }
+
+  :is(input, textarea):focus::placeholder {
+    color: token('text-muted');
+  }
+
+  &[data-float='always'],
+  &:focus-within,
+  &:has(:is(input, textarea):not(:placeholder-shown)),
+  &:has(select, .#{$prefix}-datepicker__button, .#{$prefix}-combobox .#{$prefix}-chip),
+  &:has(input:is([type='date'], [type='time'], [type='datetime-local'], [type='month'], [type='week'], [type='color'], [type='file'])) {
+    .#{$prefix}-field__float > .#{$prefix}-field__label {
+      color: token('text');
+      font-weight: 600;
+      transform: translateY(-0.875rem) scale(0.8);
+    }
+
+    :is(input, textarea)::placeholder {
+      color: token('text-muted');
+    }
+  }
+
+  &[data-disabled] .#{$prefix}-field__float > .#{$prefix}-field__label {
+    opacity: 0.6;
+  }
 }
 
 // ---------- Input ----------
 .#{$prefix}-input {
-  @extend %control;
+  @include fm.control-sizes;
+  @include fm.control;
+  @include fm.control-hit-area;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0 0.875rem;
+  padding: 0 var(--_px);
+  cursor: text;
+
+  @include fm.validation-states('> .#{$prefix}-input__control');
 
   &:focus-within {
-    @extend %control-focus;
+    @include fm.control-focus;
   }
 
-  &[data-invalid] {
-    @extend %control-invalid;
+  &[data-readonly] {
+    background: token('surface-2');
   }
 
   &[data-disabled] {
@@ -89,14 +255,27 @@
     cursor: not-allowed;
   }
 
-  &[data-size='sm'] {
-    min-height: 2.5rem;
-    font-size: token('text-sm');
+  &[data-variant='ghost']:not(:focus-within) {
+    @include fm.control-ghost;
   }
 
-  &[data-size='lg'] {
-    min-height: 3.25rem;
-    font-size: token('text-lg');
+  &[data-variant='plaintext'] {
+    border-color: transparent;
+    background: transparent;
+    padding-inline: 0;
+
+    &:focus-within {
+      padding-inline: 0.5rem;
+    }
+  }
+
+  // Native pickers: date, time, color and file inputs.
+  &[data-type='color'] {
+    padding-inline: 0.375rem;
+  }
+
+  &[data-type='file'] {
+    padding-inline-start: 0.3125rem;
   }
 }
 
@@ -104,40 +283,149 @@
   flex: 1;
   min-width: 0;
   height: 100%;
-  min-height: inherit;
+  min-height: calc(var(--_h) - 2px);
   padding: 0;
   border: 0;
   background: transparent;
+  color: inherit;
+  font: inherit;
   outline: none;
 
   &::placeholder {
     color: token('text-muted');
     opacity: 1;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &::-webkit-calendar-picker-indicator {
+    padding: 0.25rem;
+    border-radius: radius('sm');
+    cursor: pointer;
+
+    &:hover {
+      background-color: token('surface-3');
+    }
+  }
+
+  &::-webkit-datetime-edit {
+    padding: 0;
+  }
+
+  &[type='color'] {
+    flex: 0 0 auto;
+    width: 3.5rem;
+    height: calc(var(--_h) - 0.75rem);
+    min-height: 0;
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: 1px solid token('border-strong');
+      border-radius: radius('sm');
+    }
+
+    &::-moz-color-swatch {
+      border: 1px solid token('border-strong');
+      border-radius: radius('sm');
+    }
+  }
+
+  &[type='file'] {
+    align-self: stretch;
+    padding-block: 0.25rem;
+    color: token('text-muted');
+    cursor: pointer;
+
+    &::file-selector-button {
+      min-height: calc(var(--_h) - 0.625rem - 2px);
+      margin-inline-end: 0.75rem;
+      padding: 0 0.875rem;
+      border: 1px solid color-mix(in srgb, token('primary-text') 30%, transparent);
+      border-radius: radius('sm');
+      background: token('primary-soft');
+      color: token('primary-text');
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    &:hover::file-selector-button {
+      border-color: token('primary-text');
+    }
+  }
 }
 
 .#{$prefix}-input__adornment {
+  --_adornment-size: var(--#{$prefix}-adornment-size, 1.15rem);
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   color: token('text-muted');
   font-size: token('text-sm');
 
   svg {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: var(--_adornment-size);
+    height: var(--_adornment-size);
+  }
+
+  // Small buttons inside the control (clear, show password, calendar).
+  > button {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    margin-inline-end: calc(var(--_px) * -0.5);
+    padding: 0 0.375rem;
+    border: 0;
+    border-radius: radius('sm');
+    background: transparent;
+    color: token('text-muted');
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    @include focus-ring;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -0.25rem;
+    }
+
+    &:hover {
+      background: token('surface-3');
+      color: token('text');
+    }
   }
 }
 
 // ---------- Textarea ----------
 .#{$prefix}-textarea {
-  @extend %control;
+  @include fm.control;
   display: block;
   padding: 0.75rem 0.875rem;
   line-height: 1.5;
   resize: vertical;
 
-  &:focus-visible {
-    @extend %control-focus;
+  &[data-size='xs'] {
+    padding: 0.375rem 0.5rem;
+    font-size: token('text-xs');
+  }
+
+  &[data-size='sm'] {
+    padding: 0.5rem 0.75rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    padding: 0.875rem 1rem;
+    font-size: token('text-lg');
   }
 
   &::placeholder {
@@ -146,7 +434,33 @@
   }
 
   &[aria-invalid='true'] {
-    @extend %control-invalid;
+    @include fm.control-invalid;
+  }
+
+  @include fm.validation-states;
+
+  &:focus-visible {
+    @include fm.control-focus;
+  }
+
+  &:read-only {
+    background: token('surface-2');
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &[data-variant='ghost']:not(:focus-visible) {
+    @include fm.control-ghost;
+  }
+
+  &[data-variant='plaintext'] {
+    border-color: transparent;
+    background: transparent;
+    padding-inline: 0;
+    resize: none;
   }
 
   &[data-auto-resize] {
@@ -157,33 +471,71 @@
 
 // ---------- Select ----------
 .#{$prefix}-select {
+  @include fm.control-sizes;
+  @include fm.control-hit-area;
   position: relative;
   display: flex;
+  border-radius: radius('md');
 
-  &[data-invalid] .#{$prefix}-select__control {
-    @extend %control-invalid;
+  > .#{$prefix}-select__control {
+    @include fm.validation-states;
+  }
+
+  &[data-invalid] > .#{$prefix}-select__control {
+    @include fm.control-invalid;
+  }
+
+  &[data-valid] > .#{$prefix}-select__control {
+    @include fm.control-valid;
+  }
+
+  &[data-variant='ghost'] > .#{$prefix}-select__control:not(:focus-visible) {
+    @include fm.control-ghost;
+  }
+
+  &[data-disabled] {
+    opacity: 0.6;
   }
 }
 
 .#{$prefix}-select__control {
-  @extend %control;
+  @include fm.control;
   appearance: none;
-  padding: 0 2.5rem 0 0.875rem;
+  padding: 0 2.5rem 0 var(--_px);
+  padding-inline: var(--_px) 2.5rem;
+  font-size: inherit;
   cursor: pointer;
 
   &:focus-visible {
-    @extend %control-focus;
+    @include fm.control-focus;
   }
 
-  [data-size='sm'] > & {
-    min-height: 2.5rem;
-    font-size: token('text-sm');
+  &:disabled {
+    cursor: not-allowed;
   }
 
-  [data-size='lg'] > & {
-    min-height: 3.25rem;
-    font-size: token('text-lg');
+  [data-adorned] > & {
+    padding-inline-start: 2.75rem;
   }
+
+  // Multiple / size > 1: a list box, no chevron.
+  [data-multiple] > & {
+    padding: 0.375rem;
+    overflow-y: auto;
+
+    option {
+      padding: 0.375rem 0.5rem;
+      border-radius: radius('sm');
+    }
+  }
+}
+
+.#{$prefix}-select__adornment {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0.875rem;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .#{$prefix}-select__chevron {
@@ -198,13 +550,33 @@
 }
 
 // ---------- Checkbox / Radio ----------
+.#{$prefix}-check,
+.#{$prefix}-switch {
+  --_c: #{token('primary')};
+  --_on: #{token('on-primary')};
+  --_soft: #{token('primary-soft')};
+  --_text: #{token('primary-text')};
+  @include color-vars;
+}
+
 .#{$prefix}-check {
+  --_box: 1.375rem;
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
   min-height: $target-size;
   padding-block: 0.6rem;
+
+  &[data-size='sm'] {
+    --_box: 1.125rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    --_box: 1.75rem;
+    font-size: token('text-lg');
+  }
 
   &[data-disabled] {
     opacity: 0.6;
@@ -237,19 +609,19 @@
   display: inline-grid;
   place-items: center;
   flex-shrink: 0;
-  width: 1.375rem;
-  height: 1.375rem;
-  margin-top: 0.1rem;
+  width: var(--_box);
+  height: var(--_box);
+  margin-top: calc((1.6em - var(--_box)) / 2);
   border: 2px solid token('border-strong');
   border-radius: radius('sm');
   background: token('surface');
-  color: token('on-primary');
+  color: var(--_on);
   transition: background-color dur('base') ease('standard'), border-color dur('base') ease('standard'),
     box-shadow dur('base') ease('standard');
 
   svg {
-    width: 0.95rem;
-    height: 0.95rem;
+    width: calc(var(--_box) * 0.7);
+    height: calc(var(--_box) * 0.7);
   }
 
   path {
@@ -260,7 +632,7 @@
 }
 
 .#{$prefix}-check__input:hover + .#{$prefix}-check__box {
-  border-color: token('primary-text');
+  border-color: var(--_text);
 }
 
 .#{$prefix}-check__input:focus-visible + .#{$prefix}-check__box {
@@ -271,14 +643,24 @@
 
 .#{$prefix}-check__input:checked + .#{$prefix}-check__box,
 .#{$prefix}-check__input[data-indeterminate] + .#{$prefix}-check__box {
-  border-color: token('primary');
-  background: token('primary');
-  box-shadow: 0 0 12px -2px token('primary');
+  // The border uses the text-strength color so the box keeps 3:1 even for light fills.
+  border-color: var(--_text);
+  background: var(--_c);
+  box-shadow: 0 0 12px -2px var(--_c);
 }
 
 .#{$prefix}-check__input:checked:not([data-indeterminate]) + .#{$prefix}-check__box .#{$prefix}-check__tick,
 .#{$prefix}-check__input[data-indeterminate] + .#{$prefix}-check__box .#{$prefix}-check__dash {
   stroke-dashoffset: 0;
+}
+
+.#{$prefix}-check[data-invalid] .#{$prefix}-check__box,
+.#{$prefix}-check__input:user-invalid + .#{$prefix}-check__box {
+  border-color: fm.$invalid-color;
+}
+
+.#{$prefix}-form[data-validated] .#{$prefix}-check__input:invalid + .#{$prefix}-check__box {
+  border-color: fm.$invalid-color;
 }
 
 .#{$prefix}-check__text {
@@ -302,10 +684,10 @@
 
   &::after {
     content: '';
-    width: 0.55rem;
-    height: 0.55rem;
+    width: calc(var(--_box) * 0.4);
+    height: calc(var(--_box) * 0.4);
     border-radius: 50%;
-    background: token('on-primary');
+    background: var(--_on);
     transform: scale(0);
     transition: transform dur('base') ease('emphasized');
   }
@@ -332,6 +714,15 @@
       column-gap: 1.75rem;
     }
   }
+
+  &[data-variant='card'] .#{$prefix}-radio-group__options {
+    display: grid;
+    gap: 0.75rem;
+
+    @include up(sm) {
+      grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    }
+  }
 }
 
 .#{$prefix}-radio-group__options {
@@ -339,8 +730,48 @@
   flex-direction: column;
 }
 
+// Choice cards: the whole card is the hit area.
+.#{$prefix}-check[data-variant='card'],
+.#{$prefix}-switch[data-variant='card'] {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid token('border-strong');
+  border-radius: radius('md');
+  background: token('surface');
+  transition: border-color dur('base') ease('standard'), background-color dur('base') ease('standard'),
+    box-shadow dur('base') ease('standard');
+
+  .#{$prefix}-check__input {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    border-color: var(--_text);
+  }
+
+  &:has(:checked) {
+    border-color: var(--_text);
+    background: var(--_soft);
+    box-shadow: 0 0 0 1px var(--_text);
+
+    .#{$prefix}-check__description {
+      color: token('text');
+    }
+  }
+
+  &:has(:focus-visible) {
+    outline: 3px solid token('focus');
+    outline-offset: 2px;
+  }
+}
+
 // ---------- Switch ----------
 .#{$prefix}-switch {
+  --_w: var(--#{$prefix}-switch-width, 2.875rem);
+  --_th: 1.625rem;
+  --_thumb: calc(var(--_th) - 8px);
   position: relative;
   display: flex;
   width: fit-content;
@@ -348,6 +779,18 @@
   gap: 0.75rem;
   min-height: $target-size;
   padding-block: 0.55rem;
+
+  &[data-size='sm'] {
+    --_w: var(--#{$prefix}-switch-width, 2.25rem);
+    --_th: 1.25rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    --_w: var(--#{$prefix}-switch-width, 3.5rem);
+    --_th: 2rem;
+    font-size: token('text-lg');
+  }
 
   &[data-label-position='start'] {
     flex-direction: row-reverse;
@@ -377,8 +820,9 @@
 .#{$prefix}-switch__track {
   position: relative;
   flex-shrink: 0;
-  width: 2.875rem;
-  height: 1.625rem;
+  width: var(--_w);
+  height: var(--_th);
+  margin-top: calc((1.6em - var(--_th)) / 2);
   border: 2px solid token('border-strong');
   border-radius: radius('full');
   background: token('surface-3');
@@ -386,15 +830,16 @@
     box-shadow dur('base') ease('standard');
 }
 
+// Positioned with a logical inset (not a transform), so it slides the right way in RTL.
 .#{$prefix}-switch__thumb {
   position: absolute;
   top: 2px;
   inset-inline-start: 2px;
-  width: 1.125rem;
-  height: 1.125rem;
+  width: var(--_thumb);
+  height: var(--_thumb);
   border-radius: 50%;
   background: token('text-muted');
-  transition: transform dur('slow') ease('emphasized'), background-color dur('base') ease('standard');
+  transition: inset-inline-start dur('slow') ease('emphasized'), background-color dur('base') ease('standard');
 }
 
 .#{$prefix}-switch__input:focus-visible ~ .#{$prefix}-switch__track {
@@ -404,12 +849,121 @@
 }
 
 .#{$prefix}-switch__input:checked ~ .#{$prefix}-switch__track {
-  border-color: token('primary');
-  background: token('primary');
-  box-shadow: 0 0 14px -2px token('primary');
+  border-color: var(--_text);
+  background: var(--_c);
+  box-shadow: 0 0 14px -2px var(--_c);
 
   .#{$prefix}-switch__thumb {
-    transform: translateX(calc(1.25rem * var(--#{$prefix}-dir, 1)));
-    background: token('on-primary');
+    inset-inline-start: calc(100% - var(--_thumb) - 2px);
+    background: var(--_on);
+  }
+}
+
+.#{$prefix}-switch[data-invalid] .#{$prefix}-switch__track {
+  border-color: fm.$invalid-color;
+}
+
+// ---------- FieldGroup (fieldset) ----------
+.#{$prefix}-field-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &[data-variant='card'] {
+    padding: 0 1.25rem 1.25rem;
+    border: 1px solid token('border-strong');
+    border-radius: radius('lg');
+    background: token('surface');
+
+    > .#{$prefix}-field-group__legend {
+      // A legend can't be a flex/grid item, so pull it inside the card with a band.
+      float: inline-start;
+      width: calc(100% + 2.5rem);
+      margin-inline: -1.25rem;
+      margin-block-end: 1rem;
+      padding: 0.875rem 1.25rem;
+      border-block-end: 1px solid token('border');
+      border-start-start-radius: radius('lg');
+      border-start-end-radius: radius('lg');
+      background: token('surface-2');
+      font-size: token('text-base');
+
+      + * {
+        clear: both;
+      }
+    }
+  }
+
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.#{$prefix}-field-group__legend {
+  padding: 0;
+  margin-block-end: 0.5rem;
+  font-size: token('text-sm');
+  font-weight: 700;
+  color: token('text');
+}
+
+.#{$prefix}-field-group__description {
+  margin: 0 0 0.75rem;
+  font-size: token('text-sm');
+  color: token('text-muted');
+}
+
+.#{$prefix}-field-group__body {
+  display: grid;
+  gap: 1rem;
+
+  [data-layout='inline'] > & {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 1.75rem;
+    row-gap: 0;
+  }
+
+  [data-layout='grid'] > & {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--#{$prefix}-field-group-min, 14rem)), 1fr));
+  }
+
+  // Checks and switches already carry 44px of height; keep stacked ones tight.
+  [data-layout='stack'] > &:has(> .#{$prefix}-check:not([data-variant='card']), > .#{$prefix}-switch:not([data-variant='card'])) {
+    gap: 0;
+  }
+}
+
+// ---------- Form layouts ----------
+.#{$prefix}-form {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+
+  &[data-layout='horizontal'] .#{$prefix}-field[data-layout='vertical'] {
+    @include field-horizontal;
+  }
+
+  &[data-layout='inline'] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem 1rem;
+
+    > * {
+      flex: 1 1 12rem;
+    }
+
+    > :is(.#{$prefix}-btn, button, .#{$prefix}-check, .#{$prefix}-switch) {
+      flex: 0 0 auto;
+    }
+  }
+
+  &[data-layout='grid'] {
+    @include up(md) {
+      grid-template-columns: repeat(var(--#{$prefix}-form-cols, 2), minmax(0, 1fr));
+    }
   }
 }
