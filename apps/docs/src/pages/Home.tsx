@@ -1,5 +1,6 @@
 import { Badge, Button, Card, CardBody, CardHeader, Grid, Progress, Switch } from 'onesmallui';
 import { Code } from '../site/Code';
+import { SolarSystem } from '../site/SolarSystem';
 
 const features = [
   { title: 'WCAG 2.2 AAA', body: 'Every text and background pair is verified at 7:1. 44px targets, visible focus, reduced motion, full keyboard support.' },
@@ -9,35 +10,6 @@ const features = [
   { title: 'Utilities', body: 'Tailwind-style responsive atoms (md:os-grid-cols-3) with Bootstrap-friendly names.' },
   { title: 'Drag & drop', body: 'Upload drop zones with validation and previews, and sortable lists that work by mouse, touch or keyboard.' },
 ];
-
-function Orbit() {
-  return (
-    <svg className="docs-orbit" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="orbit-g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--os-primary)" />
-          <stop offset="1" stopColor="var(--os-accent)" />
-        </linearGradient>
-      </defs>
-      <circle cx="200" cy="200" r="70" className="docs-orbit__core" />
-      <g className="docs-orbit__ring docs-orbit__ring--1">
-        <circle cx="200" cy="200" r="110" />
-        <circle cx="310" cy="200" r="6" className="docs-orbit__planet" />
-      </g>
-      <g className="docs-orbit__ring docs-orbit__ring--2">
-        <circle cx="200" cy="200" r="150" strokeDasharray="4 10" />
-        <circle cx="200" cy="50" r="9" className="docs-orbit__planet" />
-      </g>
-      <g className="docs-orbit__ring docs-orbit__ring--3">
-        <circle cx="200" cy="200" r="190" strokeDasharray="1 6" />
-        <circle cx="10" cy="200" r="4" className="docs-orbit__planet" />
-      </g>
-      <text x="200" y="212" textAnchor="middle" className="docs-orbit__label">
-        1SmUI
-      </text>
-    </svg>
-  );
-}
 
 export function Home() {
   return (
@@ -64,7 +36,7 @@ export function Home() {
             </Button>
           </div>
         </div>
-        <Orbit />
+        <SolarSystem />
       </section>
 
       <Code language="bash" title="Install" code="npm install onesmallui" />

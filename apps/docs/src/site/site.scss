@@ -23,7 +23,13 @@ body {
   height: 4rem;
   padding: 0 clamp(0.75rem, 2vw, 1.5rem);
   border-bottom: 1px solid var(--os-border);
-  @include os.glass('bg');
+  // Opaque below lg: through the translucent glass, hero buttons scrolled under the
+  // header showed behind the menu button and logo on phones.
+  background: var(--os-bg);
+
+  @include os.up(lg) {
+    @include os.glass('bg');
+  }
 }
 
 .docs-menu-btn {
@@ -398,46 +404,37 @@ body {
   color: var(--os-text-muted);
 }
 
-.docs-orbit {
+.docs-solar {
+  position: relative;
   width: min(100%, 22rem);
   margin-inline: auto;
-  overflow: visible;
-
-  circle {
-    fill: none;
-    stroke: url(#orbit-g);
-    stroke-width: 1.5;
-  }
 }
 
-.docs-orbit__core {
-  fill: color-mix(in srgb, var(--os-primary) 10%, transparent) !important;
-  stroke-width: 2 !important;
-  filter: drop-shadow(0 0 18px var(--os-glow));
-  animation: os-glow-pulse 4s ease-in-out infinite;
+.docs-solar__scene {
+  position: relative;
+  aspect-ratio: 1;
 }
 
-.docs-orbit__planet {
-  fill: var(--os-primary) !important;
-  stroke: none !important;
-  filter: drop-shadow(0 0 6px var(--os-primary));
+.docs-solar__canvas,
+.docs-solar__wordmark {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.docs-orbit__ring {
-  transform-origin: 200px 200px;
-  animation: os-spin linear infinite;
-}
-
-.docs-orbit__ring--1 { animation-duration: 14s; }
-.docs-orbit__ring--2 { animation-duration: 26s; animation-direction: reverse; }
-.docs-orbit__ring--3 { animation-duration: 40s; }
-
-.docs-orbit__label {
+.docs-solar__wordmark text {
   fill: var(--os-text);
   font-family: var(--os-font-display);
-  font-size: 32px;
+  font-size: 25px;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
+}
+
+.docs-solar__toggle {
+  position: absolute !important;
+  right: 0;
+  bottom: 0;
 }
 
 // ---------- Theming ----------
