@@ -73,9 +73,9 @@
   "scripts": {
     "tokens": "node ../../scripts/build-tokens.mjs",
     "build:js": "vite build && vite build -c vite.dom.config.ts && vite build -c vite.dom-iife.config.ts",
-    "build:types": "tsc -p tsconfig.build.json && rollup -c rollup.dts.config.mjs && rm -rf dist/types",
+    "build:types": "tsc -p tsconfig.build.json && rollup -c rollup.dts.config.mjs && node -e \"fs.rmSync('dist/types',{recursive:true,force:true})\"",
     "build:css": "sass --no-source-map --load-path=node_modules scss/index.scss dist/onesmallui.css && sass --no-source-map --style=compressed scss/index.scss dist/onesmallui.min.css",
-    "build": "npm run tokens && rm -rf dist && npm run build:js && npm run build:types && npm run build:css",
+    "build": "npm run tokens && node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && npm run build:js && npm run build:types && npm run build:css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
