@@ -5,8 +5,8 @@ import { afterEach, expect } from 'vitest';
 
 afterEach(cleanup);
 
-// jsdom lacks matchMedia and <dialog> methods.
-if (!window.matchMedia) {
+// jsdom lacks matchMedia and <dialog> methods. (Node-environment tests have no window.)
+if (typeof window !== 'undefined' && !window.matchMedia) {
   window.matchMedia = (query: string) =>
     ({
       matches: false,
@@ -19,12 +19,14 @@ if (!window.matchMedia) {
       dispatchEvent: () => false,
     }) as MediaQueryList;
 }
-HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
-  this.setAttribute('open', '');
-};
-HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
-  this.removeAttribute('open');
-};
+if (typeof HTMLDialogElement !== 'undefined') {
+  HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+    this.setAttribute('open', '');
+  };
+  HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
+  };
+}
 
 // jest-axe's matcher: expect(await axe(container)).toHaveNoViolations()
 expect.extend(toHaveNoViolations);

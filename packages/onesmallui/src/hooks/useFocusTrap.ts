@@ -16,8 +16,9 @@ export interface UseFocusTrapOptions {
   returnFocus?: boolean | RefObject<HTMLElement | null>;
 }
 
-// Nested traps: only the most recently activated one handles Tab.
-const stack: object[] = [];
+// Active traps; only the last one handles Tab. A trap inside another sits above
+// it whatever the activation order (React runs child effects first).
+const stack: { container: HTMLElement }[] = [];
 
 function focusContainer(el: HTMLElement) {
   if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
@@ -45,8 +46,10 @@ export function useFocusTrap(
   useEffect(() => {
     const container = ref.current;
     if (!active || !container) return;
-    const token = {};
-    stack.push(token);
+    const token = { container };
+    const below = stack.findIndex((t) => t.container !== container && container.contains(t.container));
+    if (below === -1) stack.push(token);
+    else stack.splice(below, 0, token);
 
     const initial = initialRef.current;
     if (initial !== false && !container.contains(document.activeElement)) {
@@ -69,16 +72,12 @@ export function useFocusTrap(
         focusContainer(container);
         return;
       }
-      const first = items[0];
-      const last = items[items.length - 1];
-      const inside = !!current && container.contains(current);
-      if (e.shiftKey && (!inside || current === first || current === container)) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && (!inside || current === last)) {
-        e.preventDefault();
-        first.focus();
-      }
+      // Move focus ourselves, so the order always matches the list (hidden, inert and
+      // disabled elements skipped) and wraps at both ends.
+      e.preventDefault();
+      const i = current ? items.indexOf(current) : -1;
+      const next = i === -1 ? (e.shiftKey ? items.length - 1 : 0) : (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
+      items[next]!.focus();
     };
     document.addEventListener('keydown', onKeyDown, true);
     return () => {
