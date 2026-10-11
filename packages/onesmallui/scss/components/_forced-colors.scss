@@ -106,8 +106,8 @@
     }
   }
 
-  // The tabs' sliding underline / pill is a background.
-  .#{$prefix}-tabs__indicator {
+  // The tabs' sliding underline / pill is a background. (Doubled class to outrank the variant rules.)
+  .#{$prefix}-tabs__list > .#{$prefix}-tabs__indicator.#{$prefix}-tabs__indicator {
     forced-color-adjust: none;
     background: Highlight;
   }
