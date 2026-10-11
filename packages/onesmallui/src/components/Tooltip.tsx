@@ -249,7 +249,8 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
       {children}
       <span
         ref={floatingRef}
-        role="tooltip"
+        // Only a tooltip while it has text: an empty, nameless tooltip node is noise for assistive tech.
+        role={state?.text ? 'tooltip' : undefined}
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'))}
         data-state={open ? 'open' : 'closed'}
