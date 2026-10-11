@@ -67,7 +67,8 @@
     "dist",
     "scss",
     "tokens",
-    "agent"
+    "agent",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "tokens": "node ../../scripts/build-tokens.mjs",
