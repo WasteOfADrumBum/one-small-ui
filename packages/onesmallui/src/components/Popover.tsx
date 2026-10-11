@@ -16,6 +16,7 @@ import {
 import { useMergedRefs } from '../hooks/useMergedRefs';
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
+import { useFocusReturn } from '../hooks/useFocusReturn';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
@@ -87,6 +88,8 @@ export function Popover({
   const titleId = `${panelId}-title`;
   const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Escape and the close button send focus back to the trigger; light dismiss leaves it where the user clicked.
+  const { restore: returnFocus } = useFocusReturn({ active: isOpen, target: anchorRef, restoreOnDeactivate: false });
 
   const show = (wait = 0) => {
     clearTimeout(timer.current);
@@ -119,7 +122,7 @@ export function Popover({
       if (e.key !== 'Escape') return;
       const hadFocus = inside(document.activeElement);
       setOpen(false);
-      if (hadFocus) anchorRef.current?.focus();
+      if (hadFocus) returnFocus();
     };
     document.addEventListener('pointerdown', onDown, true);
     document.addEventListener('keydown', onKey);
@@ -127,7 +130,7 @@ export function Popover({
       document.removeEventListener('pointerdown', onDown, true);
       document.removeEventListener('keydown', onKey);
     };
-  }, [isOpen, setOpen, floatingRef, anchorRef]);
+  }, [isOpen, setOpen, floatingRef, anchorRef, returnFocus]);
 
   const childRef = isValidElement(children) ? (children.props as { ref?: Ref<HTMLElement> }).ref : undefined;
   const triggerRef = useMergedRefs(anchorRef, childRef);
@@ -228,7 +231,7 @@ export function Popover({
                   label="Close"
                   onClick={() => {
                     setOpen(false);
-                    anchorRef.current?.focus();
+                    returnFocus();
                   }}
                 />
               )}

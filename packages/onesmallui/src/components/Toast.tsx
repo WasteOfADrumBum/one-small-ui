@@ -10,6 +10,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
+import { AnnouncerProvider, textContent, useAnnouncer, useHasAnnouncer } from '../hooks/useAnnouncer';
 import { useLatestRef } from '../hooks/useLatestRef';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
@@ -56,6 +57,8 @@ export interface ToastOptions {
   content?: ReactNode;
   /** Skip the enter/exit animation. */
   instant?: boolean;
+  /** What screen readers hear. Defaults to the title and description text. */
+  announcement?: string;
   id?: string;
 }
 
@@ -92,6 +95,11 @@ export interface ToastProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   state?: 'open' | 'closing';
   /** Use `alert` for urgent messages. Defaults to `alert` for `danger`, else `status`. */
   role?: 'status' | 'alert';
+  /**
+   * Make the toast its own live region (default). `ToastProvider` sets `false` and
+   * announces through `useAnnouncer` instead, which is read more reliably.
+   */
+  live?: boolean;
   as?: 'div' | 'li';
   children?: ReactNode;
 }
@@ -116,6 +124,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
     instant,
     state = 'open',
     role,
+    live = true,
     as: Tag = 'div',
     className,
     children,
@@ -154,8 +163,8 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
       data-variant={variant}
       data-state={state}
       data-instant={instant || undefined}
-      role={role ?? (color === 'danger' ? 'alert' : 'status')}
-      aria-atomic="true"
+      role={live ? (role ?? (color === 'danger' ? 'alert' : 'status')) : undefined}
+      aria-atomic={live ? true : undefined}
       {...appearanceProps(appearance)}
       onPointerEnter={(e) => {
         setPaused(true);
@@ -255,8 +264,22 @@ export interface ToastProviderProps {
 
 let counter = 0;
 
-/** Renders toasts and provides `useToast()` to every child. */
-export function ToastProvider({
+/**
+ * Renders toasts and provides `useToast()` to every child. Each toast is announced
+ * to screen readers: `danger` toasts assertively, the rest politely. Uses the
+ * nearest `AnnouncerProvider`, or mounts its own, so toasts are never silent.
+ */
+export function ToastProvider(props: ToastProviderProps) {
+  const hasAnnouncer = useHasAnnouncer();
+  if (hasAnnouncer) return <ToastHost {...props} />;
+  return (
+    <AnnouncerProvider>
+      <ToastHost {...props} />
+    </AnnouncerProvider>
+  );
+}
+
+function ToastHost({
   children,
   placement = 'bottom-right',
   defaultDuration = null,
@@ -265,6 +288,7 @@ export function ToastProvider({
   defaults,
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastRecord[]>([]);
+  const { announce } = useAnnouncer();
 
   const remove = useCallback((id: string) => setToasts((all) => all.filter((t) => t.id !== id)), []);
   const dismiss = useCallback(
@@ -285,13 +309,13 @@ export function ToastProvider({
   const toast = useCallback(
     (options: ToastOptions) => {
       const id = options.id ?? `os-toast-${++counter}`;
-      setToasts((all) => {
-        const next = [...all.filter((t) => t.id !== id), { duration: defaultDuration, ...defaults, ...options, id }];
-        return next.slice(-limit);
-      });
+      const record = { duration: defaultDuration, ...defaults, ...options, id };
+      setToasts((all) => [...all.filter((t) => t.id !== id), record].slice(-limit));
+      const message = record.announcement ?? [textContent(record.title), textContent(record.description)].filter(Boolean).join('. ');
+      if (message) announce(message, { politeness: record.color === 'danger' ? 'assertive' : 'polite' });
       return id;
     },
-    [defaultDuration, limit, defaults],
+    [defaultDuration, limit, defaults, announce],
   );
 
   const value = useMemo(() => ({ toast, dismiss, dismissAll }), [toast, dismiss, dismissAll]);
@@ -301,11 +325,15 @@ export function ToastProvider({
       {children}
       <section className={cls('toast-viewport')} data-placement={normalize(placement)} aria-label={label}>
         <ol className={cls('toast-viewport__list')}>
-          {toasts.map(({ id, leaving, content, ...t }) => (
-            <Toast key={id} as="li" {...t} state={leaving ? 'closing' : 'open'} onDismiss={() => dismiss(id)}>
-              {content}
-            </Toast>
-          ))}
+          {toasts.map(({ id, leaving, content, ...t }) => {
+            const { announcement: _announced, ...toastProps } = t;
+            void _announced;
+            return (
+              <Toast key={id} as="li" live={false} {...toastProps} state={leaving ? 'closing' : 'open'} onDismiss={() => dismiss(id)}>
+                {content}
+              </Toast>
+            );
+          })}
         </ol>
       </section>
     </ToastContext.Provider>

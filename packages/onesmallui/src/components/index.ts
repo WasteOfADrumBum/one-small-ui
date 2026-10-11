@@ -34,6 +34,7 @@ export * from './OtpInput';
 export * from './Pagination';
 export * from './PasswordStrength';
 export * from './Popover';
+export * from './Portal';
 export * from './Progress';
 export * from './Radio';
 export * from './Range';
