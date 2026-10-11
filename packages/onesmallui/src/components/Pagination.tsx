@@ -1,5 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
+import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
+import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import type { Size, ThemeColor } from './types';
@@ -61,6 +63,7 @@ export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onCh
   }>;
 }
 
+// First/last are double chevrons, drawn here; previous/next come from the icon set.
 const icon = (d: string) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d={d} />
@@ -68,8 +71,8 @@ const icon = (d: string) => (
 );
 const icons = {
   first: icon('m11 17-5-5 5-5m7 10-5-5 5-5'),
-  previous: icon('m15 18-6-6 6-6'),
-  next: icon('m9 18 6-6-6-6'),
+  previous: <ChevronLeftIcon />,
+  next: <ChevronRightIcon />,
   last: icon('m13 17 5-5-5-5M6 17l5-5-5-5'),
 };
 

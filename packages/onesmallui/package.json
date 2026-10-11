@@ -47,6 +47,16 @@
     },
     "./styles.css": "./dist/onesmallui.css",
     "./styles.min.css": "./dist/onesmallui.min.css",
+    "./icons": {
+      "import": {
+        "types": "./dist/icons.d.ts",
+        "default": "./dist/icons.js"
+      },
+      "require": {
+        "types": "./dist/icons.d.cts",
+        "default": "./dist/icons.cjs"
+      }
+    },
     "./dom": {
       "import": {
         "types": "./dist/dom.d.ts",

@@ -1,6 +1,7 @@
 import { forwardRef, useId, useRef, type HTMLAttributes, type ReactNode } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { breakpoints, useMediaQuery, type Breakpoint } from '../hooks/useMediaQuery';
+import { MenuIcon } from '../icons/MenuIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { appearanceProps, type OverlayAppearance } from './DialogBase';
@@ -97,9 +98,7 @@ export const Navbar = forwardRef<HTMLElement, NavbarProps>(function Navbar(
             aria-controls={isOpen ? id : undefined}
             onClick={() => setOpen(!isOpen)}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
+            <MenuIcon />
           </button>
         )}
       </div>

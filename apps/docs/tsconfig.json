@@ -15,7 +15,8 @@
     "baseUrl": ".",
     "paths": {
       "@onesmall/ui": ["../../packages/onesmallui/src/index.ts"],
-      "@onesmall/ui/dom": ["../../packages/onesmallui/src/dom/index.ts"]
+      "@onesmall/ui/dom": ["../../packages/onesmallui/src/dom/index.ts"],
+      "@onesmall/ui/icons": ["../../packages/onesmallui/src/icons/index.ts"]
     }
   },
   "include": ["src"]

@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
+import { ChevronDownIcon } from '../icons/ChevronDownIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import type { OverlayAppearance } from './DialogBase';
@@ -25,11 +26,7 @@ export type NavVariant = 'links' | 'tabs' | 'pills' | 'underline';
 export const NavbarCollapsedContext = createContext(false);
 const MeasureContext = createContext(false);
 
-const Chevron = () => (
-  <svg className={cls('nav__chevron')} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);
+const Chevron = () => <ChevronDownIcon className={cls('nav__chevron')} />;
 
 export interface NavItemProps extends Omit<HTMLAttributes<HTMLElement>, 'onClick'> {
   href?: string;

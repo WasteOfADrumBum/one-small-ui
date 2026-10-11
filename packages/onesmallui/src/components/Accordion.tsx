@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useId, useRef, type HTMLAttributes, type ReactNode } from 'react';
 import { useLatestRef } from '../hooks/useLatestRef';
 import { useControllableState } from '../hooks/useControllableState';
+import { ChevronDownIcon } from '../icons/ChevronDownIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -90,12 +91,6 @@ export interface AccordionItemProps extends Omit<HTMLAttributes<HTMLDivElement>,
   indicator?: AccordionIndicator;
 }
 
-const Chevron = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);
-
 export function AccordionItem({ value, title, disabled, indicator, className, children, ...rest }: AccordionItemProps) {
   const ctx = useContext(AccordionContext);
   if (!ctx) throw new Error('<AccordionItem> must be inside <Accordion>.');
@@ -114,7 +109,7 @@ export function AccordionItem({ value, title, disabled, indicator, className, ch
 
   const indicatorEl = (
     <span className={cls('accordion__chevron')} data-static={isFn || undefined} aria-hidden="true">
-      {isFn ? (ind as (open: boolean) => ReactNode)(isOpen) : (ind ?? <Chevron />)}
+      {isFn ? (ind as (open: boolean) => ReactNode)(isOpen) : (ind ?? <ChevronDownIcon />)}
     </span>
   );
   const body = (

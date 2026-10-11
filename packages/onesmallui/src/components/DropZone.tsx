@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { useLatestRef } from '../hooks/useLatestRef';
 import { useDropZone, type DropZoneOptions, type FileRejection } from '../hooks/useDropZone';
+import { UploadIcon } from '../icons/UploadIcon';
 import { cx } from '../utils/cx';
 import { formatBytes } from '../utils/format';
 import { cls } from '../utils/prefix';
@@ -132,12 +133,7 @@ export function DropZone({
         />
         <label htmlFor={id} className={cls('dropzone__label')}>
           <span className={cls('dropzone__icon')} aria-hidden="true">
-            {icon ?? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5" />
-                <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
-              </svg>
-            )}
+            {icon ?? <UploadIcon strokeWidth={1.6} />}
           </span>
           <span className={cls('dropzone__prompt')}>
             {isDragReject ? 'Some of these files are not allowed' : isDragging ? 'Release to upload' : label}
