@@ -1,0 +1,67 @@
+@use '../abstracts' as *;
+
+// <Transition>: data-state="opening | open | closing | closed" with a preset in
+// data-enter / data-leave. Presets set where the element comes from (--_from) and
+// goes to (--_to); one pair of keyframes plays them. --os-transition-duration is
+// set by the component (0ms under reduced motion), so CSS and callbacks agree.
+.#{$prefix}-transition {
+  --_dur: var(--#{$prefix}-transition-duration, #{dur('base')});
+
+  &[data-state='opening'] {
+    animation: #{$prefix}-transition-in var(--_dur) ease('enter') both;
+  }
+
+  &[data-state='closing'] {
+    animation: #{$prefix}-transition-out var(--_dur) ease('exit') both;
+  }
+
+  &[data-state='opening'][data-enter='fade'],
+  &[data-state='closing'][data-leave='fade'] {
+    --_from: none;
+    --_to: none;
+  }
+
+  &[data-state='opening'][data-enter='scale'],
+  &[data-state='closing'][data-leave='scale'] {
+    --_from: scale(0.95);
+    --_to: scale(0.95);
+  }
+
+  // slide-<direction>: moves in that direction on the way in and on the way out.
+  &[data-state='opening'][data-enter='slide-up'] { --_from: translateY(1rem); }
+  &[data-state='closing'][data-leave='slide-up'] { --_to: translateY(-1rem); }
+  &[data-state='opening'][data-enter='slide-down'] { --_from: translateY(-1rem); }
+  &[data-state='closing'][data-leave='slide-down'] { --_to: translateY(1rem); }
+  &[data-state='opening'][data-enter='slide-left'] { --_from: translateX(calc(1rem * var(--#{$prefix}-dir, 1))); }
+  &[data-state='closing'][data-leave='slide-left'] { --_to: translateX(calc(-1rem * var(--#{$prefix}-dir, 1))); }
+  &[data-state='opening'][data-enter='slide-right'] { --_from: translateX(calc(-1rem * var(--#{$prefix}-dir, 1))); }
+  &[data-state='closing'][data-leave='slide-right'] { --_to: translateX(calc(1rem * var(--#{$prefix}-dir, 1))); }
+
+  // collapse: height is driven from JS (measured); no keyframes.
+  &[data-state='opening'][data-enter='collapse'],
+  &[data-state='closing'][data-leave='collapse'] {
+    overflow: hidden;
+    animation: none;
+    transition: height var(--_dur) ease('standard');
+  }
+
+  // Custom class names: no preset animation.
+  &[data-state='opening']:not([data-enter]),
+  &[data-state='closing']:not([data-leave]) {
+    animation: none;
+  }
+}
+
+@keyframes #{$prefix}-transition-in {
+  from {
+    opacity: 0;
+    transform: var(--_from, none);
+  }
+}
+
+@keyframes #{$prefix}-transition-out {
+  to {
+    opacity: 0;
+    transform: var(--_to, none);
+  }
+}

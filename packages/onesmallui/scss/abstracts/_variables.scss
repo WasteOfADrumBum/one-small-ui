@@ -3,6 +3,7 @@
 //   @use '@onesmall/ui/scss' with ($prefix: 'ui', $radius-base: 6px);
 
 @use 'sass:map';
+@use 'motion' as m;
 
 // Class-name prefix: `.os-btn`, `.os-card`, utilities like `.os-flex`.
 $prefix: 'os' !default;
@@ -75,18 +76,10 @@ $radii: (
   'full': 9999px,
 ) !default;
 
-// Motion
-$durations: (
-  'fast': 120ms,
-  'base': 200ms,
-  'slow': 360ms,
-  'slower': 600ms,
-) !default;
-$easings: (
-  'standard': cubic-bezier(0.2, 0, 0, 1),
-  'emphasized': cubic-bezier(0.3, 0, 0, 1.2),
-  'exit': cubic-bezier(0.4, 0, 1, 1),
-) !default;
+// Motion: fast, base, slow and the standard, enter and exit easings come from
+// tokens/themes.json ("motion"); `slower` and `emphasized` are SCSS-only extras.
+$durations: map.merge(m.$motion-durations, ('slower': 600ms)) !default;
+$easings: map.merge(m.$motion-easings, ('emphasized': cubic-bezier(0.3, 0, 0, 1.2))) !default;
 
 // Feature switches
 // Wrap the CSS in cascade layers (os.tokens < os.reset < os.base < os.components < os.utilities),

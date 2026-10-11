@@ -13,6 +13,8 @@ import {
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
+import { useTransition, type TransitionState } from '../hooks/useTransition';
+import { motion } from '../tokens';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
@@ -46,6 +48,9 @@ export interface TooltipProps {
   appearance?: OverlayAppearance;
   offset?: number;
 }
+
+/** Tooltip `data-state`: `opening` shows as `open` (its CSS animates on mount). */
+const tooltipState = (state: TransitionState) => (state === 'opening' ? 'open' : state);
 
 function useTooltipState(delay: number, setOpen: (o: boolean) => void) {
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -86,15 +91,16 @@ export function Tooltip({
 }: TooltipProps) {
   const id = `os-tip-${useId().replace(/:/g, '')}`;
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
-  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLSpanElement, HTMLSpanElement>({ open: isOpen, placement, offset });
+  const { state, mounted } = useTransition(isOpen, { duration: motion.duration.fast });
+  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLSpanElement, HTMLSpanElement>({ open: mounted, placement, offset });
   const { show, showNow, hide, cancel } = useTooltipState(delay, setOpen);
 
   useLayoutEffect(() => {
     const el = floatingRef.current;
-    if (!isOpen || !el) return;
+    if (!mounted || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [isOpen, floatingRef]);
+  }, [mounted, floatingRef]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -132,7 +138,7 @@ export function Tooltip({
         role={interactive ? undefined : 'tooltip'}
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'), contentClassName)}
-        data-state={isOpen ? 'open' : 'closed'}
+        data-state={tooltipState(state)}
         data-interactive={interactive || undefined}
         data-tone={appearance === 'default' ? 'inverse' : undefined}
         {...appearanceProps(appearance)}
@@ -169,7 +175,8 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
   const id = `os-tip-${useId().replace(/:/g, '')}`;
   const [state, setState] = useState<{ el: HTMLElement; text: string; placement?: Placement } | null>(null);
   const open = state !== null;
-  const { floatingRef, setAnchor } = useFloating<HTMLElement, HTMLSpanElement>({ open, placement: state?.placement ?? placement, offset: 8 });
+  const { state: phase, mounted } = useTransition(open, { duration: motion.duration.fast });
+  const { floatingRef, setAnchor } = useFloating<HTMLElement, HTMLSpanElement>({ open: mounted, placement: state?.placement ?? placement, offset: 8 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const current = useRef<HTMLElement | null>(null);
 
@@ -207,10 +214,10 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
 
   useLayoutEffect(() => {
     const el = floatingRef.current;
-    if (!open || !el) return;
+    if (!mounted || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [open, floatingRef]);
+  }, [mounted, floatingRef]);
 
   useEffect(() => {
     if (!open) return;
@@ -253,7 +260,7 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
         role={state?.text ? 'tooltip' : undefined}
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'))}
-        data-state={open ? 'open' : 'closed'}
+        data-state={tooltipState(phase)}
         data-tone={appearance === 'default' ? 'inverse' : undefined}
         {...appearanceProps(appearance)}
         onPointerEnter={() => clearTimeout(timer.current)}

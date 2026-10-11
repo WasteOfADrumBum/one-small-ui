@@ -51,5 +51,6 @@ export * from './Textarea';
 export * from './Toast';
 export * from './Toggler';
 export * from './Tooltip';
+export * from './Transition';
 export * from './VisuallyHidden';
 export * from './types';

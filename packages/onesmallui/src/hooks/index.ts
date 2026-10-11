@@ -11,3 +11,4 @@ export * from './useScrollLock';
 export * from './useReducedMotion';
 export { AnnouncerProvider, LiveRegion, useAnnouncer } from './useAnnouncer';
 export type { Announce, AnnounceOptions, LiveRegionProps, Politeness } from './useAnnouncer';
+export * from './useTransition';

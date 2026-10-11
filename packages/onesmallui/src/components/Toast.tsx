@@ -12,10 +12,11 @@ import {
 } from 'react';
 import { AnnouncerProvider, textContent, useAnnouncer, useHasAnnouncer } from '../hooks/useAnnouncer';
 import { useLatestRef } from '../hooks/useLatestRef';
+import { useTransition } from '../hooks/useTransition';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { CloseButton } from './CloseButton';
-import { appearanceProps, type OverlayAppearance } from './DialogBase';
+import { appearanceProps, EXIT_MS, type OverlayAppearance } from './DialogBase';
 import type { StatusColor } from './types';
 
 export type ToastPlacement =
@@ -291,20 +292,8 @@ function ToastHost({
   const { announce } = useAnnouncer();
 
   const remove = useCallback((id: string) => setToasts((all) => all.filter((t) => t.id !== id)), []);
-  const dismiss = useCallback(
-    (id: string) => {
-      let instant = false;
-      setToasts((all) =>
-        all.map((t) => {
-          if (t.id !== id) return t;
-          instant = !!t.instant;
-          return { ...t, leaving: true };
-        }),
-      );
-      setTimeout(() => remove(id), instant ? 0 : 220);
-    },
-    [remove],
-  );
+  // Marks it leaving; ToastItem removes it once its exit transition ends.
+  const dismiss = useCallback((id: string) => setToasts((all) => all.map((t) => (t.id === id ? { ...t, leaving: true } : t))), []);
   const dismissAll = useCallback(() => setToasts([]), []);
   const toast = useCallback(
     (options: ToastOptions) => {
@@ -325,19 +314,29 @@ function ToastHost({
       {children}
       <section className={cls('toast-viewport')} data-placement={normalize(placement)} aria-label={label}>
         <ol className={cls('toast-viewport__list')}>
-          {toasts.map(({ id, leaving, content, ...t }) => {
-            const { announcement: _announced, ...toastProps } = t;
-            void _announced;
-            return (
-              <Toast key={id} as="li" live={false} {...toastProps} state={leaving ? 'closing' : 'open'} onDismiss={() => dismiss(id)}>
-                {content}
-              </Toast>
-            );
-          })}
+          {toasts.map(({ id, leaving, content, ...t }) => (
+            <ToastItem key={id} {...t} leaving={!!leaving} onDismiss={() => dismiss(id)} onExited={() => remove(id)}>
+              {content}
+            </ToastItem>
+          ))}
         </ol>
       </section>
     </ToastContext.Provider>
   );
+}
+
+type ToastItemProps = Omit<ToastRecord, 'id' | 'content'> & {
+  leaving: boolean;
+  onDismiss: () => void;
+  onExited: () => void;
+  children?: ReactNode;
+};
+
+/** A provider toast: plays its exit transition, then reports it can be removed. */
+function ToastItem({ leaving, onExited, instant, announcement, ...t }: ToastItemProps) {
+  void announcement; // already announced by the provider
+  const { state } = useTransition(!leaving, { duration: instant ? 0 : EXIT_MS, onExited });
+  return <Toast as="li" live={false} instant={instant} {...t} state={state === 'closing' || state === 'closed' ? 'closing' : 'open'} />;
 }
 
 /** Shows toasts. Must be used inside `<ToastProvider>`. */
