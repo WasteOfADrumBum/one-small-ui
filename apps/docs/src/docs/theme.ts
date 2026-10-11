@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Theming',
   summary:
     'Light, dark and system color modes, remembered between visits. Themes apply globally or per component, and every token is a CSS variable you can change at runtime.',
-  importLine: "import { ThemeProvider, ThemeToggle, useTheme } from 'onesmallui';",
+  importLine: "import { ThemeProvider, ThemeToggle, useTheme } from '@onesmall/ui';",
   examples: [
     { name: 'theme-basic', title: 'Light, dark and system modes' },
     { name: 'theme-scoped', title: 'Per-component themes', description: 'Put data-os-theme="light" or "dark" on any element.' },

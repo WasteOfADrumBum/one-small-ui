@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { Spinner } from 'onesmallui';
+import { Spinner } from '@onesmall/ui';
 
 export default function Example() {
   return (

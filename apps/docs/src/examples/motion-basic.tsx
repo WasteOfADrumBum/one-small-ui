@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Accordion, AccordionItem, Switch } from 'onesmallui';
+import { Accordion, AccordionItem, Switch } from '@onesmall/ui';
 
 // data-os-motion="off" collapses every duration under that element.
 // prefers-reduced-motion does the same automatically.

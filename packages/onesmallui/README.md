@@ -14,14 +14,14 @@ A futuristic, WCAG 2.2 AAA accessible component library for React, written in Ty
 ## Install
 
 ```bash
-npm install onesmallui
+npm install @onesmall/ui
 ```
 
 ## Use
 
 ```tsx
-import 'onesmallui/styles.css';
-import { ThemeProvider, ToastProvider, Button, ThemeToggle } from 'onesmallui';
+import '@onesmall/ui/styles.css';
+import { ThemeProvider, ToastProvider, Button, ThemeToggle } from '@onesmall/ui';
 
 export function App() {
   return (
@@ -38,7 +38,7 @@ export function App() {
 ### Customize with SCSS
 
 ```scss
-@use 'onesmallui/scss' with (
+@use '@onesmall/ui/scss' with (
   $radius-base: 6px,
   $prefix: 'os'
 );
@@ -47,7 +47,7 @@ export function App() {
 ### Use the mixins and functions in your own styles
 
 ```scss
-@use 'onesmallui/scss/abstracts' as os;
+@use '@onesmall/ui/scss/abstracts' as os;
 
 .panel {
   padding: os.space('6');

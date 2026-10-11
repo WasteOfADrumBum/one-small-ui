@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DropZone } from 'onesmallui';
+import { DropZone } from '@onesmall/ui';
 
 // Pass a progress map keyed by file name to show upload progress per file.
 export default function Example() {

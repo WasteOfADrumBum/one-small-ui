@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Badge, Button, Card, CardBody, CardHeader, Range, Switch } from 'onesmallui';
+import { Badge, Button, Card, CardBody, CardHeader, Range, Switch } from '@onesmall/ui';
 import { CockpitFrame } from './CockpitFrame';
 import { Radar, type RadarContact } from './Radar';
 import { SCENE, SpaceScene } from './SpaceScene';

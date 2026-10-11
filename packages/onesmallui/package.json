@@ -1,6 +1,6 @@
 {
-  "name": "onesmallui",
-  "version": "0.2.0",
+  "name": "@onesmall/ui",
+  "version": "0.1.0",
   "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA accessible React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
   "keywords": [
     "react",
@@ -16,26 +16,47 @@
     "dropzone"
   ],
   "license": "MIT",
-  "author": "Joshua Small",
+  "author": "Joshua Small (https://onesmall.company)",
+  "homepage": "https://ui.onesmall.company",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WasteOfADrumBum/one-small-ui.git",
+    "directory": "packages/onesmallui"
+  },
+  "bugs": {
+    "url": "https://github.com/WasteOfADrumBum/one-small-ui/issues"
+  },
   "type": "module",
   "sideEffects": [
     "*.css",
     "*.scss"
   ],
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./dom": {
-      "types": "./dist/dom/index.d.ts",
-      "import": "./dist/dom.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./styles.css": "./dist/onesmallui.css",
     "./styles.min.css": "./dist/onesmallui.min.css",
+    "./dom": {
+      "import": {
+        "types": "./dist/dom.d.ts",
+        "default": "./dist/dom.js"
+      },
+      "require": {
+        "types": "./dist/dom.d.cts",
+        "default": "./dist/dom.cjs"
+      }
+    },
     "./scss": "./scss/index.scss",
     "./scss/*": "./scss/*",
     "./tokens.json": "./tokens/themes.json",
@@ -46,46 +67,53 @@
     "dist",
     "scss",
     "tokens",
-    "agent",
-    "README.md",
-    "LICENSE"
+    "agent"
   ],
   "scripts": {
     "tokens": "node ../../scripts/build-tokens.mjs",
-    "build:js": "vite build && vite build -c vite.dom.config.ts && vite build -c vite.dom-iife.config.ts && tsc -p tsconfig.build.json",
+    "build:js": "vite build && vite build -c vite.dom.config.ts && vite build -c vite.dom-iife.config.ts",
+    "build:types": "tsc -p tsconfig.build.json && rollup -c rollup.dts.config.mjs && rm -rf dist/types",
     "build:css": "sass --no-source-map --load-path=node_modules scss/index.scss dist/onesmallui.css && sass --no-source-map --style=compressed scss/index.scss dist/onesmallui.min.css",
-    "build": "npm run tokens && rm -rf dist && npm run build:js && npm run build:css",
+    "build": "npm run tokens && rm -rf dist && npm run build:js && npm run build:types && npm run build:css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
     "test": "vitest run",
-    "prepublishOnly": "npm run build"
+    "check": "npm run typecheck && npm run lint && npm test",
+    "prepublishOnly": "npm run check && npm run build"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^6.1.0",
     "axe-core": "^4.10.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "jest-axe": "^11.0.0",
     "jsdom": "^26.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "rollup": "^4.64.5",
+    "rollup-plugin-dts": "^6.5.1",
     "sass": "^1.89.0",
     "typescript": "~5.9.2",
-    "vitest": "^3.2.0",
+    "typescript-eslint": "^8.71.1",
     "vite": "^8.3.0",
-    "@vitejs/plugin-react": "^6.1.0"
+    "vitest": "^3.2.0"
   },
-  "homepage": "https://one-small-ui.vercel.app",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/WasteOfADrumBum/one-small-ui.git",
-    "directory": "packages/onesmallui"
+  "publishConfig": {
+    "access": "public"
   },
-  "bugs": {
-    "url": "https://github.com/WasteOfADrumBum/one-small-ui/issues"
+  "engines": {
+    "node": ">=18.18"
   }
 }

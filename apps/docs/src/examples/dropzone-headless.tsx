@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, useDropZone } from 'onesmallui';
+import { Button, useDropZone } from '@onesmall/ui';
 
 // Build your own drop target with the headless hook.
 export default function Example() {

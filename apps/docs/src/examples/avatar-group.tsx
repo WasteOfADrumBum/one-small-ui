@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup } from 'onesmallui';
+import { Avatar, AvatarGroup } from '@onesmall/ui';
 
 const crew = ['Ada Lovelace', 'Grace Hopper', 'Mae Jemison', 'Neil Armstrong', 'Sally Ride', 'Yuri Gagarin', 'Valentina Tereshkova'];
 const colors = ['primary', 'accent', 'success', 'info', 'warning', 'secondary', 'danger'] as const;

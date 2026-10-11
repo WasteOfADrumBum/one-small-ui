@@ -33,7 +33,7 @@ How the library is built, so every component feels like the same library.
 ## Docs (`apps/docs`)
 
 - One page = one file in `apps/docs/src/docs/<slug>.ts` exporting a `ComponentDoc` (see `site/docTypes.ts`). It shows up in the nav and the a11y audit automatically.
-- Examples are files in `apps/docs/src/examples/<name>.tsx` with a default export. They render live and their source is shown verbatim, so keep them short, realistic and copy-ready (import from `'onesmallui'` only).
+- Examples are files in `apps/docs/src/examples/<name>.tsx` with a default export. They render live and their source is shown verbatim, so keep them short, realistic and copy-ready (import from `'@onesmall/ui'` only).
 
 ## Checks
 

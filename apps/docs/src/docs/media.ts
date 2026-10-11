@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Image, Video, AspectRatio',
   group: 'Layout & media',
   summary: 'Responsive media with modern formats, lazy loading, blur-up fades, captions and fixed ratios.',
-  importLine: "import { Image, Video, AspectRatio } from 'onesmallui';",
+  importLine: "import { Image, Video, AspectRatio } from '@onesmall/ui';",
   examples: [{ name: 'media-basic', title: 'Images and video' }],
   props: [
     {

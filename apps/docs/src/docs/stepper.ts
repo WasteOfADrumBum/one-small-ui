@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Step-by-step indicators for wizards, checkouts and timelines. Horizontal, vertical or responsive; filled, outline and dot styles; adjustable gap and alignment; linked steps; rich step content; and sideways scrolling when steps overflow.',
-  importLine: "import { Stepper, Step } from 'onesmallui';",
+  importLine: "import { Stepper, Step } from '@onesmall/ui';",
   examples: [
     { name: 'stepper-basic', title: 'Styles, colors, status and alignment' },
     {

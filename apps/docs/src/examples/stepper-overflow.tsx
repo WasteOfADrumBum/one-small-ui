@@ -1,4 +1,4 @@
-import { Step, Stepper } from 'onesmallui';
+import { Step, Stepper } from '@onesmall/ui';
 
 const legs = ['Earth', 'LEO', 'Gateway', 'Lunar orbit', 'Surface', 'Ascent', 'Gateway', 'Return burn', 'Re-entry', 'Splashdown'];
 

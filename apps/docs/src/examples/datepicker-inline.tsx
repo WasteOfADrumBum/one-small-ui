@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar } from 'onesmallui';
+import { Calendar } from '@onesmall/ui';
 
 export default function Example() {
   const [days, setDays] = useState<Date[]>([new Date(2026, 9, 12), new Date(2026, 9, 14)]);

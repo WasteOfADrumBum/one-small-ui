@@ -23,7 +23,7 @@ ${site}/components.json  # structured data`,
       language: 'bash',
       description: 'Copy the skill into your project so Claude Code (or any agent that reads skills) picks it up.',
       code: `mkdir -p .claude/skills/onesmallui
-cp node_modules/onesmallui/agent/SKILL.md .claude/skills/onesmallui/SKILL.md`,
+cp node_modules/@onesmall/ui/agent/SKILL.md .claude/skills/onesmallui/SKILL.md`,
     },
   ],
   a11y: [],

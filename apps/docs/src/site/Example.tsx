@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 import { getExample } from './examples';
 import { Code } from './Code';
 

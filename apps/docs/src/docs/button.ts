@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Actions',
   summary:
     'Triggers an action. Seven variants, nine colors, four sizes, three shapes, icons, active, pressed and loading states, and link mode with `href`.',
-  importLine: "import { Button } from 'onesmallui';",
+  importLine: "import { Button } from '@onesmall/ui';",
   examples: [
     {
       name: 'button-variants',

@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Typography',
   group: 'Content',
   summary: 'Headings, display sizes, lead text, inline text elements, abbreviations, blockquotes, lists and description lists. Sizes are fluid (clamp), so type scales with the viewport without breakpoints.',
-  importLine: "import { Blockquote } from 'onesmallui';",
+  importLine: "import { Blockquote } from '@onesmall/ui';",
   examples: [
     {
       name: 'typography-headings',

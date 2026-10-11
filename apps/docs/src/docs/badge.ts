@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Data display',
   summary:
     'Compact status labels and counters. Soft (subtle), solid and outline variants in every theme color, em-based sizing for headings and buttons, and notification badges pinned to a corner.',
-  importLine: "import { Badge, BadgeAnchor } from 'onesmallui';",
+  importLine: "import { Badge, BadgeAnchor } from '@onesmall/ui';",
   examples: [
     { name: 'badge-basic', title: 'Colors, variants, sizes and dots' },
     { name: 'badge-inline', title: 'In headings and buttons', description: '`size="inherit"` follows the parent text size.' },

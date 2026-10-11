@@ -1,4 +1,4 @@
-import { Button, Collapse, useDisclosure } from 'onesmallui';
+import { Button, Collapse, useDisclosure } from '@onesmall/ui';
 
 export default function Example() {
   // Drive a Collapse from code: `open` plus any button wired with aria-expanded / aria-controls.

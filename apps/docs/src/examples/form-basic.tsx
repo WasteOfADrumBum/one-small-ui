@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Button, Field, Input, Select, Textarea } from 'onesmallui';
+import { Button, Field, Input, Select, Textarea } from '@onesmall/ui';
 
 const Mail = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

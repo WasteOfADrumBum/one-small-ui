@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'A custom select menu with live search, single or multiple selection, grouped options, icons, descriptions and checkmarks, that submits with forms through hidden inputs.',
-  importLine: "import { Combobox } from 'onesmallui';",
+  importLine: "import { Combobox } from '@onesmall/ui';",
   examples: [
     { name: 'combobox-basic', title: 'Single, multiple, select-only, sizes and disabled', description: 'Preselected values and placeholders.' },
     { name: 'combobox-rich', title: 'Groups, icons, descriptions and form submission' },

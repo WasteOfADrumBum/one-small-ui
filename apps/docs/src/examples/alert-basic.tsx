@@ -1,4 +1,4 @@
-import { Alert } from 'onesmallui';
+import { Alert } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

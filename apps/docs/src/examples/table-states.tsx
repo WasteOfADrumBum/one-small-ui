@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 const data = [
   ['#1042', 'Shipped', '$120.00'],

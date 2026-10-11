@@ -1,4 +1,4 @@
-import { MenuDivider, MenuItem, Nav, NavItem, NavMenu } from 'onesmallui';
+import { MenuDivider, MenuItem, Nav, NavItem, NavMenu } from '@onesmall/ui';
 
 const here = '#components/nav';
 

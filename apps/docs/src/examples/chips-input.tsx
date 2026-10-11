@@ -1,4 +1,4 @@
-import { Chip, ChipGroup, ChipInput, Field } from 'onesmallui';
+import { Chip, ChipGroup, ChipInput, Field } from '@onesmall/ui';
 
 export default function Example() {
   return (

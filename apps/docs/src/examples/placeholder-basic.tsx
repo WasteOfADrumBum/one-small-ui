@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardText, CardTitle, Placeholder, Skeleton } from 'onesmallui';
+import { Button, Card, CardBody, CardText, CardTitle, Placeholder, Skeleton } from '@onesmall/ui';
 
 export default function Example() {
   const [loading, setLoading] = useState(true);

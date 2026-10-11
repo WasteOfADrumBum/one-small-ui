@@ -1,4 +1,4 @@
-import { CodeBlock } from 'onesmallui';
+import { CodeBlock } from '@onesmall/ui';
 
 export default function Example() {
   return (

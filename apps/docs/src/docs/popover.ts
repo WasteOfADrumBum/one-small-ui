@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Overlays',
   summary:
     'Contextual overlays with a title and body, anchored to a trigger. Click, hover or focus triggers, responsive placement with flipping, an arrow, light dismiss and custom styling. A non-modal dialog in the top layer.',
-  importLine: "import { Popover } from 'onesmallui';",
+  importLine: "import { Popover } from '@onesmall/ui';",
   examples: [
     { name: 'popover-basic', title: 'Placements', description: 'Responsive placement takes a value per breakpoint.' },
     { name: 'popover-triggers', title: 'Triggers, dismiss on next click, disabled controls' },

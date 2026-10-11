@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Attach text, icons, buttons, segmented buttons, menu buttons, checkboxes and radios to inputs, selects, textareas and file inputs. Inner corners are squared and borders shared automatically.',
-  importLine: "import { InputGroup, InputGroupText } from 'onesmallui';",
+  importLine: "import { InputGroup, InputGroupText } from '@onesmall/ui';",
   examples: [
     { name: 'input-group-text', title: 'Leading and trailing text', description: 'Works with inputs, selects, file inputs and textareas.' },
     {

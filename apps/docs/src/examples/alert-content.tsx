@@ -1,4 +1,4 @@
-import { Alert, AlertHeading, AlertLink } from 'onesmallui';
+import { Alert, AlertHeading, AlertLink } from '@onesmall/ui';
 
 const Rocket = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

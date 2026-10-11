@@ -9,7 +9,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Text inputs, textareas, selects, native date, time, color and file pickers, and datalists, in four sizes with ghost, read-only and plain-text styles. Wrap any control in Field for its label, help text and feedback.',
-  importLine: "import { Field, Input, Textarea, Select } from 'onesmallui';",
+  importLine: "import { Field, Input, Textarea, Select } from '@onesmall/ui';",
   examples: [
     { name: 'form-basic', title: 'A complete form', description: 'Submit with an invalid email to see error handling.' },
     { name: 'form-text-inputs', title: 'Text inputs and textareas', description: 'Native input types keep the right mobile keyboards and autofill.' },

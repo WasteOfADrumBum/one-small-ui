@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Image or custom-content slides on a native scroll-snap track (touch scrolling for free) or a crossfade. Overlay, top or bottom controls, indicators, several slides at once, peeking neighbors, variable widths, opt-in pausable autoplay with per-slide intervals, and loop, rewind or stop at the end.',
-  importLine: "import { Carousel, CarouselSlide, CarouselCaption } from 'onesmallui';",
+  importLine: "import { Carousel, CarouselSlide, CarouselCaption } from '@onesmall/ui';",
   examples: [
     { name: 'carousel-basic', title: 'Image slides with captions' },
     { name: 'carousel-options', title: 'Multiple, peek, variable widths, fade, autoplay, dark' },

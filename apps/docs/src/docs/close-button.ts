@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Actions',
   summary:
     'A reusable dismiss control in three sizes, with an overlay variant for photos and dark imagery. Alerts, dialogs, drawers and toasts use it.',
-  importLine: "import { CloseButton } from 'onesmallui';",
+  importLine: "import { CloseButton } from '@onesmall/ui';",
   examples: [{ name: 'close-button-basic', title: 'Sizes, disabled and on imagery' }],
   props: [
     {

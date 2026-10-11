@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ListGroup, ListGroupItem } from 'onesmallui';
+import { ListGroup, ListGroupItem } from '@onesmall/ui';
 
 const decks = ['Bridge', 'Engineering', 'Hydroponics', 'Cargo hold'];
 

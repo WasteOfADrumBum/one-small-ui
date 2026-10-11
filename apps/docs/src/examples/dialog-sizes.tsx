@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Dialog, type DialogProps } from 'onesmallui';
+import { Button, Dialog, type DialogProps } from '@onesmall/ui';
 
 type Option = { label: string; size?: DialogProps['size']; fullscreen?: DialogProps['fullscreen'] };
 

@@ -1,4 +1,4 @@
-import { Badge, useBreakpoint, useCopyToClipboard, usePrefersReducedMotion, Button } from 'onesmallui';
+import { Badge, useBreakpoint, useCopyToClipboard, usePrefersReducedMotion, Button } from '@onesmall/ui';
 
 export default function Example() {
   const isDesktop = useBreakpoint('lg');
@@ -8,7 +8,7 @@ export default function Example() {
     <div className="os-flex os-flex-wrap os-items-center os-gap-3">
       <Badge color={isDesktop ? 'success' : 'info'}>{isDesktop ? 'Desktop (lg+)' : 'Below lg'}</Badge>
       <Badge color={reducedMotion ? 'warning' : 'neutral'}>Reduced motion: {reducedMotion ? 'on' : 'off'}</Badge>
-      <Button size="sm" variant="soft" onClick={() => copy('npm install onesmallui')}>
+      <Button size="sm" variant="soft" onClick={() => copy('npm install @onesmall/ui')}>
         {copied ? 'Copied!' : 'Copy install command'}
       </Button>
     </div>

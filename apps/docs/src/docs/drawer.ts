@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Overlays',
   summary:
     'Side panels and sheets that slide in from any edge, on the native <dialog> element. Header, body and footer parts, responsive inline mode, sheet presentation, optional body scrolling and static backdrops. Replaces offcanvas.',
-  importLine: "import { Drawer } from 'onesmallui';",
+  importLine: "import { Drawer } from '@onesmall/ui';",
   examples: [
     { name: 'drawer-placements', title: 'Placements', description: 'start and end follow the text direction; left and right are kept as physical aliases.' },
     { name: 'drawer-options', title: 'Sheet, body scrolling, backdrop, instant and appearance' },

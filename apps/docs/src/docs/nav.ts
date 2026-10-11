@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Navigation links styled as plain links, tabs, pills or underline. Horizontal or vertical, start/center/end aligned, filled or justified, with active and disabled links and embedded dropdown menus.',
-  importLine: "import { Nav, NavItem, NavMenu } from 'onesmallui';",
+  importLine: "import { Nav, NavItem, NavMenu } from '@onesmall/ui';",
   examples: [
     { name: 'nav-basic', title: 'Links, tabs, pills and underline', description: 'The active link gets aria-current="page"; disabled links are not focusable.' },
     { name: 'nav-layout', title: 'Alignment, fill, justify and vertical' },

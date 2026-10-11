@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'A segmented or progress-bar strength meter with text feedback and a configurable rules checklist, updating live and announcing politely. The look is CSS-only via data-strength, so it also works without JavaScript.',
-  importLine: "import { PasswordStrength, usePasswordStrength, scorePassword } from 'onesmallui';",
+  importLine: "import { PasswordStrength, usePasswordStrength, scorePassword } from '@onesmall/ui';",
   examples: [
     { name: 'password-strength-basic', title: 'Live meter, bar variant and custom rules' },
     { name: 'password-strength-static', title: 'Static, CSS-only markup' },

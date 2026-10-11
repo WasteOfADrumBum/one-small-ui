@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Field, Select, ToastProvider, useToast, type ToastPlacement } from 'onesmallui';
+import { Button, Field, Select, ToastProvider, useToast, type ToastPlacement } from '@onesmall/ui';
 
 const placements: ToastPlacement[] = [
   'top-left',

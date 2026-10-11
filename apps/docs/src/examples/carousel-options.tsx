@@ -1,4 +1,4 @@
-import { Card, Carousel, CarouselSlide } from 'onesmallui';
+import { Card, Carousel, CarouselSlide } from '@onesmall/ui';
 
 const crew = ['Vega', 'Ortiz', 'Ana', 'Kaito', 'Noor', 'Sami', 'Lena'];
 

@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'A slider on top of native <input type="range">: filled track, min/max labels, steps, a value bubble, tick marks with labels, theme colors and sizes.',
-  importLine: "import { Range } from 'onesmallui';",
+  importLine: "import { Range } from '@onesmall/ui';",
   examples: [
     { name: 'range-basic', title: 'Filled track, value bubble and min/max', description: 'formatValue formats the bubble, the min/max labels and aria-valuetext.' },
     { name: 'range-ticks', title: 'Steps and tick marks', description: 'ticks={true} marks every step; an array places labelled ticks. Ticks also render a <datalist>.' },

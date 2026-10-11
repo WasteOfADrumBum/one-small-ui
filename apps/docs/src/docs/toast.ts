@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Feedback',
   summary:
     'Stacked notifications with a header (icon, title, time), body, custom content and actions. Nine placements, persistent by default with opt-in pausable auto-hide, instant or animated, soft, solid (color fill), dark and translucent styles. Use the provider, or <Toast> on its own.',
-  importLine: "import { ToastProvider, useToast, Toast, ToastStack } from 'onesmallui';",
+  importLine: "import { ToastProvider, useToast, Toast, ToastStack } from '@onesmall/ui';",
   examples: [
     { name: 'toast-basic', title: 'Triggering toasts' },
     { name: 'toast-header', title: 'Header, custom content and actions' },

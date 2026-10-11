@@ -1,4 +1,4 @@
-import { ListGroup, ListGroupItem } from 'onesmallui';
+import { ListGroup, ListGroupItem } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

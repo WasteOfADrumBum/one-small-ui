@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Compact tags and selected values with icons and avatars, theme colors, dismiss buttons, toggle (filter) chips, and a multi-value chip input.',
-  importLine: "import { Chip, ChipGroup, ChipInput } from 'onesmallui';",
+  importLine: "import { Chip, ChipGroup, ChipInput } from '@onesmall/ui';",
   examples: [
     { name: 'chips-basic', title: 'Tags, colors, icons, avatars and dismissible chips' },
     { name: 'chips-input', title: 'Toggle chips and chip input', description: 'Selectable groups use aria-pressed; ChipInput turns typed text into chips.' },

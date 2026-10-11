@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Switchable content panels following the WAI-ARIA tabs pattern. Line, pill, underline, list-group and button triggers, your own Button as a tab, optional fade, and automatic or manual activation.',
-  importLine: "import { Tabs, TabList, Tab, TabPanel } from 'onesmallui';",
+  importLine: "import { Tabs, TabList, Tab, TabPanel } from '@onesmall/ui';",
   examples: [
     { name: 'tabs-basic', title: 'Line and pill tabs' },
     { name: 'tabs-variants', title: 'Underline, list group and button triggers', description: 'Manual activation and fade={false} shown too.' },

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SortableList } from 'onesmallui';
+import { SortableList } from '@onesmall/ui';
 
 export default function Example() {
   const [planets, setPlanets] = useState(['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter']);

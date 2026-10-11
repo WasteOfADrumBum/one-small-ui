@@ -1,6 +1,6 @@
 // The built-in utility map. Every entry goes through the public `utilities()` mixin
 // (abstracts/_mixins.scss), so anything here can be overridden or removed with
-// `@use 'onesmallui/scss' with ($utilities: ('opacity': null))`.
+// `@use '@onesmall/ui/scss' with ($utilities: ('opacity': null))`.
 //
 // Responsive variants (`md:`) are limited to layout-shaping groups (display, flex,
 // grid, spacing, alignment, text-align, order, width, float) to keep the CSS small.

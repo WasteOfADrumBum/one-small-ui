@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DatePicker, Field } from 'onesmallui';
+import { DatePicker, Field } from '@onesmall/ui';
 
 export default function Example() {
   const [date, setDate] = useState<Date | null>(new Date(2026, 9, 9));

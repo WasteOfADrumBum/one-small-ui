@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Drawer, Nav, NavItem } from 'onesmallui';
+import { Button, Drawer, Nav, NavItem } from '@onesmall/ui';
 
 // From lg up the content renders inline as a sidebar; below lg it becomes a drawer.
 export default function Example() {

@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Field wires a label, control, description and feedback together; FieldGroup groups related controls in a fieldset with a legend, optionally as a card. Labels go above, beside or inline, and feedback below or as a bubble.',
-  importLine: "import { Field, FieldGroup, FloatingLabel, useFieldControl, useFieldContext } from 'onesmallui';",
+  importLine: "import { Field, FieldGroup, FloatingLabel, useFieldControl, useFieldContext } from '@onesmall/ui';",
   examples: [
     { name: 'field-layouts', title: 'Label layouts', description: 'Overhead (default), inline, and horizontal with a fixed label column.' },
     { name: 'field-groups', title: 'Grouped controls and group cards', description: 'A fieldset with a legend, and one rendered as a card with a grid layout.' },

@@ -1,4 +1,4 @@
-import { Card, CardBody, Container, Grid, Stack } from 'onesmallui';
+import { Card, CardBody, Container, Grid, Stack } from '@onesmall/ui';
 
 export default function Example() {
   return (

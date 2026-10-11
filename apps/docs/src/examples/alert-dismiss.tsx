@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Button, useDisclosure } from 'onesmallui';
+import { Alert, Button, useDisclosure } from '@onesmall/ui';
 
 export default function Example() {
   // Uncontrolled: `dismissible` hides the alert itself; `onDismiss` lets you react.

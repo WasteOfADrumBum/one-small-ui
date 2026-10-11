@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Feedback',
   summary:
     'Loading placeholders: Skeleton blocks for layout, and inline Placeholder text that follows the surrounding font. Adjustable width, size and color, with wave, pulse or no animation.',
-  importLine: "import { Placeholder, Skeleton } from 'onesmallui';",
+  importLine: "import { Placeholder, Skeleton } from '@onesmall/ui';",
   examples: [
     { name: 'placeholder-basic', title: 'Loading a card', description: 'Placeholders stand in for text in the real markup, so the layout does not jump when content arrives.' },
     { name: 'placeholder-options', title: 'Animation, width, size and color' },

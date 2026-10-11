@@ -1,4 +1,4 @@
-import { Step, Stepper } from 'onesmallui';
+import { Step, Stepper } from '@onesmall/ui';
 
 export default function Example() {
   return (

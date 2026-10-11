@@ -1,4 +1,4 @@
-import { Field, Select } from 'onesmallui';
+import { Field, Select } from '@onesmall/ui';
 
 const ships = [
   { value: 'nova', label: 'Nova', group: 'Scouts' },

@@ -1,4 +1,4 @@
-import { Button, Field, Input, Menu, MenuContent, MenuText, MenuTrigger } from 'onesmallui';
+import { Button, Field, Input, Menu, MenuContent, MenuText, MenuTrigger } from '@onesmall/ui';
 
 // contentRole="dialog" holds free-form content: Tab moves through it, Escape closes.
 export default function Example() {

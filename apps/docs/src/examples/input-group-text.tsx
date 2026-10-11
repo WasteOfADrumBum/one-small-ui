@@ -1,4 +1,4 @@
-import { Field, Input, InputGroup, InputGroupText, Select, Textarea } from 'onesmallui';
+import { Field, Input, InputGroup, InputGroupText, Select, Textarea } from '@onesmall/ui';
 
 export default function Example() {
   return (

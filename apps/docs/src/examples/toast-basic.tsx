@@ -1,4 +1,4 @@
-import { Button, useToast } from 'onesmallui';
+import { Button, useToast } from '@onesmall/ui';
 
 // Wrap your app once in <ToastProvider>, then call useToast() anywhere.
 export default function Example() {

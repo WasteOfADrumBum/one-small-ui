@@ -1,4 +1,4 @@
-import { Badge, Checkbox, ListGroup, ListGroupItem, Radio } from 'onesmallui';
+import { Badge, Checkbox, ListGroup, ListGroupItem, Radio } from '@onesmall/ui';
 
 export default function Example() {
   return (

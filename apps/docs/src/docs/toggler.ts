@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Utilities',
   summary:
     'A button (or hook) that toggles classes or attribute values on itself or other elements: one element, a ref, or every match of a selector.',
-  importLine: "import { Toggler, useToggler } from 'onesmallui';",
+  importLine: "import { Toggler, useToggler } from '@onesmall/ui';",
   examples: [{ name: 'toggler-basic', title: 'Classes, attributes, multiple targets, disclosure and the hook' }],
   props: [
     {

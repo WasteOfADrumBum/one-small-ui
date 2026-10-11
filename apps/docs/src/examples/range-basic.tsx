@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Field, Range } from 'onesmallui';
+import { Field, Range } from '@onesmall/ui';
 
 export default function Example() {
   const [thrust, setThrust] = useState(40);

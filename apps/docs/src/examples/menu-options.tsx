@@ -1,4 +1,4 @@
-import { Button, Menu, MenuContent, MenuItem, MenuTrigger, type MenuAutoClose } from 'onesmallui';
+import { Button, Menu, MenuContent, MenuItem, MenuTrigger, type MenuAutoClose } from '@onesmall/ui';
 
 const autoCloses: { label: string; value: MenuAutoClose }[] = [
   { label: 'Default (true)', value: true },

@@ -1,4 +1,4 @@
-import { Placeholder, Skeleton } from 'onesmallui';
+import { Placeholder, Skeleton } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

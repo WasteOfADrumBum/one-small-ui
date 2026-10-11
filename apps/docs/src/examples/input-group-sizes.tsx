@@ -1,4 +1,4 @@
-import { Button, Input, InputGroup, InputGroupText } from 'onesmallui';
+import { Button, Input, InputGroup, InputGroupText } from '@onesmall/ui';
 
 const sizes = ['xs', 'sm', 'md', 'lg'] as const;
 

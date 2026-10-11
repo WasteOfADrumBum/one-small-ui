@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'SortableList',
   group: 'Drag & drop',
   summary: 'Reorder items by dragging with mouse, touch or pen, or entirely by keyboard.',
-  importLine: "import { SortableList } from 'onesmallui';",
+  importLine: "import { SortableList } from '@onesmall/ui';",
   examples: [
     { name: 'sortable-basic', title: 'Vertical list with handles', description: 'Drag the grip, or focus it and press Space, then arrow keys.' },
     { name: 'sortable-horizontal', title: 'Horizontal, drag anywhere' },

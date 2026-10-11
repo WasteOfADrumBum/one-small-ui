@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Data display',
   summary:
     'A flexible list of items, links or buttons with active and disabled states, flush, numbered and responsive horizontal layouts, theme colors, badges, form controls, and tab control.',
-  importLine: "import { ListGroup, ListGroupItem } from 'onesmallui';",
+  importLine: "import { ListGroup, ListGroupItem } from '@onesmall/ui';",
   examples: [
     { name: 'list-group-basic', title: 'Static items, links and buttons', description: 'Pass `href` for a link or `onClick` for a button. Active items get `aria-current`.' },
     { name: 'list-group-variants', title: 'Flush, numbered, colors and horizontal' },

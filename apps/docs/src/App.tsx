@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Drawer, SkipLink, ThemeToggle } from 'onesmallui';
+import { Button, Drawer, SkipLink, ThemeToggle } from '@onesmall/ui';
 import { componentDocs, groups } from './site/componentDocs';
 import { useHashRoute } from './site/router';
 import { Home } from './pages/Home';

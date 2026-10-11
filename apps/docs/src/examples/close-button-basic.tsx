@@ -1,4 +1,4 @@
-import { CloseButton } from 'onesmallui';
+import { CloseButton } from '@onesmall/ui';
 
 export default function Example() {
   return (

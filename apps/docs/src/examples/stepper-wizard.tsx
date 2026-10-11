@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Step, Stepper } from 'onesmallui';
+import { Button, Step, Stepper } from '@onesmall/ui';
 
 const steps = [
   { title: 'Crew', body: 'Pick who flies: up to six crew members.' },

@@ -1,6 +1,6 @@
 // .os-scheme-dark / .os-scheme-light re-scope every token for a subtree, whatever the page theme.
 // Components inside follow automatically.
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 
 export default function Example() {
   return (

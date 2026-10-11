@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Field, OtpInput } from 'onesmallui';
+import { Field, OtpInput } from '@onesmall/ui';
 
 export default function Example() {
   const [code, setCode] = useState('');

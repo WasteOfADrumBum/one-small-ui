@@ -1,4 +1,4 @@
-import { Badge } from 'onesmallui';
+import { Badge } from '@onesmall/ui';
 
 const colors = ['neutral', 'primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

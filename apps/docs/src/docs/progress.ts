@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Feedback',
   summary:
     'Linear progress with an accessible name and value. Any width and height, labels beside or inside the bar, eight theme colors, striped and animated stripes, and stacked multi-segment bars.',
-  importLine: "import { Progress, ProgressStack } from 'onesmallui';",
+  importLine: "import { Progress, ProgressStack } from '@onesmall/ui';",
   examples: [
     { name: 'progress-basic', title: 'Values, sizes, width, height and colors' },
     { name: 'progress-labels', title: 'Labels inside the bar, stripes and animation', description: 'Animated stripes stop under reduced motion.' },

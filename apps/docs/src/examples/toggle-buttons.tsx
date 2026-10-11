@@ -1,4 +1,4 @@
-import { ToggleButton, ToggleButtonGroup } from 'onesmallui';
+import { ToggleButton, ToggleButtonGroup } from '@onesmall/ui';
 
 export default function Example() {
   return (

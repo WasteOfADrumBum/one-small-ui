@@ -1,4 +1,4 @@
-import { Nav, NavItem, Navbar } from 'onesmallui';
+import { Nav, NavItem, Navbar } from '@onesmall/ui';
 
 const here = '#components/navbar';
 const Logo = () => (

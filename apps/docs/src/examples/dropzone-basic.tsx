@@ -1,4 +1,4 @@
-import { DropZone } from 'onesmallui';
+import { DropZone } from '@onesmall/ui';
 
 export default function Example() {
   return (

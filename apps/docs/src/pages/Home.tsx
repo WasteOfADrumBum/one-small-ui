@@ -1,4 +1,4 @@
-import { Badge, Button, Card, CardBody, Grid } from 'onesmallui';
+import { Badge, Button, Card, CardBody, Grid } from '@onesmall/ui';
 import { Code } from '../site/Code';
 import { SolarSystem } from '../site/SolarSystem';
 import { MissionControl } from '../site/cockpit/MissionControl';
@@ -40,7 +40,7 @@ export function Home() {
         <SolarSystem />
       </section>
 
-      <Code language="bash" title="Install" code="npm install onesmallui" />
+      <Code language="bash" title="Install" code="npm install @onesmall/ui" />
 
       <section aria-labelledby="features-title" className="os-mt-12">
         <h2 id="features-title" className="docs-h2">

@@ -1,4 +1,4 @@
-import { Button, Menu, MenuContent, MenuDivider, MenuItem, MenuTrigger, useToast } from 'onesmallui';
+import { Button, Menu, MenuContent, MenuDivider, MenuItem, MenuTrigger, useToast } from '@onesmall/ui';
 
 const Icon = ({ d }: { d: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

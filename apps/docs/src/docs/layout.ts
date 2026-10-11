@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Container, Stack, Grid',
   group: 'Layout & media',
   summary: 'Responsive layout primitives with per-breakpoint props.',
-  importLine: "import { Container, Stack, Grid } from 'onesmallui';",
+  importLine: "import { Container, Stack, Grid } from '@onesmall/ui';",
   examples: [{ name: 'layout-grid', title: 'Responsive layout', description: 'Resize your window to see columns and direction change.' }],
   props: [
     {

@@ -1,8 +1,8 @@
 // OneSmallUI (1SmUI) — full stylesheet.
 //
-// Use the compiled CSS:          import 'onesmallui/styles.css';
-// Or compile with your overrides: @use 'onesmallui/scss' with ($prefix: 'os', $radius-base: 6px);
-// Only need the tools?            @use 'onesmallui/scss/abstracts' as os;
+// Use the compiled CSS:          import '@onesmall/ui/styles.css';
+// Or compile with your overrides: @use '@onesmall/ui/scss' with ($prefix: 'os', $radius-base: 6px);
+// Only need the tools?            @use '@onesmall/ui/scss/abstracts' as os;
 //
 // Output is wrapped in cascade layers so unlayered app CSS overrides it without
 // fighting specificity. Turn that off with `$enable-layers: false`.

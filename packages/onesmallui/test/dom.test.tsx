@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Collapse, init } from '../src/dom';
 
-describe('onesmallui/dom', () => {
+describe('@onesmall/ui/dom', () => {
   it('toggles a collapse from a data-os-toggle trigger and fires cancelable events', () => {
     document.body.innerHTML = `
       <button data-os-toggle="collapse" data-os-target="#c">More</button>

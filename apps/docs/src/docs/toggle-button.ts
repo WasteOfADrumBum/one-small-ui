@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   name: 'Toggle button',
   group: 'Actions',
   summary: 'Checkboxes and radios that look like buttons. Real inputs underneath, so they submit with forms.',
-  importLine: "import { ToggleButton, ToggleButtonGroup } from 'onesmallui';",
+  importLine: "import { ToggleButton, ToggleButtonGroup } from '@onesmall/ui';",
   examples: [{ name: 'toggle-buttons', title: 'Checkbox and radio toggles' }],
   props: [
     {

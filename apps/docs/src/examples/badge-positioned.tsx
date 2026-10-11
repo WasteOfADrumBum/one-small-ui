@@ -1,4 +1,4 @@
-import { Avatar, Badge, BadgeAnchor, Button } from 'onesmallui';
+import { Avatar, Badge, BadgeAnchor, Button } from '@onesmall/ui';
 
 const Bell = () => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">

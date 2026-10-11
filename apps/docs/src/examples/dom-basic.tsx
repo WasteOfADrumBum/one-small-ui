@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { init } from 'onesmallui/dom';
+import { init } from '@onesmall/ui/dom';
 
 // Plain HTML using the same os- classes, wired by data-os-* attributes.
 // In a non-React page this is just markup plus one script tag.

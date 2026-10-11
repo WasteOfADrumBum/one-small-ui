@@ -13,7 +13,7 @@ const doc: ComponentDoc = {
       title: 'Configure with Sass modules',
       language: 'scss',
       description: 'Every variable is !default. Load the library once with your overrides.',
-      code: `@use 'onesmallui/scss' with (
+      code: `@use '@onesmall/ui/scss' with (
   $prefix: 'os',
   $radius-base: 6px,
   $font-sans: ('Inter', system-ui, sans-serif),
@@ -26,7 +26,7 @@ const doc: ComponentDoc = {
     {
       title: 'Use the tools in your own Sass',
       language: 'scss',
-      code: `@use 'onesmallui/scss/abstracts' as os;
+      code: `@use '@onesmall/ui/scss/abstracts' as os;
 
 .my-panel {
   padding: os.space('4');                  // spacing map

@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   summary:
     'Dropdown menus following the WAI-ARIA menu button pattern: actions, links, checkbox and radio items, icons, descriptions, groups, nested submenus, scrolling, typeahead and configurable auto-close. Rendered in the top layer and positioned with useFloating.',
   importLine:
-    "import { Menu, MenuTrigger, MenuContent, MenuItem, MenuCheckboxItem, MenuRadioGroup, MenuRadioItem, MenuGroup, MenuDivider, MenuSub } from 'onesmallui';",
+    "import { Menu, MenuTrigger, MenuContent, MenuItem, MenuCheckboxItem, MenuRadioGroup, MenuRadioItem, MenuGroup, MenuDivider, MenuSub } from '@onesmall/ui';",
   examples: [
     { name: 'menu-basic', title: 'Actions and links', description: 'Icons, descriptions, shortcuts, an active link and a disabled item.' },
     { name: 'menu-selection', title: 'Checkbox and radio items with headers', description: 'Selection items keep the menu open by default.' },

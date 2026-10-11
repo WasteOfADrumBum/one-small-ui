@@ -15,10 +15,10 @@ export default defineConfig({
   define: { __OS_VERSION__: JSON.stringify(version) },
   resolve: {
     alias: [
-      { find: /^onesmallui\/scss$/, replacement: lib('scss/index.scss') },
-      { find: /^onesmallui\/scss\/(.*)$/, replacement: lib('scss/$1') },
-      { find: /^onesmallui\/dom$/, replacement: lib('src/dom/index.ts') },
-      { find: /^onesmallui$/, replacement: lib('src/index.ts') },
+      { find: /^@onesmall\/ui\/scss$/, replacement: lib('scss/index.scss') },
+      { find: /^@onesmall\/ui\/scss\/(.*)$/, replacement: lib('scss/$1') },
+      { find: /^@onesmall\/ui\/dom$/, replacement: lib('src/dom/index.ts') },
+      { find: /^@onesmall\/ui$/, replacement: lib('src/index.ts') },
     ],
   },
 });

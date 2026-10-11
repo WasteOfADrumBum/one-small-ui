@@ -1,6 +1,6 @@
 ---
 name: onesmallui
-description: Build React UIs with the OneSmallUI (1SmUI) component library — components, os- utility classes, theming, forms and data-attribute JS. Use when a project depends on `onesmallui` or asks for 1SmUI.
+description: Build React UIs with the OneSmallUI (1SmUI) component library — components, os- utility classes, theming, forms and data-attribute JS. Use when a project depends on `@onesmall/ui` or asks for 1SmUI.
 ---
 
 # Using OneSmallUI (1SmUI)
@@ -10,10 +10,10 @@ Index: https://one-small-ui.vercel.app/llms.txt · Structured data: https://one-
 
 ## Setup
 
-1. `npm install onesmallui` (peer: react >= 18; no other runtime deps).
-2. Import CSS once: `import 'onesmallui/styles.css'`, or `@use 'onesmallui/scss' with (...)` to override Sass variables.
+1. `npm install @onesmall/ui` (peers: react and react-dom 18 or 19; no other runtime deps).
+2. Import CSS once: `import '@onesmall/ui/styles.css'`, or `@use '@onesmall/ui/scss' with (...)` to override Sass variables.
 3. Wrap the app: `<ThemeProvider><ToastProvider>…</ToastProvider></ThemeProvider>`.
-4. Everything is a named export: `import { Button, Field, Input, Dialog, Menu } from 'onesmallui'`.
+4. Everything is a named export: `import { Button, Field, Input, Dialog, Menu } from '@onesmall/ui'`.
 
 ## Conventions
 
@@ -23,7 +23,7 @@ Index: https://one-small-ui.vercel.app/llms.txt · Structured data: https://one-
 - Themes: `data-os-theme="light|dark"` on `<html>` or any element; tokens are CSS variables `--os-<token>`.
 - Controlled/uncontrolled pattern: `value` / `defaultValue` / `onValueChange`; overlays use `open` / `onOpenChange` or `onClose`.
 - Placement props accept `top | bottom | left | right` with `-start`/`-end`, or per-breakpoint objects `{ base: 'bottom', md: 'right' }`.
-- Without React, `onesmallui/dom` wires up `data-os-toggle`, `data-os-target` and `data-os-dismiss` attributes and dispatches `os:show/os:shown/os:hide/os:hidden` events.
+- Without React, `@onesmall/ui/dom` wires up `data-os-toggle`, `data-os-target` and `data-os-dismiss` attributes and dispatches `os:show/os:shown/os:hide/os:hidden` events.
 
 ## Accessibility rules (the library targets WCAG 2.2 AAA — keep it that way)
 

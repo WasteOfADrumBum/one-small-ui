@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ThemeProvider, ToastProvider } from 'onesmallui';
-import 'onesmallui/scss';
+import { ThemeProvider, ToastProvider } from '@onesmall/ui';
+import '@onesmall/ui/scss';
 import './site/site.scss';
 import { App } from './App';
 

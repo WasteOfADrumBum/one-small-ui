@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Verification-code and PIN entry: one slot per character, separate or connected slots with separators, sizes, alphanumeric codes, masking, and disabled and invalid states.',
-  importLine: "import { OtpInput } from 'onesmallui';",
+  importLine: "import { OtpInput } from '@onesmall/ui';",
   examples: [{ name: 'otp-basic', title: 'Codes, PINs, alphanumeric, connected and disabled' }],
   props: [
     {

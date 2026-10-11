@@ -1,4 +1,4 @@
-import { Container } from 'onesmallui';
+import { Container } from '@onesmall/ui';
 
 // .os-container steps its max width at each breakpoint; .os-container-md stays fluid until md;
 // .os-container-fluid never caps. The Container component does the same with size="responsive".

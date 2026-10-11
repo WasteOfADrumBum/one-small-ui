@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'A responsive header: brand text or logo, navigation, forms and text. Below a breakpoint the content collapses into a Drawer behind a toggle button, which can also be controlled from outside. Static, sticky or fixed placement; dark, themed and translucent appearances.',
-  importLine: "import { Navbar, NavbarText, Nav, NavItem } from 'onesmallui';",
+  importLine: "import { Navbar, NavbarText, Nav, NavItem } from '@onesmall/ui';",
   examples: [
     { name: 'navbar-basic', title: 'Brand, links, search and text', description: 'Resize below 1024px to see the drawer.' },
     { name: 'navbar-appearance', title: 'Dark, themed, translucent, logo and always collapsed' },

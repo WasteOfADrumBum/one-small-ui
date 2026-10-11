@@ -15,7 +15,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Native selection controls with an animated custom look: checked, unchecked and indeterminate states, descriptions, eight theme colors, three sizes, cards and disabled states.',
-  importLine: "import { Checkbox, RadioGroup, Radio, Switch } from 'onesmallui';",
+  importLine: "import { Checkbox, RadioGroup, Radio, Switch } from '@onesmall/ui';",
   examples: [
     { name: 'selection-controls', title: 'Selection controls', description: 'Checkbox with indeterminate parent, a radio group and switches.' },
     { name: 'checks-colors', title: 'Theme colors', description: 'Every ThemeColor. Checked boxes keep a 3:1 border even for light fills like warning.' },

@@ -1,5 +1,5 @@
 /**
- * Shared plumbing for the vanilla (no-React) controls in `onesmallui/dom`.
+ * Shared plumbing for the vanilla (no-React) controls in `@onesmall/ui/dom`.
  *
  * Every control is a class with `getOrCreate(element, options)`, programmatic
  * methods (`show`, `hide`, `toggle`, `dispose`, …) and DOM events:

@@ -1,4 +1,4 @@
-import { Alert } from 'onesmallui';
+import { Alert } from '@onesmall/ui';
 import { Code } from '../site/Code';
 
 export function GettingStarted() {
@@ -8,23 +8,23 @@ export function GettingStarted() {
       <p className="docs-lead">Install the package, import the styles once, and wrap your app in the providers.</p>
 
       <h2 id="install">1. Install</h2>
-      <Code language="bash" title="Terminal" code={`npm install onesmallui\n# or\npnpm add onesmallui\n# or\nyarn add onesmallui`} />
+      <Code language="bash" title="Terminal" code={`npm install @onesmall/ui\n# or\npnpm add @onesmall/ui\n# or\nyarn add @onesmall/ui`} />
       <p>React 18 or newer is a peer dependency. There are no other runtime dependencies.</p>
 
       <h2 id="styles">2. Import the styles</h2>
       <p>Pick one. The compiled CSS is easiest; the SCSS entry lets you change any variable.</p>
-      <Code language="tsx" title="main.tsx" code={`import 'onesmallui/styles.css';`} />
+      <Code language="tsx" title="main.tsx" code={`import '@onesmall/ui/styles.css';`} />
       <Code
         language="scss"
         title="styles.scss"
-        code={`// Override variables at compile time\n@use 'onesmallui/scss' with (\n  $radius-base: 6px,\n  $prefix: 'os'\n);`}
+        code={`// Override variables at compile time\n@use '@onesmall/ui/scss' with (\n  $radius-base: 6px,\n  $prefix: 'os'\n);`}
       />
 
       <h2 id="providers">3. Add the providers</h2>
       <Code
         language="tsx"
         title="App.tsx"
-        code={`import { ThemeProvider, ToastProvider, Button, useToast } from 'onesmallui';
+        code={`import { ThemeProvider, ToastProvider, Button, useToast } from '@onesmall/ui';
 
 export function App() {
   return (
@@ -47,7 +47,7 @@ function Main() {
       <Code
         language="tsx"
         title="Next.js app/layout.tsx"
-        code={`import { themeInitScript } from 'onesmallui';
+        code={`import { themeInitScript } from '@onesmall/ui';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

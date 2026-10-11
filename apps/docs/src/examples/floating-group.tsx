@@ -1,4 +1,4 @@
-import { Button, FloatingLabel, Input, InputGroup, InputGroupText } from 'onesmallui';
+import { Button, FloatingLabel, Input, InputGroup, InputGroupText } from '@onesmall/ui';
 
 export default function Example() {
   return (

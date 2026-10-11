@@ -6,8 +6,8 @@ const doc: ComponentDoc = {
   name: 'JavaScript (no React)',
   group: 'Framework',
   summary:
-    'onesmallui/dom wires interactive components on plain HTML through data-os-* attributes, with methods and cancelable events. It uses the same os- classes as the React components, ships as ES modules with TypeScript declarations, and has a single-file script for CDNs.',
-  importLine: "import { init } from 'onesmallui/dom';",
+    '@onesmall/ui/dom wires interactive components on plain HTML through data-os-* attributes, with methods and cancelable events. It uses the same os- classes as the React components, ships as ES modules with TypeScript declarations, and has a single-file script for CDNs.',
+  importLine: "import { init } from '@onesmall/ui/dom';",
   examples: [{ name: 'dom-basic', title: 'Collapse, tooltip and dismiss from markup' }],
   reference: [
     {
@@ -54,8 +54,8 @@ const doc: ComponentDoc = {
     {
       title: 'Script tag (auto-initialises, global OneSmallUI)',
       language: 'markup',
-      code: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/onesmallui@${__OS_VERSION__}/dist/onesmallui.min.css">
-<script src="https://cdn.jsdelivr.net/npm/onesmallui@${__OS_VERSION__}/dist/onesmallui-dom.iife.js" defer></script>
+      code: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@onesmall/ui@${__OS_VERSION__}/dist/onesmallui.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@onesmall/ui@${__OS_VERSION__}/dist/onesmallui-dom.iife.js" defer></script>
 
 <button class="os-btn" data-variant="solid" data-color="primary" data-size="md"
         data-os-toggle="dialog" data-os-target="#hello">Open</button>
@@ -69,7 +69,7 @@ const doc: ComponentDoc = {
     {
       title: 'Methods and events',
       language: 'ts',
-      code: `import { init, Collapse } from 'onesmallui/dom';
+      code: `import { init, Collapse } from '@onesmall/ui/dom';
 
 init();
 document.addEventListener('os:hide', (e) => {

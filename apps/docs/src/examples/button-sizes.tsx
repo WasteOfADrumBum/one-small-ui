@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 
 const Rocket = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

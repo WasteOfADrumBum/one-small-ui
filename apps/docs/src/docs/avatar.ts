@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   name: 'Avatar',
   group: 'Data display',
   summary: 'Pictures or initials in six sizes, with presence status, theme colors and overlapping stacks with a "+N" counter.',
-  importLine: "import { Avatar, AvatarGroup } from 'onesmallui';",
+  importLine: "import { Avatar, AvatarGroup } from '@onesmall/ui';",
   examples: [
     { name: 'avatar-basic', title: 'Sizes, status, images and initials colors' },
     { name: 'avatar-group', title: 'Stacks and overflow count', description: '`max` limits the visible avatars; `total` counts people you have not loaded.' },

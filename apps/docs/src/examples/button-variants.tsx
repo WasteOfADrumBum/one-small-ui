@@ -1,4 +1,4 @@
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 
 export default function Example() {
   return (

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button, Dialog } from 'onesmallui';
+import { Button, Dialog } from '@onesmall/ui';
 
 // Open a second dialog from the first. Focus returns to the original trigger.
 export default function Example() {

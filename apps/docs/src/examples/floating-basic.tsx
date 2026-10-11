@@ -1,4 +1,4 @@
-import { FloatingLabel, Input, Select, Textarea } from 'onesmallui';
+import { FloatingLabel, Input, Select, Textarea } from '@onesmall/ui';
 
 export default function Example() {
   return (

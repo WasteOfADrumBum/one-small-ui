@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Checkbox, Field, Form, Input } from 'onesmallui';
+import { Button, Checkbox, Field, Form, Input } from '@onesmall/ui';
 
 export default function Example() {
   const [status, setStatus] = useState('');

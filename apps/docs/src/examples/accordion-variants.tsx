@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem } from 'onesmallui';
+import { Accordion, AccordionItem } from '@onesmall/ui';
 
 // Region landmarks are named by their trigger, so keep titles unique on the page.
 const items = {

@@ -1,4 +1,4 @@
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse', 'neutral'] as const;
 

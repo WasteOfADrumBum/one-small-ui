@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Nav, NavItem, Navbar } from 'onesmallui';
+import { Button, Nav, NavItem, Navbar } from '@onesmall/ui';
 
 const here = '#components/navbar';
 

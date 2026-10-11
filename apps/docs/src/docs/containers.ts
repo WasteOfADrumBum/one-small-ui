@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Containers & breakpoints',
   group: 'Layout & media',
   summary: 'Containers center content with responsive side padding. .os-container steps its max width at each breakpoint, .os-container-<bp> is fluid until that breakpoint, and .os-container-fluid never caps.',
-  importLine: "import { Container } from 'onesmallui';",
+  importLine: "import { Container } from '@onesmall/ui';",
   examples: [
     {
       name: 'containers-basic',

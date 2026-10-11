@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Form lays fields out vertically, horizontally, inline or in a grid, and adds validation: native constraint validation with styled messages, states shown only after interaction or a submit attempt, server errors, success states, tooltip feedback and custom state colors.',
-  importLine: "import { Form, Field } from 'onesmallui';",
+  importLine: "import { Form, Field } from '@onesmall/ui';",
   examples: [
     { name: 'form-layouts', title: 'Vertical, horizontal, inline and grid layouts' },
     {

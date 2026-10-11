@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Input, InputGroup, InputGroupText } from 'onesmallui';
+import { Input, InputGroup, InputGroupText } from '@onesmall/ui';
 
 export default function Example() {
   const id = useId();

@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Form adornments',
   group: 'Forms',
   summary: 'Icons, text and small buttons inside Input (start and end) and Select (start), integrated with Field labels and sizes.',
-  importLine: "import { Input, Select } from 'onesmallui';",
+  importLine: "import { Input, Select } from '@onesmall/ui';",
   examples: [{ name: 'adornments-basic', title: 'Icons, text, buttons and sizing' }],
   props: [
     {

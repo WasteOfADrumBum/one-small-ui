@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pagination } from 'onesmallui';
+import { Pagination } from '@onesmall/ui';
 
 export default function Example() {
   const [page, setPage] = useState(6);

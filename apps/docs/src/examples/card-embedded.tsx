@@ -11,7 +11,7 @@ import {
   TabList,
   TabPanel,
   Tabs,
-} from 'onesmallui';
+} from '@onesmall/ui';
 
 export default function Example() {
   return (

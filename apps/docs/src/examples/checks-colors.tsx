@@ -1,4 +1,4 @@
-import { Checkbox, Radio, RadioGroup, Switch, type ThemeColor } from 'onesmallui';
+import { Checkbox, Radio, RadioGroup, Switch, type ThemeColor } from '@onesmall/ui';
 
 const colors: ThemeColor[] = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'];
 

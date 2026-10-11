@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Overlays',
   summary:
     'Modal and non-modal dialogs on the native <dialog> element: built-in focus management, static backdrops, scrollable bodies, sizes, responsive fullscreen and four animations. Replaces Modal.',
-  importLine: "import { Dialog } from 'onesmallui';",
+  importLine: "import { Dialog } from '@onesmall/ui';",
   examples: [
     { name: 'dialog-basic', title: 'Modal dialog', description: 'showModal(): focus is trapped and the page is inert. autoFocus picks the initial focus.' },
     { name: 'dialog-nonmodal', title: 'Non-modal dialog', description: 'show(): no backdrop, the page stays usable.' },

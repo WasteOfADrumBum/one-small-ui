@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Checkbox, Radio, RadioGroup, Switch } from 'onesmallui';
+import { Checkbox, Radio, RadioGroup, Switch } from '@onesmall/ui';
 
 const systems = ['Shields', 'Thrusters', 'Life support'];
 

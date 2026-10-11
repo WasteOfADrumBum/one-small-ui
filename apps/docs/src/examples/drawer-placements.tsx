@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Drawer, type DrawerPlacement } from 'onesmallui';
+import { Button, Drawer, type DrawerPlacement } from '@onesmall/ui';
 
 // start/end follow the text direction (they swap in RTL); left/right are physical.
 const placements: DrawerPlacement[] = ['start', 'end', 'top', 'bottom'];

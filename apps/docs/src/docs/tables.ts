@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Tables',
   group: 'Content',
   summary: 'Data tables with theme colors, stripes, hover and active states, borders, compact and card styles, captions, footers, row-group dividers, nesting, stacked mobile layout and a keyboard-scrollable wrapper. Use the Table component or the .os-table class with data attributes.',
-  importLine: "import { Table } from 'onesmallui';",
+  importLine: "import { Table } from '@onesmall/ui';",
   examples: [
     {
       name: 'table-basic',

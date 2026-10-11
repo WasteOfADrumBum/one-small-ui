@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Breadcrumb',
   group: 'Navigation',
   summary: 'Shows where the current page sits in the site hierarchy, with chevron, slash, dot, arrow, text or SVG dividers.',
-  importLine: "import { Breadcrumb, BreadcrumbItem } from 'onesmallui';",
+  importLine: "import { Breadcrumb, BreadcrumbItem } from '@onesmall/ui';",
   examples: [
     { name: 'breadcrumb-basic', title: 'Page hierarchy and current page' },
     { name: 'breadcrumb-separators', title: 'Dividers', description: 'Built-in `chevron`, `slash`, `dot` and `arrow`, or any text or node.' },
