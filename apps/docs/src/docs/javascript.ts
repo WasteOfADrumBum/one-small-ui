@@ -54,8 +54,8 @@ const doc: ComponentDoc = {
     {
       title: 'Script tag (auto-initialises, global OneSmallUI)',
       language: 'markup',
-      code: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/onesmallui@0.2.0/dist/onesmallui.min.css">
-<script src="https://cdn.jsdelivr.net/npm/onesmallui@0.2.0/dist/onesmallui-dom.iife.js" defer></script>
+      code: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/onesmallui@${__OS_VERSION__}/dist/onesmallui.min.css">
+<script src="https://cdn.jsdelivr.net/npm/onesmallui@${__OS_VERSION__}/dist/onesmallui-dom.iife.js" defer></script>
 
 <button class="os-btn" data-variant="solid" data-color="primary" data-size="md"
         data-os-toggle="dialog" data-os-target="#hello">Open</button>
