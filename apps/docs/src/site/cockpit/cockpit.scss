@@ -1,0 +1,426 @@
+@use 'onesmallui/scss/abstracts' as os;
+
+// ---------- CockpitFrame ----------
+.docs-cockpit {
+  --_navy: #1b2a4f;
+  --_hull: color-mix(in srgb, var(--os-surface-2) 88%, var(--_navy));
+  --_hull-alpha: 100%;
+  --_edge: color-mix(in srgb, var(--os-border-strong) 70%, var(--_navy));
+  --_hud: var(--os-primary);
+  --_g: var(--cockpit-glow, 0.5);
+  position: relative;
+  isolation: isolate;
+  padding: clamp(0.75rem, 2.5vw, 1.5rem);
+  border: 2px solid var(--_edge);
+  border-radius: 1.75rem 1.75rem 0.75rem 0.75rem;
+  background: color-mix(in srgb, var(--_hull) var(--_hull-alpha), transparent);
+  box-shadow:
+    inset 0 0 calc(8px + 48px * var(--_g)) color-mix(in srgb, var(--_hud) calc(var(--_g) * 55%), transparent),
+    0 0 calc(4px + 28px * var(--_g)) color-mix(in srgb, var(--_hud) calc(var(--_g) * 40%), transparent);
+  transition:
+    background-color 0.6s ease,
+    box-shadow 0.4s ease;
+
+  &[data-cloaked] {
+    --_hull-alpha: 45%;
+    --_hud: var(--os-accent);
+  }
+}
+
+// Panel seams and rivets.
+.docs-cockpit__seams {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, var(--_edge) 1.5px, transparent 2px) 0 0 / 2.5rem 2.5rem,
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), color-mix(in srgb, var(--_edge) 45%, transparent) calc(25% - 1px) 25%),
+    linear-gradient(transparent calc(50% - 1px), color-mix(in srgb, var(--_edge) 45%, transparent) calc(50% - 1px) 50%, transparent 50%);
+  opacity: 0.55;
+
+  [data-cloaked] > & {
+    opacity: 0.2;
+  }
+}
+
+// Engine glow strips along the bottom and side edges.
+.docs-cockpit__glow {
+  position: absolute;
+  inset: auto 6% -2px;
+  height: 4px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--_hud), transparent);
+  box-shadow: 0 0 calc(6px + 26px * var(--_g)) var(--_hud);
+  opacity: calc(0.15 + var(--_g) * 0.85);
+  transition: opacity 0.3s ease;
+}
+
+// ---------- ViewportWindow ----------
+.docs-viewport {
+  --_cut: 2.25rem;
+  min-width: 0;
+}
+
+.docs-viewport__glass {
+  position: relative;
+  aspect-ratio: 600 / 420;
+  overflow: hidden;
+  background: #020512;
+}
+
+.docs-viewport__scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: filter 0.6s ease;
+
+  [data-cloaked] & {
+    filter: hue-rotate(28deg) saturate(0.85);
+  }
+}
+
+// Faint reflection on the glass.
+.docs-viewport__sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.08), transparent 35%, transparent 70%, rgb(127 231 255 / 0.05));
+}
+
+// Mobile: one wide pane split by a center strut, so it still reads as two windows.
+.docs-mission__view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 1.25rem 1.25rem 0.5rem 0.5rem;
+  background: linear-gradient(180deg, var(--_edge), color-mix(in srgb, var(--_edge) 60%, var(--_navy)));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--_hud) 35%, transparent);
+
+  .docs-viewport[data-side='left'] .docs-viewport__glass {
+    border-radius: 0.9rem 0 0 0.25rem;
+  }
+  .docs-viewport[data-side='right'] .docs-viewport__glass {
+    border-radius: 0 0.9rem 0.25rem 0;
+  }
+
+  // Thick angled frames: each window is its own pane of cockpit glass.
+  @include os.up(md) {
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    padding: 0;
+    background: none;
+    box-shadow: none;
+
+    .docs-viewport {
+      padding: 12px;
+      background: linear-gradient(180deg, var(--_edge), color-mix(in srgb, var(--_edge) 55%, var(--_navy)));
+      filter: drop-shadow(0 0 calc(2px + 10px * var(--_g)) color-mix(in srgb, var(--_hud) calc(var(--_g) * 60%), transparent));
+    }
+
+    .docs-viewport[data-side='left'],
+    .docs-viewport[data-side='left'] .docs-viewport__glass {
+      clip-path: polygon(var(--_cut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--_cut));
+      border-radius: 0;
+    }
+    .docs-viewport[data-side='right'],
+    .docs-viewport[data-side='right'] .docs-viewport__glass {
+      clip-path: polygon(0 0, calc(100% - var(--_cut)) 0, 100% var(--_cut), 100% 100%, 0 100%);
+      border-radius: 0;
+    }
+  }
+}
+
+// ---------- Scene ----------
+.docs-scene__stars {
+  transition: transform 0.6s ease-out;
+
+  &[data-depth='far'] {
+    transform: translate(calc(var(--px, 0) * -6px), calc(var(--py, 0) * -4px));
+  }
+  &[data-depth='near'] {
+    transform: translate(calc(var(--px, 0) * -16px), calc(var(--py, 0) * -10px));
+  }
+}
+
+.docs-scene__reticle {
+  fill: none;
+  stroke: #7fe7ff;
+  stroke-width: 2;
+
+  [data-cloaked] & {
+    stroke: #c9b6ff;
+  }
+}
+
+.docs-scene__sat-track {
+  animation: docs-sat-track 90s linear -45s infinite;
+}
+
+.docs-scene__sat-drift {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 1.2s ease;
+
+  :not([data-autopilot]) > * > & {
+    animation: docs-sat-drift 7s ease-in-out infinite alternate;
+  }
+}
+
+.docs-scene__glare {
+  animation: docs-glare 9s ease-in-out infinite alternate;
+}
+
+.docs-scene__shield {
+  transition: opacity 0.3s ease;
+
+  rect {
+    animation: docs-shimmer 6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes docs-sat-track {
+  from {
+    transform: translateX(-680px);
+  }
+  to {
+    transform: translateX(680px);
+  }
+}
+
+@keyframes docs-sat-drift {
+  from {
+    transform: translate(0, -7px) rotate(-7deg);
+  }
+  to {
+    transform: translate(0, 8px) rotate(6deg);
+  }
+}
+
+@keyframes docs-glare {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes docs-shimmer {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes docs-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ---------- Radar ----------
+.docs-radar {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.docs-radar__scope {
+  position: relative;
+  width: min(100%, 15rem);
+  aspect-ratio: 1;
+  color: #5ce1ff;
+
+  [data-cloaked] & {
+    color: #b9a0ff;
+  }
+}
+
+.docs-radar__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.docs-radar__disc {
+  fill: #031021;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.docs-radar__ring,
+.docs-radar__tick {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.45;
+  stroke-width: 1;
+}
+
+.docs-radar__tick {
+  stroke-opacity: 0.9;
+  stroke-width: 2;
+}
+
+.docs-radar__beam {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.docs-radar__sweep {
+  transform-origin: 100px 100px;
+  animation: docs-sweep 4s linear infinite;
+}
+
+.docs-radar__blips {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-radar__blip {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #7fe7ff;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  &[data-unknown] {
+    color: #ffd28a;
+
+    &::before {
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+  }
+
+  &[aria-pressed='true'] {
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+
+  &:hover::before {
+    transform: scale(1.25);
+  }
+  &[data-unknown]:hover::before {
+    transform: rotate(45deg) scale(1.25);
+  }
+
+  // White ring with a cyan halo reads on the dark scope in both themes.
+  &:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 1px;
+    box-shadow: 0 0 0 6px rgb(92 225 255 / 0.55);
+  }
+}
+
+.docs-radar__readout {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  min-height: 3rem;
+  font-size: var(--os-text-sm);
+  text-align: center;
+  color: var(--os-text-muted);
+
+  strong {
+    color: var(--os-text);
+    font-family: var(--os-font-display);
+    letter-spacing: 0.04em;
+  }
+}
+
+// ---------- Mission control layout ----------
+.docs-mission .docs-cockpit__body {
+  display: grid;
+  gap: 1rem;
+  grid-template-areas: 'view' 'console' 'radar' 'reactor' 'flight';
+
+  // Tablet: radar full width, then the two cards side by side.
+  @include os.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: 'view view' 'console console' 'radar radar' 'reactor flight';
+  }
+
+  @include os.up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: 'view view view' 'console console console' 'reactor radar flight';
+  }
+}
+
+.docs-mission__view {
+  grid-area: view;
+}
+.docs-mission__console {
+  grid-area: console;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block: -0.5rem -0.25rem;
+}
+.docs-mission__note {
+  margin: 0;
+  font-size: var(--os-text-sm);
+  color: var(--os-text-muted);
+}
+.docs-mission__radar {
+  grid-area: radar;
+}
+.docs-mission__reactor {
+  grid-area: reactor;
+}
+.docs-mission__flight {
+  grid-area: flight;
+}
+
+.docs-mission__meter {
+  display: grid;
+  gap: 0.25rem;
+}
+
+// Pause control, offscreen and hidden tabs: freeze every ambient animation in place.
+.docs-mission[data-motion='paused'] {
+  .docs-scene__sat-track,
+  .docs-scene__sat-drift,
+  .docs-scene__glare,
+  .docs-scene__shield rect,
+  .docs-radar__sweep {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-scene__sat-track,
+  .docs-scene__sat-drift,
+  .docs-scene__glare,
+  .docs-scene__shield rect,
+  .docs-radar__sweep {
+    animation: none !important;
+  }
+  .docs-scene__stars {
+    transform: none !important;
+  }
+}
