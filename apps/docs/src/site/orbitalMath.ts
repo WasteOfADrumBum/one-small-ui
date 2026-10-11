@@ -104,7 +104,7 @@ PLANETS[MARS].phase = PLANETS[EARTH].phase + Math.PI + nEarth * FIRST_LAUNCH - n
 // ---------- The Moon ----------
 
 /** Sidereal month: about 13.4 lunar orbits per Earth year. */
-export const MOON = { orbit: 12, size: 1.9, perYear: 13.37, phase: 0.8 };
+export const MOON = { orbit: 7.5, size: 1.9, perYear: 13.37, phase: 0.8 };
 
 /** The Moon in the orbital plane: Earth's position plus a tight circular orbit, same tilt. */
 export function moonPosition(years: number): Vec {
