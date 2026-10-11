@@ -1,0 +1,57 @@
+@use '../abstracts' as *;
+
+// Close button sizes and the overlay variant. Base styles live in _button.scss.
+.#{$prefix}-close-btn {
+  --_icon: 1.25rem;
+  position: relative;
+
+  svg {
+    width: var(--_icon);
+    height: var(--_icon);
+  }
+
+  &[data-size='sm'] {
+    --_icon: 1rem;
+    width: 2rem;
+    height: 2rem;
+
+    // Keep a 44px hit area around the smaller visual (WCAG 2.5.5, AAA).
+    &::after {
+      content: '';
+      position: absolute;
+      inset: calc((2rem - #{$target-size}) / 2);
+    }
+  }
+
+  &[data-size='lg'] {
+    --_icon: 1.5rem;
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  // For photos, video and other dark or busy imagery: a dark translucent disc
+  // rendered with dark-theme tokens so the icon keeps its contrast.
+  &[data-variant='overlay'] {
+    border-radius: 50%;
+    border-color: color-mix(in srgb, token('text') 35%, transparent);
+    background: color-mix(in srgb, token('bg') 78%, transparent);
+    color: token('text');
+    backdrop-filter: blur(6px);
+
+    &:hover {
+      background: token('bg');
+      color: token('text');
+      border-color: token('text');
+    }
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      background: transparent;
+    }
+  }
+}

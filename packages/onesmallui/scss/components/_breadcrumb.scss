@@ -1,0 +1,83 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-breadcrumb {
+  font-size: token('text-sm');
+}
+
+.#{$prefix}-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.#{$prefix}-breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+
+  &:first-child > .#{$prefix}-breadcrumb__separator {
+    display: none;
+  }
+}
+
+.#{$prefix}-breadcrumb__separator {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1rem;
+  color: token('text-muted');
+  user-select: none;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  // Directional icons point the reading direction.
+  [data-separator='chevron'] &,
+  [data-separator='arrow'] & {
+    transform: scaleX(var(--#{$prefix}-dir));
+  }
+}
+
+.#{$prefix}-breadcrumb__link,
+.#{$prefix}-breadcrumb__page {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: $target-size;
+  padding-inline: 0.25rem;
+  border-radius: radius('sm');
+}
+
+.#{$prefix}-breadcrumb__link {
+  color: token('primary-text');
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  @include focus-ring;
+  @include transition(color, text-decoration-thickness);
+
+  &:hover {
+    color: token('text');
+    text-decoration-thickness: 2px;
+  }
+}
+
+.#{$prefix}-breadcrumb__page {
+  color: token('text');
+  font-weight: 600;
+}
+
+.#{$prefix}-breadcrumb__icon {
+  display: inline-grid;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}

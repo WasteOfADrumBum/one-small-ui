@@ -11,10 +11,14 @@ export default function Example() {
   const [loading, setLoading] = useState(false);
   return (
     <div className="os-flex os-flex-wrap os-items-center os-gap-3">
+      <Button size="xs">Extra small</Button>
       <Button size="sm">Small</Button>
       <Button size="md">Medium</Button>
       <Button size="lg" leftIcon={<Rocket />}>
         Large with icon
+      </Button>
+      <Button rightIcon={<Rocket />} variant="soft">
+        Icon right
       </Button>
       <Button iconOnly aria-label="Launch" color="accent">
         <Rocket />
@@ -31,6 +35,9 @@ export default function Example() {
       </Button>
       <Button href="#getting-started" variant="outline">
         I am a link
+      </Button>
+      <Button fullWidth variant="soft" color="secondary">
+        Full width
       </Button>
     </div>
   );

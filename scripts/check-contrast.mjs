@@ -19,7 +19,7 @@ const ratio = (a, b) => {
 };
 
 const surfaces = ['bg', 'surface', 'surface-2', 'surface-3'];
-const statuses = ['primary', 'accent', 'success', 'warning', 'danger', 'info'];
+const statuses = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'];
 const checks = [];
 for (const s of surfaces) {
   checks.push(['text', s, 7], ['text-muted', s, 7], ['border-strong', s, 3], ['focus', s, 3]);

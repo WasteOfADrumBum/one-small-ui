@@ -1,0 +1,215 @@
+@use '../abstracts' as *;
+
+// ---------- Carousel ----------
+// The slide transition is a native scroll-snap track: touch, trackpad and
+// keyboard scrolling work without JS. Fade stacks slides in one grid cell.
+.#{$prefix}-carousel {
+  --_gap: 1rem;
+  --_per-view: 1;
+  --_peek: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  color: token('text');
+}
+
+.#{$prefix}-carousel__viewport {
+  position: relative;
+  min-width: 0;
+}
+
+.#{$prefix}-carousel__track {
+  display: flex;
+  gap: var(--_gap);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  scroll-padding-inline: var(--_peek);
+  padding-inline: var(--_peek);
+  scrollbar-width: none;
+  border-radius: radius('lg');
+  @include focus-ring;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline-offset: 3px;
+  }
+
+  [data-transition='fade'] > .#{$prefix}-carousel__viewport > & {
+    display: grid;
+    overflow: hidden;
+    padding: 0;
+    touch-action: pan-y;
+  }
+}
+
+.#{$prefix}-carousel__slide {
+  position: relative;
+  flex: 0 0 calc((100% - (var(--_per-view) - 1) * var(--_gap)) / var(--_per-view));
+  min-width: 0;
+  scroll-snap-align: start;
+  border-radius: radius('lg');
+  overflow: hidden;
+
+  [data-per-view='auto'] & {
+    flex: 0 0 auto;
+  }
+
+  > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  [data-transition='fade'] & {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity dur('slower') ease('standard'), visibility 0s linear dur('slower');
+
+    &[data-active] {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+  }
+}
+
+.#{$prefix}-carousel__caption {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  padding: 2.5rem 1.25rem 1.25rem;
+  background: linear-gradient(to top, color-mix(in srgb, token('bg') 92%, transparent) 55%, transparent);
+  color: token('text');
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+}
+
+// Buttons: solid surface pills so they keep contrast over any image.
+.#{$prefix}-carousel__btn {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: $target-size;
+  height: $target-size;
+  padding: 0;
+  border: 1px solid token('border-strong');
+  border-radius: 50%;
+  background: token('surface');
+  color: token('text');
+  box-shadow: var(--#{$prefix}-shadow-md);
+  cursor: pointer;
+  @include transition(background-color, color, border-color);
+  @include focus-ring;
+
+  &:hover:not(:disabled) {
+    background: token('surface-3');
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  svg[data-dir] {
+    transform: scaleX(var(--#{$prefix}-dir));
+  }
+}
+
+[data-controls='overlay'] .#{$prefix}-carousel__prev,
+[data-controls='overlay'] .#{$prefix}-carousel__next {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+}
+
+[data-controls='overlay'] .#{$prefix}-carousel__prev {
+  inset-inline-start: 0.75rem;
+}
+
+[data-controls='overlay'] .#{$prefix}-carousel__next {
+  inset-inline-end: 0.75rem;
+}
+
+// Overlay / no-controls play button sits in the top corner of the carousel.
+.#{$prefix}-carousel > .#{$prefix}-carousel__play {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+}
+
+.#{$prefix}-carousel__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .#{$prefix}-carousel__indicators {
+    flex: 1;
+  }
+}
+
+.#{$prefix}-carousel__indicators {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+
+  [data-controls='overlay'] .#{$prefix}-carousel__viewport > & {
+    position: absolute;
+    inset-block-end: 0.5rem;
+    inset-inline: 4rem;
+    width: fit-content;
+    margin-inline: auto;
+    border-radius: radius('full');
+    background: token('surface');
+    border: 1px solid token('border-strong');
+  }
+}
+
+// 44px hit area around a small visual dot.
+.#{$prefix}-carousel__dot {
+  display: inline-grid;
+  place-items: center;
+  width: $target-size;
+  height: $target-size;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:focus-visible {
+    outline-offset: -6px;
+  }
+
+  &::before {
+    content: '';
+    width: 0.65rem;
+    height: 0.65rem;
+    border: 2px solid token('border-strong');
+    border-radius: radius('full');
+    @include transition(width, background-color, border-color);
+  }
+
+  &[aria-current='true']::before {
+    width: 1.5rem;
+    border-color: token('primary');
+    background: token('primary');
+  }
+}

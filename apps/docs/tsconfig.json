@@ -14,7 +14,8 @@
     "types": ["vite/client"],
     "baseUrl": ".",
     "paths": {
-      "onesmallui": ["../../packages/onesmallui/src/index.ts"]
+      "onesmallui": ["../../packages/onesmallui/src/index.ts"],
+      "onesmallui/dom": ["../../packages/onesmallui/src/dom/index.ts"]
     }
   },
   "include": ["src"]

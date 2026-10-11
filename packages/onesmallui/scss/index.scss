@@ -3,9 +3,37 @@
 // Use the compiled CSS:          import 'onesmallui/styles.css';
 // Or compile with your overrides: @use 'onesmallui/scss' with ($prefix: 'os', $radius-base: 6px);
 // Only need the tools?            @use 'onesmallui/scss/abstracts' as os;
+//
+// Output is wrapped in cascade layers so unlayered app CSS overrides it without
+// fighting specificity. Turn that off with `$enable-layers: false`.
+@use 'sass:meta';
 @forward 'abstracts';
-@use 'themes';
-@use 'base/reset';
-@use 'base/animations';
-@use 'components';
-@use 'utilities';
+@use 'abstracts' as *;
+
+@if $enable-layers {
+  @layer os.tokens, os.reset, os.base, os.components, os.utilities;
+
+  @layer os.tokens {
+    @include meta.load-css('themes');
+  }
+  @layer os.reset {
+    @include meta.load-css('base/reset');
+  }
+  @layer os.base {
+    @include meta.load-css('base/animations');
+    @include meta.load-css('base/content');
+  }
+  @layer os.components {
+    @include meta.load-css('components');
+  }
+  @layer os.utilities {
+    @include meta.load-css('utilities');
+  }
+} @else {
+  @include meta.load-css('themes');
+  @include meta.load-css('base/reset');
+  @include meta.load-css('base/animations');
+  @include meta.load-css('base/content');
+  @include meta.load-css('components');
+  @include meta.load-css('utilities');
+}

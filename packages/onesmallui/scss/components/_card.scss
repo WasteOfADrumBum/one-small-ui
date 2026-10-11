@@ -101,3 +101,234 @@
     transform: scale(1.04);
   }
 }
+
+// ---------- Theme colors ----------
+.#{$prefix}-card {
+  @include color-vars;
+
+  &[data-color] {
+    border-color: color-mix(in srgb, var(--_text) 40%, #{token('border')});
+  }
+
+  &[data-color][data-variant='surface'] {
+    background: var(--_soft);
+  }
+
+  &[data-color][data-variant='outline'] {
+    border-color: var(--_c);
+  }
+
+  &[data-color][data-variant='glass'] {
+    background: color-mix(in srgb, var(--_soft) 72%, transparent);
+  }
+
+  // Filled with the color; every part reads in on-<color>.
+  &[data-variant='solid'] {
+    --_solid-bg: #{token('inverse')};
+    --_solid-fg: #{token('on-inverse')};
+    border-color: transparent;
+    background: var(--_solid-bg);
+    color: var(--_solid-fg);
+
+    &[data-color] {
+      --_solid-bg: var(--_c);
+      --_solid-fg: var(--_on);
+    }
+
+    .#{$prefix}-card__subtitle,
+    .#{$prefix}-card__text,
+    .#{$prefix}-card__link {
+      color: inherit;
+    }
+
+    .#{$prefix}-card__link {
+      @include focus-ring;
+
+      &:focus-visible {
+        outline-color: currentColor;
+      }
+    }
+  }
+
+  &[data-color]:not([data-variant='solid']) .#{$prefix}-card__title {
+    color: var(--_text);
+  }
+
+  // Muted text is only guaranteed 7:1 on neutral surfaces; tinted cards use full text color.
+  &[data-color]:not([data-variant='solid']) :is(.#{$prefix}-card__text, .#{$prefix}-card__subtitle) {
+    color: token('text');
+  }
+}
+
+// ---------- Text parts ----------
+.#{$prefix}-card__title {
+  margin: 0 0 0.35rem;
+  font-size: token('text-lg');
+  font-weight: 700;
+  line-height: $line-height-tight;
+}
+
+.#{$prefix}-card__subtitle {
+  margin: -0.15rem 0 0.5rem;
+  color: token('text-muted');
+  font-size: token('text-sm');
+  font-weight: 500;
+}
+
+.#{$prefix}-card__text {
+  margin: 0 0 0.75rem;
+  color: token('text-muted');
+}
+
+.#{$prefix}-card__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: $target-size;
+  color: token('primary-text');
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  border-radius: radius('sm');
+  @include focus-ring;
+
+  + .#{$prefix}-card__link {
+    margin-inline-start: 1.25rem;
+  }
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+// ---------- Images and overlays ----------
+.#{$prefix}-card__img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+
+  &[data-position='cover'] {
+    height: 100%;
+    min-height: 14rem;
+  }
+}
+
+.#{$prefix}-card:has(> .#{$prefix}-card__overlay) {
+  isolation: isolate;
+}
+
+// Always rendered with dark-theme tokens (data-os-theme="dark"), over a scrim that
+// keeps light text at 7:1 on any photo.
+.#{$prefix}-card__overlay {
+  --_scrim-a: color-mix(in srgb, #{token('bg')} 94%, transparent);
+  --_scrim-b: color-mix(in srgb, #{token('bg')} 82%, transparent);
+  --_scrim-c: color-mix(in srgb, #{token('bg')} 40%, transparent);
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+  background: linear-gradient(to top, var(--_scrim-a) 0%, var(--_scrim-b) 55%, var(--_scrim-c) 100%);
+  color: token('text');
+
+  &[data-align='start'] {
+    justify-content: flex-start;
+    background: linear-gradient(to bottom, var(--_scrim-a) 0%, var(--_scrim-b) 55%, var(--_scrim-c) 100%);
+  }
+
+  &[data-align='center'] {
+    justify-content: center;
+    background: var(--_scrim-b);
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  .#{$prefix}-card__text {
+    color: token('text');
+  }
+}
+
+// ---------- Embedded list groups and navigation ----------
+.#{$prefix}-card > .#{$prefix}-list-group {
+  border-inline: 0;
+  border-radius: 0;
+
+  &:first-child {
+    border-block-start: 0;
+  }
+
+  &:last-child {
+    border-block-end: 0;
+  }
+}
+
+.#{$prefix}-card__header > .#{$prefix}-tabs {
+  flex: 1;
+  min-width: 0;
+}
+
+// ---------- Horizontal cards ----------
+.#{$prefix}-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.#{$prefix}-card[data-orientation='horizontal'] {
+  @include up(sm) {
+    flex-direction: row;
+
+    > .#{$prefix}-card__media,
+    > .#{$prefix}-card__img {
+      flex: 0 0 var(--#{$prefix}-card-media-size, 38%);
+      max-width: var(--#{$prefix}-card-media-size, 38%);
+      height: auto;
+      align-self: stretch;
+      object-fit: cover;
+    }
+
+    > .#{$prefix}-card__body {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}
+
+// ---------- Groups and grids ----------
+.#{$prefix}-card-group {
+  display: grid;
+  gap: 1rem;
+
+  &[data-layout='grid'] {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--#{$prefix}-card-min, 16rem)), 1fr));
+  }
+
+  // Edge to edge, equal heights, shared borders from `sm` up.
+  &[data-layout='attached'] {
+    @include up(sm) {
+      display: flex;
+      gap: 0;
+
+      > .#{$prefix}-card {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      > .#{$prefix}-card:not(:first-child) {
+        margin-inline-start: -1px;
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+      }
+
+      > .#{$prefix}-card:not(:last-child) {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+      }
+    }
+  }
+}

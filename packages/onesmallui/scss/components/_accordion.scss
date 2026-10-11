@@ -1,0 +1,130 @@
+@use '../abstracts' as *;
+
+// Accordion extensions: variants, sizes, native <details> mode, custom indicators
+// and nesting. The base accordion styles live in _navigation.scss.
+
+.#{$prefix}-accordion {
+  --_px: 1.25rem;
+
+  &[data-size='sm'] {
+    --_px: 1rem;
+
+    .#{$prefix}-accordion__trigger {
+      min-height: $target-size;
+      padding-block: 0.5rem;
+      padding-inline: var(--_px);
+      font-size: token('text-sm');
+    }
+
+    .#{$prefix}-accordion__inner {
+      padding-inline: var(--_px);
+      font-size: token('text-sm');
+    }
+
+    [data-state='open'] > .#{$prefix}-accordion__region > .#{$prefix}-accordion__content > .#{$prefix}-accordion__inner {
+      padding-block-end: 1rem;
+    }
+  }
+
+  &[data-variant='flush'] {
+    border-inline: 0;
+    border-block-start: 0;
+    border-radius: 0;
+    background: transparent;
+
+    > .#{$prefix}-accordion__item:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  &[data-variant='spaced'] {
+    display: grid;
+    gap: 0.75rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+
+    > .#{$prefix}-accordion__item {
+      border: 1px solid token('border');
+      border-radius: radius('lg');
+      background: token('surface');
+      overflow: hidden;
+      @include transition(border-color, box-shadow);
+
+      &[data-state='open'] {
+        border-color: color-mix(in srgb, token('primary-text') 45%, token('border'));
+        box-shadow: var(--#{$prefix}-shadow-sm);
+      }
+    }
+
+    > .#{$prefix}-accordion__item + .#{$prefix}-accordion__item {
+      border-top: 1px solid token('border');
+    }
+  }
+}
+
+.#{$prefix}-accordion__trigger {
+  text-align: start;
+}
+
+// The indicator is a wrapper so any icon can be dropped in.
+.#{$prefix}-accordion__chevron {
+  display: inline-grid;
+  place-items: center;
+
+  > svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  [open] > summary > & {
+    transform: rotate(180deg);
+  }
+
+  [aria-expanded='true'] > &[data-static],
+  [open] > summary > &[data-static] {
+    transform: none;
+  }
+}
+
+button.#{$prefix}-accordion__trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+// Nested accordions: a closed child must not inherit its open parent's state styles.
+[data-state='closed'] > .#{$prefix}-accordion__region > .#{$prefix}-accordion__content > .#{$prefix}-accordion__inner {
+  padding-block-end: 0;
+  opacity: 0;
+}
+
+.#{$prefix}-accordion__inner .#{$prefix}-accordion {
+  margin-block: 0.5rem;
+}
+
+// Native <details> / <summary> mode.
+.#{$prefix}-accordion[data-native] {
+  summary.#{$prefix}-accordion__trigger {
+    list-style: none;
+
+    &::-webkit-details-marker,
+    &::marker {
+      display: none;
+      content: '';
+    }
+
+    &[aria-disabled='true'] {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  [open] > summary.#{$prefix}-accordion__trigger {
+    color: token('primary-text');
+  }
+}

@@ -1,0 +1,148 @@
+@use '../abstracts' as *;
+
+.#{$prefix}-pagination {
+  --_size: #{$target-size};
+  --_gap: 0.25rem;
+  @include color-vars;
+  display: flex;
+  font-size: token('text-sm');
+
+  &:not([data-color]) {
+    --_c: #{token('primary')};
+    --_on: #{token('on-primary')};
+    --_soft: #{token('primary-soft')};
+    --_text: #{token('primary-text')};
+  }
+
+  &[data-align='center'] {
+    justify-content: center;
+  }
+
+  &[data-align='end'] {
+    justify-content: flex-end;
+  }
+
+  &[data-size='sm'] {
+    --_gap: 0.125rem;
+    font-size: token('text-xs');
+  }
+
+  &[data-size='lg'] {
+    --_size: 3.25rem;
+    font-size: token('text-base');
+  }
+}
+
+.#{$prefix}-pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--_gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.#{$prefix}-pagination__link,
+.#{$prefix}-pagination__ellipsis {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--_size);
+  height: var(--_size);
+  padding-inline: 0.5rem;
+  border-radius: radius('md');
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.#{$prefix}-pagination__ellipsis {
+  color: token('text-muted');
+}
+
+.#{$prefix}-pagination__link {
+  position: relative;
+  border: 1px solid transparent;
+  background: transparent;
+  color: token('text');
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  @include transition(background-color, color, border-color);
+  @include focus-ring;
+
+  svg {
+    width: 1.1em;
+    height: 1.1em;
+    transform: scaleX(var(--#{$prefix}-dir));
+  }
+
+  &:hover:not(:disabled, [aria-disabled='true'], [aria-current]) {
+    background: token('surface-2');
+    border-color: token('border-strong');
+  }
+
+  &[aria-current] {
+    background: var(--_c);
+    border-color: var(--_c);
+    color: var(--_on);
+    cursor: default;
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    color: token('text-muted');
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  [data-variant='outline'] & {
+    border-color: token('border-strong');
+    background: token('surface');
+
+    &[aria-current] {
+      background: var(--_c);
+      border-color: var(--_c);
+    }
+
+    &:disabled,
+    &[aria-disabled='true'] {
+      border-color: token('border');
+    }
+  }
+
+  [data-variant='soft'] & {
+    background: token('surface-2');
+
+    &[aria-current] {
+      background: var(--_soft);
+      border-color: var(--_text);
+      color: var(--_text);
+    }
+  }
+
+  [data-variant='ghost'] &[aria-current] {
+    background: transparent;
+    border-color: transparent;
+    color: var(--_text);
+    box-shadow: inset 0 -3px 0 var(--_text);
+    border-radius: 0;
+  }
+}
+
+// Small: a 2rem-tall visual, still 44px wide, with the hit area extended to 44px tall.
+.#{$prefix}-pagination[data-size='sm'] .#{$prefix}-pagination__link,
+.#{$prefix}-pagination[data-size='sm'] .#{$prefix}-pagination__ellipsis {
+  height: 2rem;
+}
+
+.#{$prefix}-pagination[data-size='sm'] .#{$prefix}-pagination__list {
+  row-gap: 0.75rem;
+}
+
+.#{$prefix}-pagination[data-size='sm'] .#{$prefix}-pagination__link::after {
+  content: '';
+  position: absolute;
+  inset-block: calc((2rem - #{$target-size}) / 2);
+  inset-inline: 0;
+}

@@ -15,7 +15,7 @@ export function useMediaQuery(query: string): boolean {
 }
 
 /** Breakpoints matching the SCSS `$breakpoints` map. */
-export const breakpoints = { sm: 480, md: 768, lg: 1024, xl: 1280, '2xl': 1536, '3xl': 1920 } as const;
+export const breakpoints = { sm: 576, md: 768, lg: 1024, xl: 1280, '2xl': 1536, '3xl': 1920 } as const;
 export type Breakpoint = keyof typeof breakpoints;
 
 /** `true` when the viewport is at least the given breakpoint wide. */

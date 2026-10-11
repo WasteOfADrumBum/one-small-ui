@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Modal, SkipLink, ThemeToggle } from 'onesmallui';
+import { Button, Drawer, SkipLink, ThemeToggle } from 'onesmallui';
 import { componentDocs, groups } from './site/componentDocs';
 import { useHashRoute } from './site/router';
 import { Home } from './pages/Home';
@@ -140,9 +140,9 @@ export function App() {
         </main>
       </div>
 
-      <Modal open={menuOpen} onClose={closeMenu} placement="left" size="sm" title="Navigation">
+      <Drawer open={menuOpen} onClose={closeMenu} placement="start" size="sm" title="Navigation">
         <Nav route={route} onNavigate={closeMenu} />
-      </Modal>
+      </Drawer>
     </div>
   );
 }

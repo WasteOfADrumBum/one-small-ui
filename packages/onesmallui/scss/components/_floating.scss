@@ -1,0 +1,60 @@
+@use '../abstracts' as *;
+
+// Shared base for anything positioned by `useFloating` / `computePosition`
+// (menus, popovers, tooltips, datepickers, comboboxes). Neutralizes the
+// browser's [popover] defaults so top-layer panels sit where JS puts them.
+.#{$prefix}-floating {
+  position: fixed;
+  inset: auto;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: inherit;
+  z-index: z('dropdown');
+}
+
+// Optional arrow. Position along the edge comes from `--os-arrow-offset`.
+.#{$prefix}-floating__arrow {
+  position: absolute;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: inherit;
+  border: inherit;
+  rotate: 45deg;
+
+  [data-side='top'] > & {
+    bottom: -0.375rem;
+    left: var(--#{$prefix}-arrow-offset, calc(50% - 0.375rem));
+    border-top: 0;
+    border-left: 0;
+  }
+  [data-side='bottom'] > & {
+    top: -0.375rem;
+    left: var(--#{$prefix}-arrow-offset, calc(50% - 0.375rem));
+    border-bottom: 0;
+    border-right: 0;
+  }
+  [data-side='left'] > & {
+    right: -0.375rem;
+    top: var(--#{$prefix}-arrow-offset, calc(50% - 0.375rem));
+    border-bottom: 0;
+    border-left: 0;
+  }
+  [data-side='right'] > & {
+    left: -0.375rem;
+    top: var(--#{$prefix}-arrow-offset, calc(50% - 0.375rem));
+    border-top: 0;
+    border-right: 0;
+  }
+}
+
+// Translucent appearance shared by overlays (menus, toasts, drawers, navbars):
+// `data-appearance="translucent"`. The dark appearance is just
+// `data-os-theme="dark"` on the component, which re-scopes every token.
+[data-appearance='translucent'] {
+  @include glass('surface');
+}

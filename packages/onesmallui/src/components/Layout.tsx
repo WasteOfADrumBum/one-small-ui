@@ -3,13 +3,13 @@ import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
 type SpaceKey = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16;
-type BreakpointKey = 'base' | 'sm' | 'md' | 'lg' | 'xl';
+type BreakpointKey = 'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 /** A value, or a value per breakpoint: `{ base: 1, md: 2, lg: 3 }`. */
 export type Responsive<T> = T | Partial<Record<BreakpointKey, T>>;
 
 const space = (n: SpaceKey) => `${n * 0.25}rem`;
 
-const ORDER: BreakpointKey[] = ['base', 'sm', 'md', 'lg', 'xl'];
+const ORDER: BreakpointKey[] = ['base', 'sm', 'md', 'lg', 'xl', '2xl'];
 
 /**
  * Turns a responsive prop into CSS variables: `--os-cols`, `--os-cols-md`, ...
@@ -35,7 +35,11 @@ interface PolymorphicProps extends HTMLAttributes<HTMLElement> {
 }
 
 export interface ContainerProps extends PolymorphicProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /**
+   * Fixed max width, `'full'` for none, or `'responsive'` to step the max width at
+   * every breakpoint (like `.os-container` / Bootstrap's `.container`).
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'responsive';
 }
 
 /** Centers content with a max width and responsive side padding. */

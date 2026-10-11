@@ -17,11 +17,14 @@ const pairs: { fg: ColorToken; bg: ColorToken }[] = [
   { fg: 'text', bg: 'bg' },
   { fg: 'text-muted', bg: 'surface' },
   { fg: 'on-primary', bg: 'primary' },
+  { fg: 'on-secondary', bg: 'secondary' },
   { fg: 'on-accent', bg: 'accent' },
   { fg: 'on-success', bg: 'success' },
   { fg: 'on-warning', bg: 'warning' },
   { fg: 'on-danger', bg: 'danger' },
   { fg: 'on-info', bg: 'info' },
+  { fg: 'on-inverse', bg: 'inverse' },
+  { fg: 'secondary-text', bg: 'secondary-soft' },
   { fg: 'primary-text', bg: 'primary-soft' },
   { fg: 'accent-text', bg: 'accent-soft' },
   { fg: 'success-text', bg: 'success-soft' },
@@ -137,7 +140,7 @@ export function Theming() {
           <tbody>
             {[
               ['$prefix', "'os'", 'Class and CSS variable prefix'],
-              ['$breakpoints', 'sm 480, md 768, lg 1024, xl 1280, 2xl 1536, 3xl 1920', 'Media queries and responsive utilities'],
+              ['$breakpoints', 'sm 576, md 768, lg 1024, xl 1280, 2xl 1536, 3xl 1920', 'Media queries and responsive utilities'],
               ['$spacers', '0 → 24 on a 0.25rem scale', 'Spacing utilities and layout gaps'],
               ['$font-sizes', 'Fluid clamp() scale xs → 5xl', 'Type scale'],
               ['$radius-base', '10px', 'Every radius is derived from it'],

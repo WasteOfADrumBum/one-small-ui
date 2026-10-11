@@ -2,8 +2,9 @@
 // light and dark themes, using the built docs site in apps/docs/dist.
 //   npm run build && npm run test:a11y
 //   SCREENSHOTS=./shots npm run test:a11y   # also save screenshots
+//   ROUTES=button,menu npm run test:a11y    # only routes containing these strings
 import { createServer } from 'node:http';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile, readdir, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,11 +33,13 @@ const server = createServer(async (req, res) => {
 await new Promise((r) => server.listen(0, r));
 const base = `http://localhost:${server.address().port}/`;
 
+// Every docs page: the guides plus one route per file in apps/docs/src/docs/.
+const docsDir = fileURLToPath(new URL('../apps/docs/src/docs/', import.meta.url));
+const slugs = (await readdir(docsDir)).filter((f) => f.endsWith('.ts')).map((f) => f.replace(/\.ts$/, ''));
 const routes = [
   'home', 'getting-started', 'theming', 'utilities', 'accessibility',
-  ...['button', 'card', 'badge', 'alert', 'forms', 'selection', 'modal', 'tabs', 'accordion', 'tooltip', 'toast',
-    'loading', 'avatar', 'layout', 'media', 'dropzone', 'sortable', 'code', 'theme', 'hooks'].map((s) => `components/${s}`),
-];
+  ...slugs.map((s) => `components/${s}`),
+].filter((r) => !process.env.ROUTES || process.env.ROUTES.split(',').some((x) => r.includes(x)));
 
 const shots = process.env.SCREENSHOTS;
 if (shots) await mkdir(shots, { recursive: true });

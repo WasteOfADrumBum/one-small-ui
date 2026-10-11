@@ -1,8 +1,20 @@
 import { forwardRef, useEffect, useId, useRef, type InputHTMLAttributes, type ReactNode } from 'react';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
+import type { Size, ThemeColor } from './types';
 
-export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+/** Shared look props for Checkbox, Radio and Switch. */
+export interface CheckLookProps {
+  /** Fill color when checked. Default `primary`. */
+  color?: ThemeColor;
+  size?: Size;
+  /** `card`: a bordered, full-width choice card that highlights when checked. */
+  variant?: 'default' | 'card';
+  /** Marks the control `aria-invalid` and shows the error style. */
+  invalid?: boolean;
+}
+
+export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'color'>, CheckLookProps {
   label: ReactNode;
   /** Extra text under the label, linked with `aria-describedby`. */
   description?: ReactNode;
@@ -12,7 +24,7 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 
 /** A native checkbox with a custom, animated look. */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { label, description, indeterminate = false, className, id, ...rest },
+  { label, description, indeterminate = false, color, size, variant, invalid, className, id, ...rest },
   ref,
 ) {
   const auto = useId();
@@ -24,19 +36,27 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   }, [indeterminate]);
 
   return (
-    <div className={cx(cls('check'), className)} data-disabled={rest.disabled || undefined}>
+    <div
+      className={cx(cls('check'), className)}
+      data-color={color}
+      data-size={size}
+      data-variant={variant === 'card' ? 'card' : undefined}
+      data-disabled={rest.disabled || undefined}
+      data-invalid={invalid || undefined}
+    >
       <input
         ref={(el) => {
           inner.current = el;
           if (typeof ref === 'function') ref(el);
           else if (ref) ref.current = el;
         }}
+        {...rest}
         id={inputId}
         type="checkbox"
         className={cls('check__input')}
-        aria-describedby={descId}
+        aria-describedby={[rest['aria-describedby'], descId].filter(Boolean).join(' ') || undefined}
+        aria-invalid={invalid || rest['aria-invalid'] || undefined}
         data-indeterminate={indeterminate || undefined}
-        {...rest}
       />
       <span className={cls('check__box')} aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

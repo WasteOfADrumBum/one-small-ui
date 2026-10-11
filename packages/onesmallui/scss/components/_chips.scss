@@ -1,0 +1,241 @@
+@use '../abstracts' as *;
+@use 'form-mixins' as fm;
+
+// ---------- Chip ----------
+.#{$prefix}-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  // Row gap keeps the 44px hit areas of neighbouring rows apart.
+  gap: 0.75rem 0.5rem;
+}
+
+.#{$prefix}-chip {
+  // Neutral by default; `data-color` picks a theme color.
+  --_c: #{token('text')};
+  --_on: #{token('bg')};
+  --_soft: #{token('surface-3')};
+  --_text: #{token('text')};
+  --_h: 2rem;
+  @include color-vars;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: var(--_h);
+  border: 1px solid color-mix(in srgb, var(--_text) 35%, transparent);
+  border-radius: radius('full');
+  background: var(--_soft);
+  color: var(--_text);
+  font-size: token('text-sm');
+  font-weight: 500;
+  line-height: 1.2;
+  vertical-align: middle;
+  transition: background-color dur('base') ease('standard'), color dur('base') ease('standard'),
+    border-color dur('base') ease('standard');
+
+  &[data-size='sm'] {
+    --_h: 1.75rem;
+    font-size: token('text-xs');
+  }
+
+  &[data-size='lg'] {
+    --_h: 2.5rem;
+    font-size: token('text-base');
+  }
+
+  &[data-variant='solid'] {
+    background: var(--_c);
+    color: var(--_on);
+    border-color: transparent;
+  }
+
+  &[data-variant='outline'] {
+    background: transparent;
+    border-color: var(--_text);
+  }
+
+  // Pressed toggle chips fill in and show a check, so state isn't color alone.
+  &[data-selected] {
+    background: var(--_c);
+    color: var(--_on);
+    border-color: var(--_text);
+  }
+
+  &[data-disabled] {
+    opacity: 0.55;
+  }
+}
+
+.#{$prefix}-chip__main {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  min-height: inherit;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+
+  [data-removable] > & {
+    padding-inline-end: 0.25rem;
+  }
+
+  &:is(button) {
+    cursor: pointer;
+    @include focus-ring;
+
+    // 44px tall hit area.
+    &::after {
+      content: '';
+      position: absolute;
+      inset-block: min(0px, calc((var(--_h) - #{$target-size}) / 2));
+      inset-inline: 0;
+    }
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, currentColor 10%, transparent);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.#{$prefix}-chip__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.#{$prefix}-chip__icon,
+.#{$prefix}-chip__check {
+  display: inline-flex;
+  flex-shrink: 0;
+
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.#{$prefix}-chip__check {
+  display: none;
+
+  [data-selected] & {
+    display: inline-flex;
+  }
+}
+
+.#{$prefix}-chip__avatar {
+  display: inline-flex;
+  margin-inline-start: -0.5rem;
+
+  .#{$prefix}-avatar,
+  img {
+    --_size: calc(var(--_h) - 6px);
+    width: calc(var(--_h) - 6px);
+    height: calc(var(--_h) - 6px);
+    font-size: 0.7em;
+  }
+
+  img {
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+
+.#{$prefix}-chip__remove {
+  position: relative;
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: calc(var(--_h) - 4px);
+  height: calc(var(--_h) - 4px);
+  margin-inline: 0 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  @include focus-ring;
+
+  // 44 × 44px hit area.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: min(0px, calc((var(--_h) - 4px - #{$target-size}) / 2));
+  }
+
+  svg {
+    width: 0.875em;
+    height: 0.875em;
+  }
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, currentColor 16%, transparent);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// ---------- Chip input ----------
+.#{$prefix}-chip-input {
+  @include fm.control-sizes;
+  @include fm.control;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 0.375rem;
+  padding: 0.3125rem 0.5rem;
+  cursor: text;
+
+  &:focus-within {
+    @include fm.control-focus;
+  }
+
+  &[data-invalid] {
+    @include fm.control-invalid;
+  }
+
+  &[data-disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.#{$prefix}-chip-input__control {
+  flex: 1 0 8rem;
+  min-width: 6rem;
+  min-height: 2rem;
+  padding: 0 0.375rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+
+  &::placeholder {
+    color: token('text-muted');
+    opacity: 1;
+  }
+}
+
+.#{$prefix}-chip-input__error {
+  flex-basis: 100%;
+  padding-inline: 0.375rem;
+  font-size: token('text-sm');
+  font-weight: 600;
+  color: fm.$invalid-color;
+}

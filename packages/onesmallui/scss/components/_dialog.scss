@@ -1,0 +1,377 @@
+@use 'sass:map';
+@use '../abstracts' as *;
+
+// Dialog and Drawer share one structure: the native <dialog> is a transparent,
+// viewport-sized grid and `__panel` is the visible surface. Clicks that land on
+// the <dialog> itself are backdrop clicks.
+
+$fullscreen-bps: sm, md, lg, xl, '2xl';
+
+%overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: z('modal');
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: token('text');
+  overflow: hidden;
+
+  &[open] {
+    display: grid;
+  }
+
+  &::backdrop {
+    background: token('overlay');
+    backdrop-filter: blur(6px);
+    animation: #{$prefix}-fade-in dur('slow') ease('standard') both;
+  }
+
+  &[data-state='closing']::backdrop {
+    animation: #{$prefix}-overlay-fade-out 220ms ease('exit') both;
+  }
+
+  &[data-backdrop='none']::backdrop {
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  // Non-modal: the page behind stays usable, so only the panel takes pointer events.
+  &[data-modal='false'] {
+    pointer-events: none;
+  }
+
+  // The translucent appearance belongs on the panel, not the full-screen root.
+  &[data-appearance='translucent'] {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+%overlay-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid token('border');
+  background: token('surface');
+  color: token('text');
+  box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 12%, transparent),
+    0 30px 80px -30px token('glow');
+  overflow: hidden;
+  pointer-events: auto;
+
+  &:focus {
+    outline: none;
+  }
+
+  [data-appearance='translucent'] > & {
+    @include glass('surface');
+  }
+}
+
+%overlay-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.25rem 0;
+  padding-inline: 1.5rem 1.25rem;
+}
+
+%overlay-title {
+  margin: 0.5rem 0 0;
+  font-size: token('text-xl');
+  line-height: $line-height-tight;
+}
+
+%overlay-description {
+  margin: 0.35rem 0 0;
+  color: token('text-muted');
+  font-size: token('text-sm');
+}
+
+%overlay-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-block: 1rem 1.5rem;
+  padding-inline: 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+%overlay-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-block-start: 1px solid token('border');
+  background: token('surface-2');
+}
+
+// ---------- Dialog ----------
+dialog.#{$prefix}-dialog {
+  @extend %overlay-root;
+  --_w: 32rem;
+  padding: 1rem;
+  overflow-y: auto;
+
+  &[data-size='sm'] { --_w: 24rem; }
+  &[data-size='lg'] { --_w: 48rem; }
+  &[data-size='xl'] { --_w: 64rem; }
+  &[data-size='full'] { --_w: 100%; }
+
+  // Non-modal dialogs float in the corner of the viewport instead of the middle.
+  &[data-modal='false'] {
+    inset: auto;
+    inset-block-end: 1rem;
+    inset-inline-end: 1rem;
+    width: auto;
+    height: auto;
+    padding: 0;
+    overflow: visible;
+  }
+}
+
+.#{$prefix}-dialog__panel {
+  @extend %overlay-panel;
+  width: min(var(--_w), 100%);
+  max-height: calc(100dvh - 2rem);
+  margin: auto; // centers, and stays reachable when taller than the screen
+  border-radius: radius('xl');
+
+  [data-scrollable='false'] > & {
+    max-height: none;
+  }
+
+  [data-modal='false'] > & {
+    width: min(var(--_w), calc(100vw - 2rem));
+    max-height: min(32rem, calc(100dvh - 2rem));
+  }
+}
+
+@mixin dialog-fullscreen {
+  padding: 0;
+
+  > .#{$prefix}-dialog__panel {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+dialog.#{$prefix}-dialog[data-fullscreen='always'] {
+  @include dialog-fullscreen;
+}
+
+@each $bp in $fullscreen-bps {
+  dialog.#{$prefix}-dialog[data-fullscreen='#{$bp}'] {
+    @include down($bp) {
+      @include dialog-fullscreen;
+    }
+  }
+}
+
+.#{$prefix}-dialog__header { @extend %overlay-header; }
+.#{$prefix}-dialog__heading { min-width: 0; }
+.#{$prefix}-dialog__title { @extend %overlay-title; }
+.#{$prefix}-dialog__description { @extend %overlay-description; }
+.#{$prefix}-dialog__footer { @extend %overlay-footer; }
+.#{$prefix}-dialog__body {
+  @extend %overlay-body;
+
+  [data-scrollable='false'] & {
+    overflow: visible;
+  }
+}
+
+// Dialog motion: scale (default), fade, slide-down, slide-up, none.
+dialog.#{$prefix}-dialog[open] > .#{$prefix}-dialog__panel {
+  animation: #{$prefix}-scale-in dur('slow') ease('emphasized') both;
+}
+dialog.#{$prefix}-dialog[data-state='closing'] > .#{$prefix}-dialog__panel {
+  animation: #{$prefix}-dialog-out 220ms ease('exit') both;
+}
+dialog.#{$prefix}-dialog[data-animation='fade'] {
+  &[open] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-fade-in; }
+  &[data-state='closing'] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-overlay-fade-out; }
+}
+dialog.#{$prefix}-dialog[data-animation='slide-down'] {
+  &[open] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-dialog-from-top; }
+  &[data-state='closing'] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-dialog-to-top; }
+}
+dialog.#{$prefix}-dialog[data-animation='slide-up'] {
+  &[open] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-dialog-from-bottom; }
+  &[data-state='closing'] > .#{$prefix}-dialog__panel { animation-name: #{$prefix}-dialog-to-bottom; }
+}
+dialog.#{$prefix}-dialog[data-animation='none'] {
+  &::backdrop,
+  > .#{$prefix}-dialog__panel {
+    animation: none;
+  }
+}
+
+// Static backdrop: a small nudge says "use the buttons".
+dialog[data-shake] > [data-dialog-panel] {
+  animation: #{$prefix}-dialog-shake 300ms ease('standard') both;
+}
+
+@keyframes #{$prefix}-dialog-out {
+  to { opacity: 0; transform: scale(0.96); }
+}
+@keyframes #{$prefix}-overlay-fade-out {
+  to { opacity: 0; }
+}
+@keyframes #{$prefix}-dialog-from-top {
+  from { opacity: 0; transform: translateY(-2.5rem); }
+}
+@keyframes #{$prefix}-dialog-to-top {
+  to { opacity: 0; transform: translateY(-2.5rem); }
+}
+@keyframes #{$prefix}-dialog-from-bottom {
+  from { opacity: 0; transform: translateY(2.5rem); }
+}
+@keyframes #{$prefix}-dialog-to-bottom {
+  to { opacity: 0; transform: translateY(2.5rem); }
+}
+@keyframes #{$prefix}-dialog-shake {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.02); }
+  70% { transform: scale(0.99); }
+}
+
+// ---------- Drawer ----------
+dialog.#{$prefix}-drawer {
+  @extend %overlay-root;
+  --_w: 24rem;
+  --_h: 50dvh;
+  --_from: translateX(calc(100% * var(--#{$prefix}-dir)));
+
+  &[data-size='sm'] { --_w: 20rem; --_h: 33dvh; }
+  &[data-size='lg'] { --_w: 32rem; --_h: 70dvh; }
+  &[data-size='xl'] { --_w: 44rem; --_h: 85dvh; }
+  &[data-size='full'] { --_w: 100vw; --_h: 100dvh; }
+
+  &[data-placement='start'] {
+    justify-items: start;
+    --_from: translateX(calc(-100% * var(--#{$prefix}-dir)));
+  }
+  &[data-placement='end'] {
+    justify-items: end;
+    --_from: translateX(calc(100% * var(--#{$prefix}-dir)));
+  }
+  &[data-placement='left'] {
+    justify-items: left;
+    --_from: translateX(-100%);
+  }
+  &[data-placement='right'] {
+    justify-items: right;
+    --_from: translateX(100%);
+  }
+  &[data-placement='top'] {
+    align-items: start;
+    --_from: translateY(-100%);
+  }
+  &[data-placement='bottom'] {
+    align-items: end;
+    --_from: translateY(100%);
+  }
+
+  // Sheet: a rounded panel floating inside the screen edges.
+  &[data-sheet] {
+    padding: 0.75rem;
+  }
+}
+
+.#{$prefix}-drawer__panel {
+  @extend %overlay-panel;
+
+  dialog > & {
+    width: min(var(--_w), 100vw);
+    height: 100%;
+    max-height: 100dvh;
+  }
+
+  dialog[data-placement='top'] > &,
+  dialog[data-placement='bottom'] > & {
+    width: 100%;
+    height: auto;
+    max-height: var(--_h);
+  }
+
+  dialog[data-placement='bottom'] > & {
+    border-start-start-radius: radius('xl');
+    border-start-end-radius: radius('xl');
+  }
+
+  dialog[data-sheet] > & {
+    width: min(var(--_w), 100%);
+    max-height: calc(100dvh - 1.5rem);
+    border-radius: radius('xl');
+  }
+
+  dialog[data-sheet][data-placement='top'] > &,
+  dialog[data-sheet][data-placement='bottom'] > & {
+    width: 100%;
+    max-height: min(var(--_h), calc(100dvh - 1.5rem));
+  }
+
+  dialog[open] > & {
+    animation: #{$prefix}-drawer-in dur('slow') ease('standard') both;
+  }
+
+  dialog[data-state='closing'] > & {
+    animation: #{$prefix}-drawer-out 220ms ease('exit') both;
+  }
+
+  dialog[data-instant] > & {
+    animation: none;
+  }
+}
+
+dialog.#{$prefix}-drawer[data-instant]::backdrop {
+  animation: none;
+}
+
+.#{$prefix}-drawer__header { @extend %overlay-header; }
+.#{$prefix}-drawer__heading { min-width: 0; }
+.#{$prefix}-drawer__title { @extend %overlay-title; }
+.#{$prefix}-drawer__description { @extend %overlay-description; }
+.#{$prefix}-drawer__body { @extend %overlay-body; }
+.#{$prefix}-drawer__footer { @extend %overlay-footer; }
+
+// Responsive drawer rendered inline above its breakpoint.
+.#{$prefix}-drawer[data-inline] {
+  display: block;
+
+  > .#{$prefix}-drawer__panel {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .#{$prefix}-drawer__body {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .#{$prefix}-drawer__footer {
+    padding-inline: 0;
+    background: transparent;
+  }
+}
+
+@keyframes #{$prefix}-drawer-in {
+  from { transform: var(--_from); }
+}
+@keyframes #{$prefix}-drawer-out {
+  to { transform: var(--_from); }
+}

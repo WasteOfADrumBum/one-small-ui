@@ -1,0 +1,296 @@
+@use '../abstracts' as *;
+@use 'form-mixins' as fm;
+
+// ---------- Calendar ----------
+.#{$prefix}-calendar {
+  --_c: #{token('primary')};
+  --_on: #{token('on-primary')};
+  --_soft: #{token('primary-soft')};
+  --_text: #{token('primary-text')};
+  @include color-vars;
+
+  position: relative;
+  display: inline-grid;
+  gap: 0.5rem;
+  max-width: 100%;
+  color: token('text');
+}
+
+.#{$prefix}-calendar__nav {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.#{$prefix}-calendar__nav-btn {
+  display: inline-grid;
+  place-items: center;
+  width: $target-size;
+  height: $target-size;
+  border: 0;
+  border-radius: radius('md');
+  background: transparent;
+  color: token('text');
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover:not(:disabled) {
+    background: token('surface-3');
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    // Point the way time moves, in either text direction.
+    scale: var(--#{$prefix}-dir, 1) 1;
+
+    &[data-flip] {
+      scale: calc(-1 * var(--#{$prefix}-dir, 1)) 1;
+    }
+  }
+}
+
+.#{$prefix}-calendar__months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+}
+
+.#{$prefix}-calendar__heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: $target-size;
+  padding-inline: $target-size;
+  font-weight: 700;
+}
+
+.#{$prefix}-calendar__grid {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
+}
+
+.#{$prefix}-calendar__weekday {
+  width: $target-size;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: token('text-xs');
+  font-weight: 600;
+  color: token('text-muted');
+  text-align: center;
+}
+
+.#{$prefix}-calendar__cell {
+  padding: 0;
+  border: 0;
+  text-align: center;
+
+  &[data-in-range] {
+    background: var(--_soft);
+  }
+
+  &[data-range-start] {
+    border-start-start-radius: radius('full');
+    border-end-start-radius: radius('full');
+  }
+
+  &[data-range-end] {
+    border-start-end-radius: radius('full');
+    border-end-end-radius: radius('full');
+  }
+}
+
+.#{$prefix}-calendar__day {
+  position: relative;
+  width: $target-size;
+  height: $target-size;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: token('text');
+  font: inherit;
+  font-size: token('text-sm');
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover:not([aria-disabled='true']) {
+    background: token('surface-3');
+  }
+
+  &[data-today] {
+    font-weight: 700;
+    box-shadow: inset 0 0 0 2px var(--_text);
+  }
+
+  &[data-selected],
+  [data-range-start] > &,
+  [data-range-end] > & {
+    background: var(--_c);
+    color: var(--_on);
+    font-weight: 700;
+
+    &:hover {
+      background: var(--_c-hover, var(--_c));
+    }
+  }
+
+  &[aria-disabled='true'] {
+    color: token('text-muted');
+    text-decoration: line-through;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.#{$prefix}-calendar__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-block-start: 0.5rem;
+  border-block-start: 1px solid token('border');
+}
+
+// ---------- DatePicker ----------
+.#{$prefix}-datepicker {
+  @include fm.control-sizes;
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.#{$prefix}-datepicker__anchor {
+  display: flex;
+  min-width: 0;
+
+  > .#{$prefix}-input {
+    flex: 1;
+  }
+}
+
+.#{$prefix}-datepicker__toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-inline-end: calc(var(--_px) * -0.5);
+  padding: 0;
+  border: 0;
+  border-radius: radius('sm');
+  background: transparent;
+  color: token('text-muted');
+  cursor: pointer;
+  @include focus-ring;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -0.25rem;
+  }
+
+  &:hover:not(:disabled) {
+    background: token('surface-3');
+    color: token('text');
+  }
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+}
+
+.#{$prefix}-datepicker__button {
+  @include fm.control;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 var(--_px);
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include fm.control-focus;
+  }
+
+  &[data-invalid] {
+    @include fm.control-invalid;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    color: token('text-muted');
+  }
+}
+
+.#{$prefix}-datepicker__value[data-placeholder] {
+  color: token('text-muted');
+}
+
+.#{$prefix}-datepicker__popup {
+  padding: 0.75rem;
+  border: 1px solid token('border-strong');
+  border-radius: radius('lg');
+  background: token('surface');
+  color: token('text');
+  box-shadow: var(--#{$prefix}-shadow-lg);
+  max-width: calc(100vw - 1rem);
+  overflow: auto;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.#{$prefix}-datepicker__action {
+  min-height: $target-size;
+  padding: 0 1rem;
+  border: 1px solid token('border-strong');
+  border-radius: radius('md');
+  background: transparent;
+  color: token('text');
+  font: inherit;
+  font-size: token('text-sm');
+  font-weight: 600;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover {
+    background: token('surface-3');
+  }
+
+  &[data-primary] {
+    border-color: token('primary');
+    background: token('primary');
+    color: token('on-primary');
+
+    &:hover {
+      background: token('primary-hover');
+    }
+  }
+}

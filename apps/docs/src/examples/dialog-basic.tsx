@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Button, Field, Input, Modal } from 'onesmallui';
+import { Button, Dialog, Field, Input } from 'onesmallui';
 
 export default function Example() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Open dialog</Button>
-      <Modal
+      <Button onClick={() => setOpen(true)}>Rename vessel</Button>
+      <Dialog
         open={open}
         onClose={() => setOpen(false)}
         title="Rename vessel"
@@ -23,7 +23,7 @@ export default function Example() {
         <Field label="Vessel name">
           <Input defaultValue="Starlight Runner" autoFocus />
         </Field>
-      </Modal>
+      </Dialog>
     </>
   );
 }

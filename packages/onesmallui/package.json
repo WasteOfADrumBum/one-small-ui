@@ -1,6 +1,6 @@
 {
   "name": "onesmallui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA accessible React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
   "keywords": [
     "react",
@@ -30,23 +30,29 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./dom": {
+      "types": "./dist/dom/index.d.ts",
+      "import": "./dist/dom.js"
+    },
     "./styles.css": "./dist/onesmallui.css",
     "./styles.min.css": "./dist/onesmallui.min.css",
     "./scss": "./scss/index.scss",
     "./scss/*": "./scss/*",
     "./tokens.json": "./tokens/themes.json",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./agent/SKILL.md": "./agent/SKILL.md"
   },
   "files": [
     "dist",
     "scss",
     "tokens",
+    "agent",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "tokens": "node ../../scripts/build-tokens.mjs",
-    "build:js": "vite build && tsc -p tsconfig.build.json",
+    "build:js": "vite build && vite build -c vite.dom.config.ts && vite build -c vite.dom-iife.config.ts && tsc -p tsconfig.build.json",
     "build:css": "sass --no-source-map --load-path=node_modules scss/index.scss dist/onesmallui.css && sass --no-source-map --style=compressed scss/index.scss dist/onesmallui.min.css",
     "build": "npm run tokens && rm -rf dist && npm run build:js && npm run build:css",
     "typecheck": "tsc -p tsconfig.json --noEmit",

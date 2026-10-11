@@ -1,6 +1,6 @@
 import { Badge } from 'onesmallui';
 
-const colors = ['neutral', 'primary', 'accent', 'success', 'warning', 'danger', 'info'] as const;
+const colors = ['neutral', 'primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 
 export default function Example() {
   return (
@@ -14,7 +14,7 @@ export default function Example() {
           ))}
         </div>
       ))}
-      <div className="os-flex os-flex-wrap os-gap-2">
+      <div className="os-flex os-flex-wrap os-items-center os-gap-2">
         <Badge color="success" dot pulse>
           Systems nominal
         </Badge>
@@ -23,6 +23,15 @@ export default function Example() {
         </Badge>
         <Badge color="danger" dot size="sm">
           Offline
+        </Badge>
+        <Badge color="info" size="lg">
+          Large
+        </Badge>
+        <Badge color="accent" shape="rounded">
+          Rounded
+        </Badge>
+        <Badge color="primary" variant="solid">
+          42
         </Badge>
       </div>
     </div>

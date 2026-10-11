@@ -1,0 +1,490 @@
+// The built-in utility map. Every entry goes through the public `utilities()` mixin
+// (abstracts/_mixins.scss), so anything here can be overridden or removed with
+// `@use 'onesmallui/scss' with ($utilities: ('opacity': null))`.
+//
+// Responsive variants (`md:`) are limited to layout-shaping groups (display, flex,
+// grid, spacing, alignment, text-align, order, width, float) to keep the CSS small.
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:string';
+@use '../abstracts' as *;
+
+// ---------- value helpers ----------
+$_margins: map.merge($spacers, ('auto': auto));
+$_negatives: ();
+@each $k in ('1', '2', '3', '4', '6', '8') {
+  $_negatives: map.merge($_negatives, ('n#{$k}': -1 * map.get($spacers, $k)));
+}
+
+$_text-colors: ('default': token('text'), 'emphasis': token('text'), 'muted': token('text-muted'));
+$_bg-colors: (
+  'bg': token('bg'), 'surface': token('surface'), 'surface-2': token('surface-2'), 'surface-3': token('surface-3'),
+  'transparent': transparent,
+);
+$_border-colors: (
+  'subtle': token('border'), 'strong': token('border-strong'), 'current': currentColor, 'transparent': transparent,
+);
+$_text-bg: ();
+$_gradients: ();
+@each $c in $theme-colors {
+  $_text-colors: map.merge($_text-colors, ($c: token('#{$c}-text')));
+  $_bg-colors: map.merge($_bg-colors, ($c: token($c), '#{$c}-soft': token('#{$c}-soft')));
+  $_border-colors: map.merge($_border-colors, (
+    $c: token($c),
+    '#{$c}-subtle': color-mix(in srgb, token($c) 40%, token('surface')),
+  ));
+  $_text-bg: map.merge($_text-bg, ($c: (color: token('on-#{$c}'), background-color: token($c))));
+  $_gradients: map.merge($_gradients, ($c: (
+    color: token('on-#{$c}'),
+    background-color: token($c),
+    background-image: linear-gradient(135deg, token($c), token('#{$c}-hover')),
+  )));
+}
+$_text-colors: map.merge($_text-colors, ('inherit': inherit, 'reset': inherit));
+$_gradients: map.merge($_gradients, ('': (
+  color: token('on-primary'),
+  background-color: token('primary'),
+  background-image: linear-gradient(135deg, token('primary'), token('accent')),
+)));
+
+$_link-colors: ('body': token('text'), 'muted': token('text-muted'));
+$_underline-colors: ();
+@each $c in $theme-colors {
+  $_link-colors: map.merge($_link-colors, ($c: token('#{$c}-text')));
+  $_underline-colors: map.merge($_underline-colors, ($c: token('#{$c}-text')));
+}
+
+@function _span($n) {
+  @return string.unquote('span #{$n}');
+}
+$_col-span: ('full': string.unquote('1 / -1'));
+$_row-span: ('full': string.unquote('1 / -1'));
+$_lines: ();
+@for $i from 1 through 12 {
+  $_col-span: map.merge($_col-span, ('#{$i}': _span($i)));
+}
+@for $i from 1 through 6 {
+  $_row-span: map.merge($_row-span, ('#{$i}': _span($i)));
+}
+@for $i from 1 through 13 {
+  $_lines: map.merge($_lines, ('#{$i}': $i));
+}
+$_lines: map.merge($_lines, ('auto': auto));
+
+$_grid-cols: ('none': none);
+@each $n in (1, 2, 3, 4, 5, 6, 12) {
+  $_grid-cols: map.merge($_grid-cols, ('#{$n}': repeat($n, minmax(0, 1fr))));
+}
+$_grid-rows: ('none': none);
+@for $n from 1 through 6 {
+  $_grid-rows: map.merge($_grid-rows, ('#{$n}': repeat($n, minmax(0, 1fr))));
+}
+
+$_z: ('n1': -1, '0': 0, '1': 1, '2': 2, '3': 3, 'auto': auto);
+$_z: map.merge($_z, $z-index);
+
+$_inset: ('0': 0, '50': 50%, '100': 100%, 'auto': auto);
+
+$_space: ();
+@each $k, $v in $spacers {
+  @if $k != 'px' and $k != '0-5' {
+    $_space: map.merge($_space, ($k: $v));
+  }
+}
+
+$_radius: ('none': 0, 'sm': radius('sm'), 'md': radius('md'), 'lg': radius('lg'), 'full': radius('full'));
+@function _corners($a, $b) {
+  $out: ();
+  @each $k, $v in $_radius {
+    $out: map.merge($out, ($k: ($a: $v, $b: $v)));
+  }
+  @return map.merge($out, ('': ($a: radius('md'), $b: radius('md'))));
+}
+
+$_opacity: ();
+@each $n in (0, 5, 10, 25, 50, 75, 90, 100) {
+  $_opacity: map.merge($_opacity, ('#{$n}': math.div($n, 100)));
+}
+
+@function _link-values($colors) {
+  $out: ();
+  @each $k, $c in $colors {
+    $out: map.merge($out, ($k: (color: $c, --_ul: $c)));
+  }
+  @return $out;
+}
+
+@function _underline-values($colors) {
+  $out: ();
+  @each $k, $c in $colors {
+    $out: map.merge($out, ($k: (--_ul: $c)));
+  }
+  @return $out;
+}
+
+@function _opacity-values() {
+  $out: ();
+  @each $n in (0, 10, 25, 50, 75, 100) {
+    $out: map.merge($out, ('#{$n}': (--_ul-o: #{$n + '%'})));
+  }
+  @return $out;
+}
+
+$core: (
+  // ---------- Color ----------
+  'color': ('props': color, 'values': $_text-colors, 'name': 'text'),
+  'background': ('props': background-color, 'values': $_bg-colors, 'name': 'bg'),
+  'text-bg': ('values': $_text-bg, 'name': 'text-bg'),
+  'gradient': ('values': $_gradients, 'name': 'bg-gradient'),
+
+  // ---------- Layout ----------
+  'display': (
+    'props': display,
+    'values': (
+      'block': block, 'inline-block': inline-block, 'inline': inline, 'flex': flex, 'inline-flex': inline-flex,
+      'grid': grid, 'inline-grid': inline-grid,
+      'contents': contents, 'flow-root': flow-root, 'hidden': none,
+    ),
+    'bare': true,
+    'responsive': true,
+    'container': true,
+    'print': true,
+  ),
+  'float': (
+    'props': float,
+    'values': ('start': inline-start, 'end': inline-end, 'none': none),
+    'name': 'float',
+    'responsive': true,
+  ),
+  'aspect-ratio': (
+    'props': aspect-ratio,
+    'values': (
+      'auto': auto, '1x1': string.unquote('1 / 1'), '4x3': string.unquote('4 / 3'), '3x2': string.unquote('3 / 2'),
+      '16x9': string.unquote('16 / 9'), '21x9': string.unquote('21 / 9'), '9x16': string.unquote('9 / 16'),
+    ),
+    'name': 'ratio',
+  ),
+  'object-fit': (
+    'props': object-fit,
+    'values': ('cover': cover, 'contain': contain, 'fill': fill, 'scale-down': scale-down, 'none': none),
+    'name': 'object',
+  ),
+  'object-position': (
+    'props': object-position,
+    'values': ('center': center, 'top': top, 'bottom': bottom),
+    'name': 'object',
+  ),
+  'overflow': ('props': overflow, 'values': (hidden, auto, visible, scroll, clip), 'name': 'overflow'),
+  'overflow-x': ('props': overflow-x, 'values': (hidden, auto, visible, scroll), 'name': 'overflow-x'),
+  'overflow-y': ('props': overflow-y, 'values': (hidden, auto, visible, scroll), 'name': 'overflow-y'),
+  'position': (
+    'props': position,
+    'values': ('static': static, 'relative': relative, 'absolute': absolute, 'fixed': fixed, 'sticky': sticky),
+    'bare': true,
+  ),
+  'inset': ('props': inset, 'values': ('0': 0, 'auto': auto), 'name': 'inset'),
+  'top': ('props': top, 'values': $_inset, 'name': 'top'),
+  'bottom': ('props': bottom, 'values': $_inset, 'name': 'bottom'),
+  'start': ('props': inset-inline-start, 'values': $_inset, 'name': 'start'),
+  'end': ('props': inset-inline-end, 'values': $_inset, 'name': 'end'),
+  'translate-middle': (
+    'values': (
+      '': (transform: translate(calc(-50% * var(--#{$prefix}-dir)), -50%)),
+      'x': (transform: translateX(calc(-50% * var(--#{$prefix}-dir)))),
+      'y': (transform: translateY(-50%)),
+    ),
+    'name': 'translate-middle',
+  ),
+  'visibility': ('props': visibility, 'values': ('visible': visible, 'invisible': hidden), 'bare': true),
+  'z-index': ('props': z-index, 'values': $_z, 'name': 'z'),
+
+  // ---------- Flex and grid ----------
+  'flex-direction': (
+    'props': flex-direction,
+    'values': ('row': row, 'col': column, 'row-reverse': row-reverse, 'col-reverse': column-reverse),
+    'name': 'flex',
+    'responsive': true,
+    'container': true,
+  ),
+  'flex-wrap': (
+    'props': flex-wrap,
+    'values': ('wrap': wrap, 'nowrap': nowrap, 'wrap-reverse': wrap-reverse),
+    'name': 'flex',
+    'responsive': true,
+  ),
+  'flex': ('props': flex, 'values': ('1': 1 1 0%, 'auto': 1 1 auto, 'initial': 0 1 auto, 'none': none), 'name': 'flex'),
+  'grow': ('props': flex-grow, 'values': ('': 1, '0': 0), 'name': 'grow'),
+  'shrink': ('props': flex-shrink, 'values': ('': 1, '0': 0), 'name': 'shrink'),
+  'align-items': (
+    'props': align-items,
+    'values': ('start': flex-start, 'center': center, 'end': flex-end, 'stretch': stretch, 'baseline': baseline),
+    'name': 'items',
+    'responsive': true,
+  ),
+  'align-content': (
+    'props': align-content,
+    'values': ('start': flex-start, 'center': center, 'end': flex-end, 'between': space-between, 'around': space-around, 'stretch': stretch),
+    'name': 'content',
+    'responsive': true,
+  ),
+  'align-self': (
+    'props': align-self,
+    'values': ('auto': auto, 'start': flex-start, 'center': center, 'end': flex-end, 'stretch': stretch, 'baseline': baseline),
+    'name': 'self',
+    'responsive': true,
+  ),
+  'justify-content': (
+    'props': justify-content,
+    'values': ('start': flex-start, 'center': center, 'end': flex-end, 'between': space-between, 'around': space-around, 'evenly': space-evenly),
+    'name': 'justify',
+    'responsive': true,
+  ),
+  'justify-items': (
+    'props': justify-items,
+    'values': ('start': start, 'center': center, 'end': end, 'stretch': stretch),
+    'name': 'justify-items',
+  ),
+  'justify-self': (
+    'props': justify-self,
+    'values': ('auto': auto, 'start': start, 'center': center, 'end': end, 'stretch': stretch),
+    'name': 'justify-self',
+  ),
+  'place-items': (
+    'props': place-items,
+    'values': ('start': start, 'center': center, 'end': end, 'stretch': stretch),
+    'name': 'place-items',
+  ),
+  'place-content': (
+    'props': place-content,
+    'values': ('start': start, 'center': center, 'end': end, 'between': space-between, 'stretch': stretch),
+    'name': 'place-content',
+  ),
+  'order': (
+    'props': order,
+    'values': ('first': -1, '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, 'last': 999),
+    'name': 'order',
+    'responsive': true,
+  ),
+  'gap': ('props': gap, 'values': $spacers, 'name': 'gap', 'responsive': true),
+  'gap-x': ('props': column-gap, 'values': $_space, 'name': 'gap-x'),
+  'gap-y': ('props': row-gap, 'values': $_space, 'name': 'gap-y'),
+  'grid-cols': ('props': grid-template-columns, 'values': $_grid-cols, 'name': 'grid-cols', 'responsive': true, 'container': true),
+  'grid-rows': ('props': grid-template-rows, 'values': $_grid-rows, 'name': 'grid-rows'),
+  'grid-flow': (
+    'props': grid-auto-flow,
+    'values': ('row': row, 'col': column, 'dense': dense, 'row-dense': row dense),
+    'name': 'grid-flow',
+  ),
+  'col-span': ('props': grid-column, 'values': $_col-span, 'name': 'col-span', 'responsive': true),
+  'col-start': ('props': grid-column-start, 'values': $_lines, 'name': 'col-start'),
+  'col-end': ('props': grid-column-end, 'values': $_lines, 'name': 'col-end'),
+  'row-span': ('props': grid-row, 'values': $_row-span, 'name': 'row-span'),
+  'row-start': ('props': grid-row-start, 'values': $_lines, 'name': 'row-start'),
+
+  // ---------- Sizing ----------
+  'width': (
+    'props': width,
+    'values': (
+      '25': 25%, '50': 50%, '75': 75%, '100': 100%, 'full': 100%, 'auto': auto, 'fit': fit-content,
+      'min': min-content, 'max': max-content,
+    ),
+    'name': 'w',
+    'responsive': true,
+  ),
+  'width-viewport': ('props': width, 'values': ('screen': 100vw), 'name': 'w'),
+  'min-width': ('props': min-width, 'values': ('0': 0, 'full': 100%, 'screen': 100vw), 'name': 'min-w'),
+  'max-width': (
+    'props': max-width,
+    'values': (
+      'prose': 75ch, 'sm': map.get($breakpoints, 'sm'), 'md': map.get($breakpoints, 'md'),
+      'lg': map.get($breakpoints, 'lg'), 'xl': $container-max, 'full': 100%, 'none': none,
+    ),
+    'name': 'max-w',
+  ),
+  'height': (
+    'props': height,
+    'values': ('25': 25%, '50': 50%, '75': 75%, '100': 100%, 'full': 100%, 'screen': 100dvh, 'auto': auto, 'fit': fit-content),
+    'name': 'h',
+  ),
+  'min-height': ('props': min-height, 'values': ('0': 0, 'full': 100%, 'screen': 100dvh), 'name': 'min-h'),
+  'max-height': ('props': max-height, 'values': ('full': 100%, 'screen': 100dvh, 'none': none), 'name': 'max-h'),
+
+  // ---------- Spacing (logical: s = inline-start, e = inline-end) ----------
+  'margin': ('props': margin, 'values': $_margins, 'name': 'm', 'responsive': true),
+  'margin-x': ('props': margin-inline, 'values': $_margins, 'name': 'mx', 'responsive': true),
+  'margin-y': ('props': margin-block, 'values': $_margins, 'name': 'my', 'responsive': true),
+  'margin-top': ('props': margin-block-start, 'values': $_margins, 'name': 'mt'),
+  'margin-bottom': ('props': margin-block-end, 'values': $_margins, 'name': 'mb'),
+  'margin-start': ('props': margin-inline-start, 'values': $_margins, 'name': 'ms'),
+  'margin-end': ('props': margin-inline-end, 'values': $_margins, 'name': 'me'),
+  'margin-negative': ('props': margin, 'values': $_negatives, 'name': 'm'),
+  'margin-x-negative': ('props': margin-inline, 'values': $_negatives, 'name': 'mx'),
+  'margin-y-negative': ('props': margin-block, 'values': $_negatives, 'name': 'my'),
+  'margin-top-negative': ('props': margin-block-start, 'values': $_negatives, 'name': 'mt'),
+  'margin-bottom-negative': ('props': margin-block-end, 'values': $_negatives, 'name': 'mb'),
+  'margin-start-negative': ('props': margin-inline-start, 'values': $_negatives, 'name': 'ms'),
+  'margin-end-negative': ('props': margin-inline-end, 'values': $_negatives, 'name': 'me'),
+  'padding': ('props': padding, 'values': $spacers, 'name': 'p', 'responsive': true),
+  'padding-x': ('props': padding-inline, 'values': $spacers, 'name': 'px', 'responsive': true),
+  'padding-y': ('props': padding-block, 'values': $spacers, 'name': 'py', 'responsive': true),
+  'padding-top': ('props': padding-block-start, 'values': $spacers, 'name': 'pt'),
+  'padding-bottom': ('props': padding-block-end, 'values': $spacers, 'name': 'pb'),
+  'padding-start': ('props': padding-inline-start, 'values': $spacers, 'name': 'ps'),
+  'padding-end': ('props': padding-inline-end, 'values': $spacers, 'name': 'pe'),
+  // Physical left/right kept for compatibility; prefer ps-/pe- (they flip in RTL).
+  'padding-right': ('props': padding-right, 'values': $spacers, 'name': 'pr'),
+  'padding-left': ('props': padding-left, 'values': $spacers, 'name': 'pl'),
+  'space-y': ('props': margin-block-start, 'values': $_space, 'name': 'space-y', 'child': '> * + *'),
+  'space-x': ('props': margin-inline-start, 'values': $_space, 'name': 'space-x', 'child': '> * + *'),
+
+  // ---------- Text ----------
+  'font-family': (
+    'props': font-family,
+    'values': ('sans': token('font-sans'), 'display': token('font-display'), 'mono': token('font-mono')),
+    'name': 'font',
+  ),
+  'font-size': ('props': font-size, 'values': $font-sizes, 'name': 'text', 'var': 'text', 'responsive': true),
+  'font-style': ('values': ('italic': (font-style: italic), 'not-italic': (font-style: normal)), 'bare': true),
+  'font-weight': (
+    'props': font-weight,
+    'values': (
+      'light': 300, 'normal': 400, 'medium': 500, 'semibold': 600, 'bold': 700, 'extrabold': 800, 'black': 900,
+      'bolder': bolder, 'lighter': lighter,
+    ),
+    'name': 'font',
+  ),
+  'leading': (
+    'props': line-height,
+    'values': ('none': 1, 'tight': $line-height-tight, 'snug': 1.375, 'normal': $line-height-base, 'relaxed': 1.75, 'loose': 2),
+    'name': 'leading',
+  ),
+  'tracking': ('props': letter-spacing, 'values': ('tight': -0.02em, 'normal': 0, 'wide': 0.08em, 'wider': 0.16em), 'name': 'tracking'),
+  'text-align': (
+    'props': text-align,
+    'values': ('start': start, 'center': center, 'end': end, 'left': left, 'right': right, 'justify': justify),
+    'name': 'text',
+    'responsive': true,
+  ),
+  'text-transform': (
+    'props': text-transform,
+    'values': ('upper': uppercase, 'lower': lowercase, 'capitalize': capitalize, 'normal-case': none),
+    'name': 'text',
+  ),
+  'text-decoration': (
+    'props': text-decoration-line,
+    'values': ('underline': underline, 'line-through': line-through, 'no-underline': none),
+    'bare': true,
+  ),
+  'underline-offset': (
+    'props': text-underline-offset,
+    'values': ('auto': auto, '1': 0.125em, '2': 0.25em, '3': 0.375em),
+    'name': 'underline-offset',
+  ),
+  'text-wrap': (
+    'values': (
+      'wrap': (white-space: normal, text-wrap: wrap),
+      'nowrap': (white-space: nowrap),
+      'balance': (text-wrap: balance),
+      'pretty': (text-wrap: pretty),
+      'break': (overflow-wrap: anywhere, word-break: normal),
+    ),
+    'name': 'text',
+  ),
+  'word-break': ('props': word-break, 'values': ('all': break-all, 'keep': keep-all), 'name': 'break'),
+  'vertical-align': (
+    'props': vertical-align,
+    'values': (baseline, top, middle, bottom, text-top, text-bottom, sub, super),
+    'name': 'align',
+  ),
+  // Links: `.os-link-primary` colors a link; underline color/opacity combine through variables.
+  'link-color': ('values': _link-values($_link-colors), 'name': 'link'),
+  'link-underline': ('values': _underline-values($_underline-colors), 'name': 'link-underline'),
+  'link-underline-opacity': ('values': _opacity-values(), 'name': 'link-underline-opacity'),
+
+  // ---------- Borders ----------
+  'border': (
+    'values': (
+      '': (border: 1px solid token('border')),
+      '0': (border: 0),
+      'top': (border-block-start: 1px solid token('border')),
+      'bottom': (border-block-end: 1px solid token('border')),
+      'start': (border-inline-start: 1px solid token('border')),
+      'end': (border-inline-end: 1px solid token('border')),
+      'x': (border-inline: 1px solid token('border')),
+      'y': (border-block: 1px solid token('border')),
+      'top-0': (border-block-start: 0),
+      'bottom-0': (border-block-end: 0),
+      'start-0': (border-inline-start: 0),
+      'end-0': (border-inline-end: 0),
+    ),
+    'name': 'border',
+  ),
+  'border-width': ('props': border-width, 'values': ('1': 1px, '2': 2px, '3': 3px, '4': 4px), 'name': 'border'),
+  'border-style': ('props': border-style, 'values': ('solid': solid, 'dashed': dashed, 'dotted': dotted), 'name': 'border'),
+  'border-color': ('props': border-color, 'values': $_border-colors, 'name': 'border'),
+  'radius': (
+    'props': border-radius,
+    'values': map.merge($_radius, ('': radius('md'), 'xl': radius('xl'), 'circle': 50%, 'pill': radius('full'))),
+    'name': 'rounded',
+  ),
+  'radius-top': ('values': _corners(border-start-start-radius, border-start-end-radius), 'name': 'rounded-top'),
+  'radius-bottom': ('values': _corners(border-end-start-radius, border-end-end-radius), 'name': 'rounded-bottom'),
+  'radius-start': ('values': _corners(border-start-start-radius, border-end-start-radius), 'name': 'rounded-start'),
+  'radius-end': ('values': _corners(border-start-end-radius, border-end-end-radius), 'name': 'rounded-end'),
+  'divide': (
+    'values': (
+      'y': (border-block-start: 1px solid token('border')),
+      'x': (border-inline-start: 1px solid token('border')),
+    ),
+    'name': 'divide',
+    'child': '> * + *',
+  ),
+  'divide-color': (
+    'props': border-color,
+    'values': ('strong': token('border-strong'), 'subtle': token('border')),
+    'name': 'divide',
+    'child': '> * + *',
+  ),
+
+  // ---------- Effects and interaction ----------
+  'opacity': ('props': opacity, 'values': $_opacity, 'name': 'opacity'),
+  'shadow': (
+    'props': box-shadow,
+    'values': (
+      '': var(--#{$prefix}-shadow-md), 'none': none, 'sm': var(--#{$prefix}-shadow-sm), 'md': var(--#{$prefix}-shadow-md),
+      'lg': var(--#{$prefix}-shadow-lg), 'glow': (0 0 24px token('glow')),
+    ),
+    'name': 'shadow',
+  ),
+  'pointer-events': ('props': pointer-events, 'values': (none, auto), 'name': 'pointer-events'),
+  'user-select': ('props': user-select, 'values': (none, text, all, auto), 'name': 'select'),
+  'cursor': (
+    'props': cursor,
+    'values': (pointer, grab, default, text, move, help, not-allowed, wait),
+    'name': 'cursor',
+  ),
+  'transition': (
+    'values': (
+      '': (
+        transition-property: (color, background-color, border-color, text-decoration-color, opacity, box-shadow, transform),
+        transition-duration: dur('base'),
+        transition-timing-function: ease('standard'),
+      ),
+      'all': (transition: all dur('base') ease('standard')),
+      'colors': (
+        transition-property: (color, background-color, border-color, text-decoration-color),
+        transition-duration: dur('base'),
+        transition-timing-function: ease('standard'),
+      ),
+      'opacity': (transition-property: opacity, transition-duration: dur('base'), transition-timing-function: ease('standard')),
+      'transform': (transition-property: transform, transition-duration: dur('base'), transition-timing-function: ease('standard')),
+      'none': (transition: none),
+    ),
+    'name': 'transition',
+  ),
+  'duration': (
+    'props': transition-duration,
+    'values': ('fast': dur('fast'), 'base': dur('base'), 'slow': dur('slow'), 'slower': dur('slower')),
+    'name': 'duration',
+  ),
+);

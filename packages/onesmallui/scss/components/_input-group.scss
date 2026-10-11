@@ -1,0 +1,126 @@
+@use '../abstracts' as *;
+@use 'form-mixins' as fm;
+
+// Boxes that draw a control's border, wherever they sit inside a group item.
+$boxes: '.#{$prefix}-input, .#{$prefix}-select__control, .#{$prefix}-textarea, .#{$prefix}-combobox__control, .#{$prefix}-datepicker__button, .#{$prefix}-chip-input';
+
+// ---------- Input group ----------
+.#{$prefix}-input-group {
+  @include fm.control-sizes;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+
+  &[data-wrap] {
+    flex-wrap: wrap;
+  }
+
+  > * {
+    min-width: 0;
+  }
+
+  // Controls grow; add-ons and buttons keep their size.
+  > :is(.#{$prefix}-input, .#{$prefix}-select, .#{$prefix}-textarea, .#{$prefix}-field, .#{$prefix}-combobox, .#{$prefix}-datepicker, .#{$prefix}-chip-input) {
+    flex: 1 1 auto;
+    width: 1%;
+  }
+
+  // Borders overlap so neighbours share one line.
+  > :not(:first-child) {
+    margin-inline-start: -1px;
+  }
+
+  // The hovered and focused item draws on top, so its border and ring are complete.
+  > :hover {
+    z-index: 1;
+  }
+
+  > :focus,
+  > :focus-within {
+    z-index: 2;
+  }
+
+  // Square the inner corners.
+  > :not(:last-child),
+  > :not(:last-child) :is(#{$boxes}) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  > :not(:first-child),
+  > :not(:first-child) :is(#{$boxes}) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  > .#{$prefix}-btn {
+    position: relative;
+    min-height: var(--_h);
+  }
+
+  &[data-size] > .#{$prefix}-btn {
+    --_h: inherit;
+  }
+
+  &[data-size='xs'] > .#{$prefix}-btn,
+  &[data-size='sm'] > .#{$prefix}-btn {
+    font-size: token('text-xs');
+  }
+
+  // Floating-label fields inside a group take the group's height.
+  > .#{$prefix}-field[data-layout='floating'] {
+    --_float-h: max(3.5rem, var(--_h));
+  }
+
+  &:has(> .#{$prefix}-field[data-layout='floating']) > :is(.#{$prefix}-input-group__text, .#{$prefix}-btn) {
+    min-height: 3.5rem;
+  }
+}
+
+.#{$prefix}-input-group__text {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--_h);
+  padding: 0 var(--_px);
+  border: 1px solid token('border-strong');
+  border-radius: radius('md');
+  background: token('surface-2');
+  color: token('text');
+  font-size: token('text-sm');
+  font-weight: 500;
+  white-space: nowrap;
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: token('text-muted');
+  }
+
+  // Checkbox and radio add-ons: wrap them in `as="label"` so the whole add-on toggles.
+  input:is([type='checkbox'], [type='radio']) {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: token('primary');
+    cursor: pointer;
+    @include focus-ring;
+  }
+
+  &:is(label) {
+    cursor: pointer;
+
+    &:hover {
+      background: token('surface-3');
+    }
+  }
+}
+
+.#{$prefix}-input-group__text:has(input:is([type='checkbox'], [type='radio']))::after {
+  // Keep the add-on's hit area at least 44px wide.
+  content: '';
+  min-width: max(0px, calc(#{$target-size} - 2 * var(--_px) - 1.25rem));
+}

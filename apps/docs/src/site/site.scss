@@ -205,7 +205,7 @@ body {
     margin-block: 1rem;
   }
 
-  ul {
+  ul:not([class]) {
     padding-left: 1.25rem;
     max-width: 75ch;
 
