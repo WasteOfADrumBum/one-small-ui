@@ -219,6 +219,16 @@ body {
     margin-block: 1rem;
   }
 
+  // Usage snippets wrap their heading + code in a section, so the direct-child
+  // rule above never reaches the code block inside.
+  > .docs-snippet {
+    margin-block: 2rem;
+
+    > .os-code {
+      margin-block: 1rem 0;
+    }
+  }
+
   ul:not([class]) {
     padding-left: 1.25rem;
     max-width: 75ch;
