@@ -1,6 +1,7 @@
-import { Badge, Button, Card, CardBody, CardHeader, Grid, Progress, Switch } from 'onesmallui';
+import { Badge, Button, Card, CardBody, Grid } from 'onesmallui';
 import { Code } from '../site/Code';
 import { SolarSystem } from '../site/SolarSystem';
+import { MissionControl } from '../site/cockpit/MissionControl';
 
 const features = [
   { title: 'WCAG 2.2 AAA', body: 'Every text and background pair is verified at 7:1. 44px targets, visible focus, reduced motion, full keyboard support.' },
@@ -61,32 +62,8 @@ export function Home() {
         <h2 id="demo-title" className="docs-h2">
           Mission control
         </h2>
-        <p className="os-text-muted">A few components working together.</p>
-        <Grid columns={{ base: 1, md: 2 }} gap={4}>
-          <Card variant="glass" glow as="article">
-            <CardHeader>
-              <h3>Reactor status</h3>
-              <Badge color="success" dot pulse>
-                Stable
-              </Badge>
-            </CardHeader>
-            <CardBody className="os-grid os-gap-4">
-              <Progress label="Core output" value={72} showValue />
-              <Progress label="Shield integrity" value={91} color="success" showValue />
-              <Progress label="Coolant" value={38} color="warning" showValue />
-            </CardBody>
-          </Card>
-          <Card variant="glass" as="article">
-            <CardHeader>
-              <h3>Flight systems</h3>
-            </CardHeader>
-            <CardBody>
-              <Switch label="Autopilot" defaultChecked />
-              <Switch label="Inertial dampers" defaultChecked description="Keeps the crew upright" />
-              <Switch label="Cloaking field" />
-            </CardBody>
-          </Card>
-        </Grid>
+        <p className="os-text-muted">A few components working together. Use the panels to fly the ship.</p>
+        <MissionControl />
       </section>
     </div>
   );
