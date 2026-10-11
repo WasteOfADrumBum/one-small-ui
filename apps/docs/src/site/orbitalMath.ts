@@ -17,7 +17,7 @@ export interface Planet {
 export const PLANETS: Planet[] = [
   { name: 'Mercury', au: 0.387, e: 0.206, size: 3, phase: 0.6 },
   { name: 'Venus', au: 0.723, e: 0.007, size: 4, phase: 2.4 },
-  { name: 'Earth', au: 1, e: 0.017, size: 4.3, phase: 3.5 },
+  { name: 'Earth', au: 1, e: 0.017, size: 5, phase: 3.5 },
   { name: 'Mars', au: 1.524, e: 0.093, size: 3.4, phase: 0 }, // set below so the first launch comes early
   { name: 'Jupiter', au: 5.203, e: 0.049, size: 8, phase: 5.2 },
   { name: 'Saturn', au: 9.537, e: 0.057, size: 6.6, phase: 1.3, ring: true },
@@ -101,14 +101,82 @@ export const SYNODIC_YEARS = (2 * Math.PI) / (nEarth - nMars);
 const FIRST_LAUNCH = 1.5 * YEARS_PER_SECOND;
 PLANETS[MARS].phase = PLANETS[EARTH].phase + Math.PI + nEarth * FIRST_LAUNCH - nMars * (FIRST_LAUNCH + TRANSFER_YEARS);
 
+// ---------- The Moon ----------
+
+/** Sidereal month: about 13.4 lunar orbits per Earth year. */
+export const MOON = { orbit: 12, size: 1.9, perYear: 13.37, phase: 0.8 };
+
+/** The Moon in the orbital plane: Earth's position plus a tight circular orbit, same tilt. */
+export function moonPosition(years: number): Vec {
+  const earth = planetPosition(PLANETS[EARTH], years);
+  const psi = MOON.phase + 2 * Math.PI * MOON.perYear * years;
+  return { x: earth.x + MOON.orbit * Math.cos(psi), y: earth.y + MOON.orbit * Math.sin(psi) };
+}
+
+// ---------- Launch schedule ----------
+
+export interface Flight {
+  launch: number;
+  duration: number;
+}
+
+const flights = new Map<number, Flight>();
+const MONTH = 1 / MOON.perYear;
+
 /**
- * First launch time at or after `years`. A launch is valid when Mars will sit
- * opposite Earth's launch point after TRANSFER_YEARS, which is the classic
- * Hohmann phase angle (Mars about 44° ahead of Earth).
+ * Launch k. The ideal launch is the k-th Hohmann window (Mars about 44° ahead of Earth).
+ * It may move by up to half a lunar month so the Moon is out of the rocket's way as it
+ * leaves Earth; the flight time then changes by the same phase drift (under 4%) so the
+ * rocket still arrives exactly on Mars.
  */
-export function nextLaunch(years: number) {
-  const k = Math.ceil((years - FIRST_LAUNCH) / SYNODIC_YEARS - 1e-9);
-  return FIRST_LAUNCH + Math.max(0, k) * SYNODIC_YEARS;
+export function flight(k: number): Flight {
+  const cached = flights.get(k);
+  if (cached) return cached;
+  const ideal = FIRST_LAUNCH + k * SYNODIC_YEARS;
+  let best: Flight = { launch: ideal, duration: TRANSFER_YEARS };
+  let bestGap = -1;
+  for (let i = 0; i <= 48; i++) {
+    const shift = (i / 48 - 0.5) * MONTH;
+    const f = { launch: ideal + shift, duration: TRANSFER_YEARS + (shift * (nEarth - nMars)) / nMars };
+    let gap = Infinity;
+    for (let j = 0; j <= 8; j++) {
+      const t = j * 0.05 * YEARS_PER_SECOND; // liftoff: the first 0.4 seconds
+      gap = Math.min(gap, rocketMoonGap(f, t));
+    }
+    if (gap > bestGap) {
+      bestGap = gap;
+      best = f;
+    }
+  }
+  flights.set(k, best);
+  return best;
+}
+
+/** The rocket grows from 20% to full size over its first 0.6 seconds, as it lifts off Earth. */
+export const LIFTOFF_SECONDS = 0.6;
+export const liftoffScale = (t: number) => 0.2 + 0.8 * Math.min(1, t / (LIFTOFF_SECONDS * YEARS_PER_SECOND));
+/** Rocket extent along its heading, in view units at full size: tail of the flame to the nose. */
+export const ROCKET_EXTENT = { tail: -13, nose: 9.5 };
+
+/** Screen distance from the Moon to the rocket's tail-to-nose line, `t` years after launch. */
+function rocketMoonGap(f: Flight, t: number) {
+  const s = t / f.duration;
+  const at = project(transferPosition(f, s));
+  const ahead = project(transferPosition(f, s + 0.005));
+  const len = Math.hypot(ahead.x - at.x, ahead.y - at.y) || 1;
+  const ux = (ahead.x - at.x) / len;
+  const uy = (ahead.y - at.y) / len;
+  const k = liftoffScale(t);
+  const moon = project(moonPosition(f.launch + t));
+  const along = Math.min(Math.max((moon.x - at.x) * ux + (moon.y - at.y) * uy, ROCKET_EXTENT.tail * k), ROCKET_EXTENT.nose * k);
+  return Math.hypot(moon.x - (at.x + ux * along), moon.y - (at.y + uy * along));
+}
+
+/** The flight in progress at `years` (until `tail` years after arrival), or else the next one. */
+export function flightAt(years: number, tail = 0): Flight {
+  let k = Math.max(0, Math.floor((years - FIRST_LAUNCH) / SYNODIC_YEARS) - 1);
+  while (years >= flight(k).launch + flight(k).duration + tail) k++;
+  return flight(k);
 }
 
 /** Solve Kepler's equation M = E − e·sin E for the eccentric anomaly. */
@@ -119,13 +187,13 @@ export function eccentricAnomaly(M: number, e: number) {
 }
 
 /**
- * Ship position on the transfer arc, `s` from 0 (launch) to 1 (arrival), in the orbital plane.
+ * Rocket position on the transfer arc, `s` from 0 (launch) to 1 (arrival), in the orbital plane.
  * The arc is half a conic with the Sun at its focus, from Earth at launch to Mars at arrival,
- * and the ship moves along it with Kepler timing (fast near Earth, slow near Mars).
+ * and the rocket moves along it with Kepler timing (fast near Earth, slow near Mars).
  */
-export function transferPosition(launch: number, s: number): Vec {
+export function transferPosition({ launch, duration }: Flight, s: number): Vec {
   const from = planetPosition(PLANETS[EARTH], launch);
-  const to = planetPosition(PLANETS[MARS], launch + TRANSFER_YEARS);
+  const to = planetPosition(PLANETS[MARS], launch + duration);
   const r1 = Math.hypot(from.x, from.y);
   const r2 = Math.hypot(to.x, to.y);
   const a0 = Math.atan2(from.y, from.x);

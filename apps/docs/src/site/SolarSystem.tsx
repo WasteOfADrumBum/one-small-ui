@@ -3,13 +3,16 @@ import { Button } from 'onesmallui';
 import {
   CENTER,
   MARS,
+  MOON,
   PLANETS,
   SUN_RADIUS,
   TILT,
-  TRANSFER_YEARS,
   VIEW,
   YEARS_PER_SECOND,
-  nextLaunch,
+  flight,
+  flightAt,
+  liftoffScale,
+  moonPosition,
   orbitAxes,
   period,
   planetPosition,
@@ -31,7 +34,19 @@ const DRIFT = { x: Math.cos(Math.PI / 5), y: -Math.sin(Math.PI / 5) };
 const TRACK_DASH = [2, 9];
 const TRAIL_SAMPLES = 14;
 const LAND_SECONDS = 0.5;
-const STATIC_YEARS = nextLaunch(0) + TRANSFER_YEARS / 2; // reduced motion: ship parked mid-arc
+const STATIC_YEARS = flight(0).launch + flight(0).duration / 2; // reduced motion: rocket parked mid-arc
+
+// The rocket, nose along +x, about 22 view units long (17px at 340px wide). SVG path data.
+const ROCKET = {
+  flame: new Path2D('M-7 -2 Q-10.5 -1.4 -13 0 Q-10.5 1.4 -7 2 Z'),
+  core: new Path2D('M-7 -1 Q-9.3 -0.6 -10.6 0 Q-9.3 0.6 -7 1 Z'),
+  fins: new Path2D('M-2.5 -3 L-6.6 -6.6 L-7 -3 Z M-2.5 3 L-6.6 6.6 L-7 3 Z'),
+  body: new Path2D('M4 -3 H-5.5 Q-7 -3 -7 -1.5 V1.5 Q-7 3 -5.5 3 H4 Z'),
+  nose: new Path2D('M4 -3 Q7.6 -2.6 9.5 0 Q7.6 2.6 4 3 Z'),
+};
+const ROCKET_COLORS = { body: '#ffffff', trim: '#ff7a1a', port: '#9fdcff', flame: '#ff8a1f', core: '#ffd23f' };
+// Thin dark outline so the white body still has 3:1 contrast on the light theme.
+const ROCKET_OUTLINE = '#1a2238';
 
 interface Colors {
   bg: string;
@@ -39,6 +54,8 @@ interface Colors {
   primary: string;
   accent: string;
   planets: string[];
+  moon: string;
+  moonEdge: string | null;
 }
 
 function rgb(hex: string) {
@@ -70,6 +87,9 @@ function readColors(el: Element): Colors {
     primary: v('--os-primary', light ? '#00557a' : '#5ce1ff'),
     accent: v('--os-accent', light ? '#4b1fb8' : '#b9a0ff'),
     planets: light ? PALETTE.light : PALETTE.dark,
+    // Very light gray; on the light theme it needs an edge to reach 3:1.
+    moon: light ? '#eceff5' : '#e4e7ee',
+    moonEdge: light ? '#4a5470' : null,
   };
 }
 
@@ -105,7 +125,14 @@ function paintSun(c: Colors, scale: number) {
   return canvas;
 }
 
-function draw(ctx: CanvasRenderingContext2D, c: Colors, sun: HTMLCanvasElement, years: number, scale: number) {
+function draw(
+  ctx: CanvasRenderingContext2D,
+  c: Colors,
+  sun: HTMLCanvasElement,
+  years: number,
+  scale: number,
+  still: boolean,
+) {
   const seconds = years / YEARS_PER_SECOND;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -182,17 +209,37 @@ function draw(ctx: CanvasRenderingContext2D, c: Colors, sun: HTMLCanvasElement, 
     });
   });
 
-  // Ship: flies the transfer arc, then lands on Mars (shrinks and fades over half a second).
-  const launch = nextLaunch(years - TRANSFER_YEARS - LAND_SECONDS * YEARS_PER_SECOND);
-  const flight = (years - launch) / TRANSFER_YEARS;
-  if (flight >= 0) {
-    const landing = flight > 1 ? (years - launch - TRANSFER_YEARS) / YEARS_PER_SECOND / LAND_SECONDS : 0;
-    const s = Math.min(flight, 1);
-    const pos = flight > 1 ? project(planetPosition(PLANETS[MARS], years)) : project(transferPosition(launch, s));
-    const ahead = project(transferPosition(launch, Math.min(s + 0.01, 1)));
-    const behind = project(transferPosition(launch, Math.max(s - 0.01, 0)));
+  // The Moon: same tilted plane, so it passes in front of and behind Earth.
+  const moon = project(moonPosition(years));
+  bodies.push({
+    z: moon.z,
+    paint: () => {
+      ctx.beginPath();
+      ctx.arc(moon.x, moon.y, MOON.size * (1 + (0.12 * moon.z) / VIEW), 0, Math.PI * 2);
+      ctx.fillStyle = c.moon;
+      ctx.fill();
+      if (c.moonEdge) {
+        ctx.strokeStyle = c.moonEdge;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    },
+  });
+
+  // Rocket: lifts off Earth growing to full size, flies the transfer arc nose first, then lands on Mars (shrinks and fades over half a second).
+  const tail = LAND_SECONDS * YEARS_PER_SECOND;
+  const f = flightAt(years, tail);
+  const progress = (years - f.launch) / f.duration;
+  if (progress >= 0) {
+    const landing = progress > 1 ? (years - f.launch - f.duration) / tail : 0;
+    const s = Math.min(progress, 1);
+    const pos = progress > 1 ? project(planetPosition(PLANETS[MARS], years)) : project(transferPosition(f, s));
+    const ahead = project(transferPosition(f, Math.min(s + 0.01, 1)));
+    const behind = project(transferPosition(f, Math.max(s - 0.01, 0)));
     const heading = Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
-    const k = 1 - landing * 0.8;
+    const k = liftoffScale(years - f.launch) * (1 - landing * 0.8);
+    // Subtle flame flicker: length only, never brightness. Static with reduced motion.
+    const flicker = still ? 1 : 1 + 0.1 * Math.sin(seconds * 2 * Math.PI * 7) + 0.05 * Math.sin(seconds * 2 * Math.PI * 11.3);
     bodies.push({
       z: pos.z + 0.01,
       paint: () => {
@@ -201,19 +248,32 @@ function draw(ctx: CanvasRenderingContext2D, c: Colors, sun: HTMLCanvasElement, 
         ctx.translate(pos.x, pos.y);
         ctx.rotate(heading);
         ctx.scale(k, k);
-        const flame = ctx.createRadialGradient(-5, 0, 0, -5, 0, 5);
-        flame.addColorStop(0, rgba(c.primary, 0.9));
-        flame.addColorStop(1, rgba(c.primary, 0));
-        ctx.fillStyle = flame;
-        ctx.fillRect(-10, -5, 10, 10);
+        ctx.save();
+        ctx.translate(-7, 0);
+        ctx.scale(flicker, 1);
+        ctx.translate(7, 0);
+        ctx.fillStyle = ROCKET_COLORS.flame;
+        ctx.fill(ROCKET.flame);
+        ctx.fillStyle = ROCKET_COLORS.core;
+        ctx.fill(ROCKET.core);
+        ctx.restore();
+        ctx.lineWidth = 0.7;
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = ROCKET_OUTLINE;
+        for (const [path, color] of [
+          [ROCKET.fins, ROCKET_COLORS.trim],
+          [ROCKET.body, ROCKET_COLORS.body],
+          [ROCKET.nose, ROCKET_COLORS.trim],
+        ] as const) {
+          ctx.fillStyle = color;
+          ctx.fill(path);
+          ctx.stroke(path);
+        }
         ctx.beginPath();
-        ctx.moveTo(6, 0);
-        ctx.lineTo(-4, -3.6);
-        ctx.lineTo(-2.4, 0);
-        ctx.lineTo(-4, 3.6);
-        ctx.closePath();
-        ctx.fillStyle = c.text;
+        ctx.arc(0.5, 0, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = ROCKET_COLORS.port;
         ctx.fill();
+        ctx.stroke();
         ctx.restore();
       },
     });
@@ -248,7 +308,7 @@ export function SolarSystem() {
     let frame = 0;
     let last = 0;
 
-    const render = () => draw(ctx, colors, sun, years, scale);
+    const render = () => draw(ctx, colors, sun, years, scale, motion.matches);
     const tick = (now: number) => {
       years += Math.min((now - last) / 1000, 0.1) * YEARS_PER_SECOND;
       last = now;
@@ -319,7 +379,7 @@ export function SolarSystem() {
       <div
         className="docs-solar__scene"
         role="img"
-        aria-label="The solar system on a tilted plane: the Sun glows behind the 1SmUI wordmark, eight planets circle it at their real relative speeds, and a small ship flies a transfer arc from Earth to Mars."
+        aria-label="The solar system on a tilted plane: the Sun glows behind the 1SmUI wordmark, eight planets circle it at their real relative speeds, the Moon circles Earth, and a small rocket flies a transfer arc from Earth to Mars."
       >
         <canvas ref={canvasRef} className="docs-solar__canvas" aria-hidden="true" />
         <svg className="docs-solar__wordmark" viewBox={`0 0 ${VIEW} ${VIEW}`} aria-hidden="true" focusable="false">

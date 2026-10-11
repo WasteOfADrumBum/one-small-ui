@@ -432,9 +432,12 @@ body {
 }
 
 .docs-solar__toggle {
+  // Bottom-right corner of the system, just below Neptune's orbit, styled as a HUD control.
   position: absolute !important;
-  right: 0;
-  bottom: 0;
+  right: 2%;
+  bottom: 13%;
+  border: 1px solid var(--os-border) !important;
+  @include os.glass('surface');
 }
 
 // ---------- Theming ----------
