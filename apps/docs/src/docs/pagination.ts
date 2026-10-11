@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Page navigation with numbered pages, automatic ellipses, previous/next and first/last controls, three styles, three sizes and start/center/end alignment. Works with buttons (onPageChange) or links (getHref).',
-  importLine: "import { Pagination, getPaginationRange } from 'onesmallui';",
+  importLine: "import { Pagination, getPaginationRange } from '@onesmall/ui';",
   examples: [
     { name: 'pagination-basic', title: 'Buttons, ellipses and first / last' },
     { name: 'pagination-variants', title: 'Variants, sizes and alignment' },

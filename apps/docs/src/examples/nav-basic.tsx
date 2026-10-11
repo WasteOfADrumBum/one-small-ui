@@ -1,4 +1,4 @@
-import { Nav, NavItem } from 'onesmallui';
+import { Nav, NavItem } from '@onesmall/ui';
 
 const here = '#components/nav';
 

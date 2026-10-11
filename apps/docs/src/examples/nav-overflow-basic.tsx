@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Nav, NavItem } from 'onesmallui';
+import { Nav, NavItem } from '@onesmall/ui';
 
 const sections = ['Overview', 'Telemetry', 'Navigation', 'Propulsion', 'Life support', 'Communications', 'Cargo', 'Medical', 'Armory'];
 

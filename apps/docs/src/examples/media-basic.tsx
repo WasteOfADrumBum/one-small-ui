@@ -1,4 +1,4 @@
-import { AspectRatio, Image, Video } from 'onesmallui';
+import { AspectRatio, Image, Video } from '@onesmall/ui';
 
 export default function Example() {
   return (

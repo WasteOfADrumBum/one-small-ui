@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 const rows = [
   { name: 'Ada Lovelace', role: 'Analyst', commits: 128 },

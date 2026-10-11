@@ -1,4 +1,4 @@
-import { Tab, TabList, TabPanel, Tabs, themes, type ColorToken } from 'onesmallui';
+import { Tab, TabList, TabPanel, Tabs, themes, type ColorToken } from '@onesmall/ui';
 import { Code } from '../site/Code';
 import { Example } from '../site/Example';
 
@@ -107,7 +107,7 @@ export function Theming() {
       <Code
         language="scss"
         title="theme.scss"
-        code={`@use 'onesmallui/scss' as os with (
+        code={`@use '@onesmall/ui/scss' as os with (
   $prefix: 'os',
   $radius-base: 12px,
   $font-sans: ('Inter', system-ui, sans-serif),

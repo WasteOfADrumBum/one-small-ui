@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

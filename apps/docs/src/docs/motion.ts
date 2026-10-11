@@ -18,7 +18,7 @@ const doc: ComponentDoc = {
     {
       title: 'Tune or disable at build time',
       language: 'scss',
-      code: `@use 'onesmallui/scss' with (
+      code: `@use '@onesmall/ui/scss' with (
   $enable-transitions: false,          // render every component without motion
   $durations: ('fast': 80ms, 'base': 160ms, 'slow': 280ms, 'slower': 480ms),
 );`,

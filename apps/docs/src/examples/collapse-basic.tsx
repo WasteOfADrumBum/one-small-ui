@@ -1,4 +1,4 @@
-import { Collapse, CollapseTrigger, Collapsible } from 'onesmallui';
+import { Collapse, CollapseTrigger, Collapsible } from '@onesmall/ui';
 
 export default function Example() {
   return (

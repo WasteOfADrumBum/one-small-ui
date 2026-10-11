@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Collapsible sections with a smooth height animation and no measuring. Default, flush and spaced variants, two sizes, single or multiple open, a native <details> mode, nesting and custom indicators.',
-  importLine: "import { Accordion, AccordionItem } from 'onesmallui';",
+  importLine: "import { Accordion, AccordionItem } from '@onesmall/ui';",
   examples: [
     { name: 'accordion-basic', title: 'Single open item' },
     { name: 'accordion-variants', title: 'Variants and sizes', description: 'Default (one bordered box), flush (edge to edge, for cards and sidebars) and spaced (separate cards).' },

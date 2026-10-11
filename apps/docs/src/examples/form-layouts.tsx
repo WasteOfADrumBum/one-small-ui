@@ -1,4 +1,4 @@
-import { Button, Checkbox, Field, Form, Input, Select, Tab, TabList, TabPanel, Tabs } from 'onesmallui';
+import { Button, Checkbox, Field, Form, Input, Select, Tab, TabList, TabPanel, Tabs } from '@onesmall/ui';
 
 const layouts = ['vertical', 'horizontal', 'inline', 'grid'] as const;
 

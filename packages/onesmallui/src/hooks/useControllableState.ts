@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useLatestRef } from './useLatestRef';
 
 /**
  * State that can be controlled (`value` + `onChange`) or uncontrolled (`defaultValue`),
@@ -12,15 +13,14 @@ export function useControllableState<T>(
   const [internal, setInternal] = useState(defaultValue);
   const isControlled = value !== undefined;
   const current = isControlled ? (value as T) : internal;
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  const onChangeRef = useLatestRef(onChange);
 
   const setValue = useCallback(
     (next: T) => {
       if (!isControlled) setInternal(next);
       onChangeRef.current?.(next);
     },
-    [isControlled],
+    [isControlled, onChangeRef],
   );
   return [current, setValue];
 }

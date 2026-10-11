@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'Labels that sit inside the control and float up when it has focus or a value. Works with inputs, textareas, selects, date and time controls, inside input groups, and with hints and errors.',
-  importLine: "import { FloatingLabel } from 'onesmallui'; // or <Field layout=\"floating\">",
+  importLine: "import { FloatingLabel } from '@onesmall/ui'; // or <Field layout=\"floating\">",
   examples: [
     { name: 'floating-basic', title: 'Inputs, textareas, selects and date/time', description: 'Selects and date/time controls always show a value, so their label stays up.' },
     { name: 'floating-group', title: 'Inside input groups' },

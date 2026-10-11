@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 function Rows() {
   return (

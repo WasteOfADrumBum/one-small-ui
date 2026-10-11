@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Accordion, AccordionItem, Button } from 'onesmallui';
+import { Accordion, AccordionItem, Button } from '@onesmall/ui';
 
 const sections = [
   { value: 'nav', title: 'Navigation', body: 'Star charts are synced every hour.' },

@@ -21,7 +21,7 @@ const pkg = JSON.parse(readFileSync(new URL('../packages/onesmallui/package.json
 
 const intro = `# OneSmallUI (1SmUI)
 
-> ${pkg.description} npm: \`onesmallui\` v${pkg.version}. Import styles once with \`import 'onesmallui/styles.css'\`. Class prefix \`os-\`; variants are data attributes (\`data-variant\`, \`data-color\`, \`data-size\`). Themes: \`data-os-theme="light|dark"\` on any element. Colors: primary, secondary, accent, success, warning, danger, info, inverse (+ neutral).`;
+> ${pkg.description} npm: \`@onesmall/ui\` v${pkg.version}. Import styles once with \`import '@onesmall/ui/styles.css'\`. Class prefix \`os-\`; variants are data attributes (\`data-variant\`, \`data-color\`, \`data-size\`). Themes: \`data-os-theme="light|dark"\` on any element. Colors: primary, secondary, accent, success, warning, danger, info, inverse (+ neutral).`;
 
 const index = [intro, ''];
 for (const g of groups) {
@@ -52,5 +52,5 @@ for (const d of componentDocs) {
   if (d.classes) full.push(`Classes: \`${d.classes}\``, '');
 }
 writeFileSync(`${out}llms-full.txt`, full.join('\n'));
-writeFileSync(`${out}components.json`, JSON.stringify({ name: 'onesmallui', version: pkg.version, docs: componentDocs }, null, 2));
+writeFileSync(`${out}components.json`, JSON.stringify({ name: '@onesmall/ui', version: pkg.version, docs: componentDocs }, null, 2));
 console.log(`llms.txt: ${componentDocs.length} pages`);

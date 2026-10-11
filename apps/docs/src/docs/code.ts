@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'CodeBlock',
   group: 'Data display',
   summary: 'Code panels with a one-click copy button. Plug in any syntax highlighter.',
-  importLine: "import { CodeBlock } from 'onesmallui';",
+  importLine: "import { CodeBlock } from '@onesmall/ui';",
   examples: [{ name: 'code-basic', title: 'Copyable code' }],
   props: [
     {

@@ -1,19 +1,19 @@
 import {
-  cloneElement,
   isValidElement,
   useEffect,
   useId,
   useLayoutEffect,
   useRef,
   type CSSProperties,
+  type ElementType,
   type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
-  type MutableRefObject,
   type ReactElement,
   type ReactNode,
   type Ref,
 } from 'react';
+import { useMergedRefs } from '../hooks/useMergedRefs';
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
@@ -54,15 +54,6 @@ export interface PopoverProps {
   style?: CSSProperties;
 }
 
-function mergeRefs<T>(...refs: (Ref<T> | undefined)[]) {
-  return (el: T | null) => {
-    for (const r of refs) {
-      if (typeof r === 'function') r(el);
-      else if (r) (r as MutableRefObject<T | null>).current = el;
-    }
-  };
-}
-
 /**
  * Contextual content (title + body) anchored to a trigger: a non-modal dialog
  * in the top layer. Escape closes it and returns focus; clicks outside dismiss it.
@@ -94,7 +85,7 @@ export function Popover({
   const id = useId().replace(/:/g, '');
   const panelId = `os-popover-${id}`;
   const titleId = `${panelId}-title`;
-  const floating = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset });
+  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const show = (wait = 0) => {
@@ -110,17 +101,17 @@ export function Popover({
   useEffect(() => () => clearTimeout(timer.current), []);
 
   useLayoutEffect(() => {
-    const el = floating.floatingRef.current;
+    const el = floatingRef.current;
     if (!isOpen || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [isOpen, floating.floatingRef]);
+  }, [isOpen, floatingRef]);
 
   // Light dismiss: a click outside the trigger and panel, or Escape anywhere.
   useEffect(() => {
     if (!isOpen) return;
     const inside = (t: EventTarget | null) =>
-      t instanceof Node && (!!floating.floatingRef.current?.contains(t) || !!floating.anchorRef.current?.contains(t));
+      t instanceof Node && (!!floatingRef.current?.contains(t) || !!anchorRef.current?.contains(t));
     const onDown = (e: PointerEvent) => {
       if (!inside(e.target)) setOpen(false);
     };
@@ -128,7 +119,7 @@ export function Popover({
       if (e.key !== 'Escape') return;
       const hadFocus = inside(document.activeElement);
       setOpen(false);
-      if (hadFocus) floating.anchorRef.current?.focus();
+      if (hadFocus) anchorRef.current?.focus();
     };
     document.addEventListener('pointerdown', onDown, true);
     document.addEventListener('keydown', onKey);
@@ -136,7 +127,10 @@ export function Popover({
       document.removeEventListener('pointerdown', onDown, true);
       document.removeEventListener('keydown', onKey);
     };
-  }, [isOpen, setOpen, floating.floatingRef, floating.anchorRef]);
+  }, [isOpen, setOpen, floatingRef, anchorRef]);
+
+  const childRef = isValidElement(children) ? (children.props as { ref?: Ref<HTMLElement> }).ref : undefined;
+  const triggerRef = useMergedRefs(anchorRef, childRef);
 
   if (!isValidElement(children)) return children;
   const props = children.props as Record<string, unknown> & {
@@ -148,35 +142,43 @@ export function Popover({
     onKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
     ref?: Ref<HTMLElement>;
   };
-  const leavingTo = (e: FocusEvent<HTMLElement>) =>
-    e.relatedTarget instanceof Node && !!floating.floatingRef.current?.contains(e.relatedTarget);
 
-  const triggerEl = cloneElement(children, {
-    ref: mergeRefs(floating.anchorRef, props.ref),
-    ...(clickable
-      ? { 'aria-haspopup': 'dialog', 'aria-expanded': isOpen, 'aria-controls': isOpen ? panelId : undefined }
-      : { 'aria-describedby': [props['aria-describedby'], isOpen ? panelId : null].filter(Boolean).join(' ') || undefined }),
-    onClick: (e: MouseEvent<HTMLElement>) => {
-      props.onClick?.(e);
-      if (clickable && !e.defaultPrevented) setOpen(!isOpen);
-    },
-    onFocus: (e: FocusEvent<HTMLElement>) => {
-      props.onFocus?.(e);
-      if (focusable) show();
-    },
-    onBlur: (e: FocusEvent<HTMLElement>) => {
-      props.onBlur?.(e);
-      if (focusable && !clickable && !leavingTo(e)) hide(hoverable ? 100 : 0);
-    },
-    onPointerEnter: (e: unknown) => {
-      props.onPointerEnter?.(e);
-      if (hoverable) show(delay);
-    },
-    onPointerLeave: (e: unknown) => {
-      props.onPointerLeave?.(e);
-      if (hoverable) hide(120);
-    },
-  });
+  // JSX rather than cloneElement, so the handlers are plain props of the trigger.
+  const Trigger = children.type as ElementType;
+  const triggerEl = (
+    <Trigger
+      {...props}
+      ref={triggerRef}
+      {...(clickable
+        ? { 'aria-haspopup': 'dialog', 'aria-expanded': isOpen, 'aria-controls': isOpen ? panelId : undefined }
+        : {
+            'aria-describedby':
+              [props['aria-describedby'], isOpen ? panelId : null].filter(Boolean).join(' ') || undefined,
+          })}
+      onClick={(e: MouseEvent<HTMLElement>) => {
+        props.onClick?.(e);
+        if (clickable && !e.defaultPrevented) setOpen(!isOpen);
+      }}
+      onFocus={(e: FocusEvent<HTMLElement>) => {
+        props.onFocus?.(e);
+        if (focusable) show();
+      }}
+      onBlur={(e: FocusEvent<HTMLElement>) => {
+        props.onBlur?.(e);
+        // Focus moving into the panel keeps it open.
+        const intoPanel = e.relatedTarget instanceof Node && !!document.getElementById(panelId)?.contains(e.relatedTarget);
+        if (focusable && !clickable && !intoPanel) hide(hoverable ? 100 : 0);
+      }}
+      onPointerEnter={(e: unknown) => {
+        props.onPointerEnter?.(e);
+        if (hoverable) show(delay);
+      }}
+      onPointerLeave={(e: unknown) => {
+        props.onPointerLeave?.(e);
+        if (hoverable) hide(120);
+      }}
+    />
+  );
 
   const withClose = closeButton ?? clickable;
 
@@ -185,7 +187,7 @@ export function Popover({
       {triggerEl}
       {isOpen && (
         <div
-          ref={floating.floatingRef}
+          ref={floatingRef}
           id={panelId}
           role="dialog"
           aria-labelledby={title ? titleId : undefined}
@@ -200,7 +202,7 @@ export function Popover({
             focusable && !clickable
               ? (e) => {
                   const to = e.relatedTarget as Node | null;
-                  if (!to || (!e.currentTarget.contains(to) && !floating.anchorRef.current?.contains(to))) hide();
+                  if (!to || (!e.currentTarget.contains(to) && !anchorRef.current?.contains(to))) hide();
                 }
               : undefined
           }
@@ -208,7 +210,7 @@ export function Popover({
           {arrow && (
             <span
               ref={(el) => {
-                floating.arrowRef.current = el;
+                arrowRef.current = el;
               }}
               className={cls('floating__arrow')}
               aria-hidden="true"
@@ -226,7 +228,7 @@ export function Popover({
                   label="Close"
                   onClick={() => {
                     setOpen(false);
-                    floating.anchorRef.current?.focus();
+                    anchorRef.current?.focus();
                   }}
                 />
               )}

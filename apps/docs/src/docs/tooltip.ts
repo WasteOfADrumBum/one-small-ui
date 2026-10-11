@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Overlays',
   summary:
     'Short descriptions on hover and focus, positioned in the top layer with flipping and responsive placement. Rich content, custom styling, interactive tooltips, disabled-control wrappers and delegated tooltips via data attributes.',
-  importLine: "import { Tooltip, TooltipProvider } from 'onesmallui';",
+  importLine: "import { Tooltip, TooltipProvider } from '@onesmall/ui';",
   examples: [
     { name: 'tooltip-basic', title: 'Placements' },
     { name: 'tooltip-rich', title: 'Rich content, styling and disabled controls' },

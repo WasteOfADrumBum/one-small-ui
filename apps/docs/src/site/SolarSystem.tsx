@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 import {
   CENTER,
   MARS,

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button, Dialog } from 'onesmallui';
+import { Button, Dialog } from '@onesmall/ui';
 
 export default function Example() {
   const [open, setOpen] = useState(false);

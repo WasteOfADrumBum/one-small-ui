@@ -1,4 +1,4 @@
-import { Carousel, CarouselCaption, CarouselSlide } from 'onesmallui';
+import { Carousel, CarouselCaption, CarouselSlide } from '@onesmall/ui';
 
 // Images as SVG data URIs so the example is self-contained.
 const art = (hue: number, label: string) =>

@@ -1,7 +1,7 @@
-import { CodeBlock } from 'onesmallui';
+import { CodeBlock } from '@onesmall/ui';
 
 const scss = `// 1. Add, change or remove utilities in the library build
-@use 'onesmallui/scss' with (
+@use '@onesmall/ui/scss' with (
   $utilities: (
     'cursor': (
       'props': cursor,
@@ -14,7 +14,7 @@ const scss = `// 1. Add, change or remove utilities in the library build
 );
 
 // 2. Or generate extra classes in your own stylesheet
-@use 'onesmallui/scss/abstracts' as os;
+@use '@onesmall/ui/scss/abstracts' as os;
 
 @layer os.utilities {
   @include os.utilities((

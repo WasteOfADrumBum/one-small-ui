@@ -1,4 +1,4 @@
-import { Card, CardBody, CardImage, CardOverlay, CardText, CardTitle } from 'onesmallui';
+import { Card, CardBody, CardImage, CardOverlay, CardText, CardTitle } from '@onesmall/ui';
 
 const earth = 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=900&q=70';
 const nebula = 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=900&q=70';

@@ -35,7 +35,7 @@ const doc: ComponentDoc = {
         ['$utilities', 'Variable merged over the built-in map; set a key to null to remove that group.'],
         [
           'utilities($map, $breakpoints), utility($key, $config)',
-          'Public mixins in onesmallui/scss/abstracts.',
+          'Public mixins in @onesmall/ui/scss/abstracts.',
         ],
       ],
     },

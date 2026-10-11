@@ -1,4 +1,4 @@
-import { FloatingLabel, Input } from 'onesmallui';
+import { FloatingLabel, Input } from '@onesmall/ui';
 
 export default function Example() {
   return (

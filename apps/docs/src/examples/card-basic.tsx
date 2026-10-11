@@ -1,4 +1,4 @@
-import { Badge, Button, Card, CardBody, CardFooter, CardHeader } from 'onesmallui';
+import { Badge, Button, Card, CardBody, CardFooter, CardHeader } from '@onesmall/ui';
 
 export default function Example() {
   return (

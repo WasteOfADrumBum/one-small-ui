@@ -263,8 +263,16 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
         aria-disabled={o.disabled || undefined}
         className={cls('combobox__option')}
         data-active={isActive || undefined}
+        // Focus stays on the input (aria-activedescendant); -1 only makes the option programmatically focusable.
+        tabIndex={-1}
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => choose(o)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            choose(o);
+          }
+        }}
         onMouseMove={() => {
           if (o.disabled) return;
           const i = enabled.indexOf(o);
@@ -298,8 +306,10 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
       data-valid={(!isInvalid && field?.valid) || undefined}
       data-disabled={disabled || undefined}
     >
+      {/* Presentation: a styling wrapper; its mousedown forwards focus to the input and toggles the list. */}
       <div
         ref={anchorRef}
+        role="presentation"
         className={cls('combobox__control')}
         onMouseDown={(e) => {
           if (disabled || (e.target as HTMLElement).closest(`.${cls('chip')}`)) return;

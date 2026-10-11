@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

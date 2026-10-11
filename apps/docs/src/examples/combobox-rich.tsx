@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Button, Combobox, Field } from 'onesmallui';
+import { Button, Combobox, Field } from '@onesmall/ui';
 
 const Dot = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">

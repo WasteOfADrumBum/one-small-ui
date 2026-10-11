@@ -1,4 +1,4 @@
-import { Badge, Button, Card, CardBody } from 'onesmallui';
+import { Badge, Button, Card, CardBody } from '@onesmall/ui';
 
 // data-os-theme works on any element, so one section (or one component) can
 // use the other theme while the rest of the page follows the user's choice.

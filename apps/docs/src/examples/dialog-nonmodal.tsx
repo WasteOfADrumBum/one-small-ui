@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Dialog } from 'onesmallui';
+import { Button, Dialog } from '@onesmall/ui';
 
 // modal={false} uses show() instead of showModal(): no backdrop,
 // the page stays interactive, and Escape still closes it.

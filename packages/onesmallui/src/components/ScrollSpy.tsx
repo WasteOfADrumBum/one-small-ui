@@ -159,11 +159,10 @@ export const ScrollSpy = forwardRef<HTMLDivElement, ScrollSpyProps>(function Scr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  if (!debug && line !== null) setLine(null);
+
   useEffect(() => {
-    if (!debug) {
-      setLine(null);
-      return;
-    }
+    if (!debug) return;
     const update = () => {
       const r = resolveRoot(root);
       const rect = r?.getBoundingClientRect();
@@ -186,6 +185,8 @@ export const ScrollSpy = forwardRef<HTMLDivElement, ScrollSpyProps>(function Scr
         if (typeof ref === 'function') ref(el);
         else if (ref) ref.current = el;
       }}
+      // Presentation: catches bubbled clicks from the in-page links inside.
+      role="presentation"
       className={cx(cls('scrollspy'), className)}
       onClick={(e) => {
         onClick?.(e);

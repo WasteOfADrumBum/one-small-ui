@@ -1,4 +1,4 @@
-import { Button, Tab, TabList, TabPanel, Tabs } from 'onesmallui';
+import { Button, Tab, TabList, TabPanel, Tabs } from '@onesmall/ui';
 
 export default function Example() {
   return (

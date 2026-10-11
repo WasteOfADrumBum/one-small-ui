@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Badge, SortableList } from 'onesmallui';
+import { Badge, SortableList } from '@onesmall/ui';
 
 interface Task {
   id: string;

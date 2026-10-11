@@ -1,4 +1,4 @@
-import { Breadcrumb, BreadcrumbItem, type BreadcrumbSeparator } from 'onesmallui';
+import { Breadcrumb, BreadcrumbItem, type BreadcrumbSeparator } from '@onesmall/ui';
 
 const Star = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState, type MouseEvent, type RefObject } from 'react';
+import { forwardRef, useCallback, useEffect, useSyncExternalStore, type MouseEvent, type RefObject } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { Button, type ButtonProps } from './Button';
 
@@ -32,6 +32,8 @@ export function resolveTargets(target: TogglerTarget | undefined): Element[] {
   });
 }
 
+const subscribeNoop = () => () => {};
+
 /**
  * Toggles classes and/or an attribute on one or many target elements, in sync
  * with a pressed state. Returns the state, a `toggle()` and the targets' ids.
@@ -47,7 +49,6 @@ export function useToggler({
   onPressedChange,
 }: UseTogglerOptions = {}) {
   const [on, setOn] = useControllableState(pressed, defaultPressed, onPressedChange);
-  const [ids, setIds] = useState<string>('');
 
   useEffect(() => {
     const els = resolveTargets(target);
@@ -60,15 +61,20 @@ export function useToggler({
         else el.setAttribute(toggleAttribute, v);
       }
     }
-    setIds(
-      els
-        .map((el) => el.id)
-        .filter(Boolean)
-        .join(' '),
-    );
     // Targets given as a fresh array each render are compared by content.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [on, toggleClass, toggleAttribute, onValue, offValue, JSON.stringify(Array.isArray(target) ? target.map(String) : String(target))]);
+
+  // The targets' ids, read from the DOM (re-checked by React after each commit, so ref targets resolve once mounted).
+  const getIds = useCallback(
+    () =>
+      resolveTargets(target)
+        .map((el) => el.id)
+        .filter(Boolean)
+        .join(' '),
+    [target],
+  );
+  const ids = useSyncExternalStore(subscribeNoop, getIds, () => '');
 
   return { pressed: on, setPressed: setOn, toggle: () => setOn(!on), controls: ids || undefined };
 }

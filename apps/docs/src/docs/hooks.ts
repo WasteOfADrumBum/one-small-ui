@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Hooks',
   group: 'Theming',
   summary: 'Utility hooks the components are built on. No Redux, no global store.',
-  importLine: "import { useBreakpoint, useMediaQuery, usePrefersReducedMotion, useDisclosure, useCopyToClipboard, useControllableState, useDropZone } from 'onesmallui';",
+  importLine: "import { useBreakpoint, useMediaQuery, usePrefersReducedMotion, useDisclosure, useCopyToClipboard, useControllableState, useDropZone } from '@onesmall/ui';",
   examples: [{ name: 'hooks-basic', title: 'Responsive and preference hooks' }],
   props: [
     {

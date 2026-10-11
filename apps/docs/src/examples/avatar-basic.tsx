@@ -1,4 +1,4 @@
-import { Avatar } from 'onesmallui';
+import { Avatar } from '@onesmall/ui';
 
 const colors = [
   ['primary', 'Pia Rao'],

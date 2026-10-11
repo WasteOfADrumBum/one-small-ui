@@ -1,5 +1,5 @@
 import { Highlight } from 'prism-react-renderer';
-import { CodeBlock, type CodeBlockProps } from 'onesmallui';
+import { CodeBlock, type CodeBlockProps } from '@onesmall/ui';
 
 /** Prism highlighting rendered with classes; colors come from AAA-checked theme tokens in site.scss. */
 export function highlight(code: string, language = 'tsx') {

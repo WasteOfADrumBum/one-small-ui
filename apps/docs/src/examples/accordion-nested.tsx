@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem } from 'onesmallui';
+import { Accordion, AccordionItem } from '@onesmall/ui';
 
 const Plus = ({ open }: { open: boolean }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

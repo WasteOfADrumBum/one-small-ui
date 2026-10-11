@@ -1,4 +1,4 @@
-import { Field, FieldGroup, Input, Select } from 'onesmallui';
+import { Field, FieldGroup, Input, Select } from '@onesmall/ui';
 
 export default function Example() {
   return (

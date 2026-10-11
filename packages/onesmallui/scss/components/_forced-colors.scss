@@ -1,0 +1,139 @@
+// Windows High Contrast / forced-colors mode (WCAG 1.4.1, 1.4.11, 2.4.7).
+// The OS replaces colors with a small system palette and drops backgrounds and
+// box-shadows, so anything that shows state only with a fill or a glow would
+// vanish. These rules restate those states with system colors; the normal
+// design is untouched outside forced colors.
+@use '../abstracts' as *;
+
+@media (forced-colors: active) {
+  // Selected / current / checked fills → Highlight.
+  .#{$prefix}-check__input:checked + .#{$prefix}-check__box,
+  .#{$prefix}-check__input[data-indeterminate] + .#{$prefix}-check__box,
+  .#{$prefix}-switch__input:checked ~ .#{$prefix}-switch__track,
+  .#{$prefix}-toggle-btn__input:checked + .#{$prefix}-btn,
+  .#{$prefix}-chip[data-selected],
+  .#{$prefix}-pagination__link[aria-current],
+  .#{$prefix}-list-group__item[aria-selected='true'],
+  .#{$prefix}-list-group__item[data-active],
+  .#{$prefix}-menu__item[data-active],
+  .#{$prefix}-menu__item[aria-current],
+  [aria-checked='true'] > .#{$prefix}-menu__indicator,
+  .#{$prefix}-calendar__day[data-selected],
+  [data-range-start] > .#{$prefix}-calendar__day,
+  [data-range-end] > .#{$prefix}-calendar__day,
+  [data-status='current'] .#{$prefix}-stepper__indicator,
+  [data-status='complete'] .#{$prefix}-stepper__indicator {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  // Small shapes drawn only with a background.
+  .#{$prefix}-radio__dot::after,
+  .#{$prefix}-switch__thumb,
+  .#{$prefix}-badge__dot,
+  .#{$prefix}-menu__dot,
+  [data-variant='grow'] > .#{$prefix}-spinner__ring {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .#{$prefix}-check__input:checked + .#{$prefix}-radio__dot::after,
+  .#{$prefix}-switch__input:checked ~ .#{$prefix}-switch__track .#{$prefix}-switch__thumb {
+    background: HighlightText;
+  }
+
+  .#{$prefix}-carousel__dot[aria-current='true']::before {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  // Meters and progress: the fill is the information.
+  .#{$prefix}-progress__track,
+  .#{$prefix}-password-strength__segment {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  .#{$prefix}-progress__bar,
+  .#{$prefix}-progress__swatch,
+  .#{$prefix}-password-strength[data-strength='weak'] .#{$prefix}-password-strength__segment:nth-child(-n + 1),
+  .#{$prefix}-password-strength[data-strength='fair'] .#{$prefix}-password-strength__segment:nth-child(-n + 2),
+  .#{$prefix}-password-strength[data-strength='good'] .#{$prefix}-password-strength__segment:nth-child(-n + 3),
+  .#{$prefix}-password-strength[data-strength='strong'] .#{$prefix}-password-strength__segment {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  // Range: a filled track (gradient) and a thumb.
+  .#{$prefix}-range__input {
+    forced-color-adjust: none;
+
+    &::-webkit-slider-runnable-track {
+      border-color: CanvasText;
+      background: linear-gradient(
+        calc(90deg * var(--#{$prefix}-dir, 1)),
+        Highlight var(--_pct, 50%),
+        Canvas var(--_pct, 50%)
+      );
+    }
+
+    &::-moz-range-track {
+      border-color: CanvasText;
+      background: linear-gradient(
+        calc(90deg * var(--#{$prefix}-dir, 1)),
+        Highlight var(--_pct, 50%),
+        Canvas var(--_pct, 50%)
+      );
+    }
+
+    &::-webkit-slider-thumb {
+      border-color: CanvasText;
+      background: ButtonFace;
+    }
+
+    &::-moz-range-thumb {
+      border-color: CanvasText;
+      background: ButtonFace;
+    }
+
+    &:focus-visible::-webkit-slider-thumb,
+    &:focus-visible::-moz-range-thumb {
+      outline-color: Highlight;
+    }
+  }
+
+  // The tabs' sliding underline / pill is a background. (Doubled class to outrank the variant rules.)
+  .#{$prefix}-tabs__list > .#{$prefix}-tabs__indicator.#{$prefix}-tabs__indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .#{$prefix}-tabs__tab[aria-selected='true'],
+  .#{$prefix}-nav__link[aria-current],
+  .#{$prefix}-nav__link[data-active] {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  // Skeletons: an outline so the placeholder shape stays visible.
+  .#{$prefix}-skeleton,
+  .#{$prefix}-placeholder {
+    outline: 1px dashed CanvasText;
+    outline-offset: -1px;
+  }
+
+  // Alerts mark their tone with a colored bar.
+  .#{$prefix}-alert::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  // Focus rings: keep them in the system highlight color everywhere.
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}

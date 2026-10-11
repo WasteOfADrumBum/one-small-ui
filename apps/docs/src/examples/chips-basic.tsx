@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Chip, ChipGroup, type ThemeColor } from 'onesmallui';
+import { Avatar, Chip, ChipGroup, type ThemeColor } from '@onesmall/ui';
 
 const colors: ThemeColor[] = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'];
 const Star = () => (

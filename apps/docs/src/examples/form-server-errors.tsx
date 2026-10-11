@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Button, Field, Form, Input } from 'onesmallui';
+import { Button, Field, Form, Input } from '@onesmall/ui';
 
 // Pretend server: "nova" is taken.
 const check = async (name: string) => (name.toLowerCase() === 'nova' ? { username: 'That username is taken.' } : {});

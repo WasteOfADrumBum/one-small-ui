@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Button, Progress, Switch } from 'onesmallui';
+import { Button, Progress, Switch } from '@onesmall/ui';
 
 // Every token is a CSS variable, so you can re-skin any subtree at runtime.
 // Here the primary role borrows the accent tokens (still AAA in both themes).

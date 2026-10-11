@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Spinner } from 'onesmallui';
+import { Button, Spinner } from '@onesmall/ui';
 
 export default function Example() {
   const [saving, setSaving] = useState(false);

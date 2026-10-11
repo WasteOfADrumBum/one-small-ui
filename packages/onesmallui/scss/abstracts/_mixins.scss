@@ -85,7 +85,7 @@
 /// container-query and print variants. Every built-in utility is made with it; it is
 /// also public:
 ///
-///   @use 'onesmallui/scss/abstracts' as os;
+///   @use '@onesmall/ui/scss/abstracts' as os;
 ///   @layer os.utilities {
 ///     @include os.utilities((
 ///       'cursor': ('props': cursor, 'values': ('help': help, 'wait': wait), 'name': 'cursor', 'responsive': true),

@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Shows and hides content with a smooth height (or width) animation and no measuring. Toggle it with a CollapseTrigger, or from code with `open`.',
-  importLine: "import { Collapsible, CollapseTrigger, Collapse, useCollapsible } from 'onesmallui';",
+  importLine: "import { Collapsible, CollapseTrigger, Collapse, useCollapsible } from '@onesmall/ui';",
   examples: [
     { name: 'collapse-basic', title: 'Trigger and panel' },
     {

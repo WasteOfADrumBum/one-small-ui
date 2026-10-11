@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardImage, CardText, CardTitle } from 'onesmallui';
+import { Button, Card, CardBody, CardImage, CardText, CardTitle } from '@onesmall/ui';
 
 export default function Example() {
   return (

@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'CSS Grid',
   group: 'Layout & media',
   summary: 'An alternative to the flexbox grid built on CSS Grid: .os-cssgrid with .os-g-col-* spans and .os-g-start-* starts. Gaps replace gutters, and the column count is a variable. The Grid component covers auto-fit layouts.',
-  importLine: "import { Grid } from 'onesmallui';",
+  importLine: "import { Grid } from '@onesmall/ui';",
   examples: [
     {
       name: 'cssgrid-basic',

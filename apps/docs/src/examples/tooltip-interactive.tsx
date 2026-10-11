@@ -1,4 +1,4 @@
-import { Button, Tooltip, TooltipProvider } from 'onesmallui';
+import { Button, Tooltip, TooltipProvider } from '@onesmall/ui';
 
 export default function Example() {
   return (

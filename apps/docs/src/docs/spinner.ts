@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Feedback',
   summary:
     'Loading indicators: a spinning border ring or a growing dot, in five sizes and every theme color (or currentColor), customizable through CSS variables, inline or inside buttons.',
-  importLine: "import { Spinner } from 'onesmallui';",
+  importLine: "import { Spinner } from '@onesmall/ui';",
   examples: [
     { name: 'spinner-basic', title: 'Border and grow, sizes and colors' },
     {

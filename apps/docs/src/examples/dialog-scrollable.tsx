@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Dialog } from 'onesmallui';
+import { Button, Dialog } from '@onesmall/ui';
 
 const paragraphs = Array.from({ length: 14 }, (_, i) => (
   <p key={i}>

@@ -26,7 +26,7 @@ export default function Example() {
         <p>Small, sharp, accessible.</p>
       </blockquote>
       <pre>
-        <code>npm install onesmallui</code>
+        <code>npm install @onesmall/ui</code>
       </pre>
       <figure>
         <img

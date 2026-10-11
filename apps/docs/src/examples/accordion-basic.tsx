@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem } from 'onesmallui';
+import { Accordion, AccordionItem } from '@onesmall/ui';
 
 export default function Example() {
   return (

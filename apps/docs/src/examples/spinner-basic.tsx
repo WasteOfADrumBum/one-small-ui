@@ -1,4 +1,4 @@
-import { Spinner } from 'onesmallui';
+import { Spinner } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;

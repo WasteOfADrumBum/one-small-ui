@@ -1,4 +1,4 @@
-import { Pagination } from 'onesmallui';
+import { Pagination } from '@onesmall/ui';
 
 export default function Example() {
   return (

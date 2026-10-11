@@ -165,7 +165,8 @@ describe('Form controls', () => {
     );
     expect(screen.getByLabelText('Agree').closest('.os-check')).toHaveAttribute('data-color', 'success');
     expect(screen.getByLabelText('A').closest('.os-check')).toHaveAttribute('data-variant', 'card');
-    expect(screen.getByLabelText('A')).toHaveAttribute('aria-invalid', 'true');
+    // aria-invalid isn't supported on role radio; the radiogroup carries it.
+    expect(screen.getByRole('radiogroup', { name: 'Plan' })).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('switch').closest('.os-switch')).toHaveStyle({ '--os-switch-width': '4rem' });
     await expectNoAxeViolations(container);
   });

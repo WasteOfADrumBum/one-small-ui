@@ -1,6 +1,6 @@
 // OneSmallUI design variables. Every value is `!default`, so you can override
 // any of them when you load the library:
-//   @use 'onesmallui/scss' with ($prefix: 'ui', $radius-base: 6px);
+//   @use '@onesmall/ui/scss' with ($prefix: 'ui', $radius-base: 6px);
 
 @use 'sass:map';
 
@@ -116,7 +116,7 @@ $container-max: 1280px !default;
 // ---------- Content, layout and utilities ----------
 
 // Utility API: add, change or remove utilities without forking the library.
-//   @use 'onesmallui/scss' with ($utilities: (
+//   @use '@onesmall/ui/scss' with ($utilities: (
 //     'cursor': ('props': cursor, 'values': ('help': help, 'wait': wait), 'name': 'cursor'),
 //     'opacity': null, // removes a built-in utility
 //   ));

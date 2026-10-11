@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Forms',
   summary:
     'A calendar popup opened from an input or a button, or an inline Calendar: single dates, several dates or ranges, multiple months, min/max and disabled dates, first day of week, Intl formatting and locales, placement and dark appearance.',
-  importLine: "import { DatePicker, Calendar } from 'onesmallui';",
+  importLine: "import { DatePicker, Calendar } from '@onesmall/ui';",
   examples: [
     { name: 'datepicker-basic', title: 'Input or button trigger, ranges and formatting', description: 'The button trigger opens above with the dark appearance.' },
     { name: 'datepicker-inline', title: 'Inline calendar with multiple dates', description: 'isDateDisabled blocks weekends.' },

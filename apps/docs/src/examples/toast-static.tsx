@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Toast, ToastStack } from 'onesmallui';
+import { Button, Toast, ToastStack } from '@onesmall/ui';
 
 // <Toast> works on its own; ToastStack stacks them (inline here, or fixed at a screen edge).
 export default function Example() {

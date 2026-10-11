@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { Field, Input, PasswordStrength } from 'onesmallui';
+import { Field, Input, PasswordStrength } from '@onesmall/ui';
 
 export default function Example() {
   const [pw, setPw] = useState('');

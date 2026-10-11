@@ -1,7 +1,7 @@
 /**
  * OneSmallUI (1SmUI)
  * Import the styles once in your app entry:
- *   import 'onesmallui/styles.css';
+ *   import '@onesmall/ui/styles.css';
  */
 export * from './components';
 export * from './hooks';

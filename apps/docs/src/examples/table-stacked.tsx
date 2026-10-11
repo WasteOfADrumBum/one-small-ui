@@ -1,4 +1,4 @@
-import { Table } from 'onesmallui';
+import { Table } from '@onesmall/ui';
 
 const people = [
   { name: 'Ada Lovelace', email: 'ada@example.com', team: 'Research', status: 'Active' },

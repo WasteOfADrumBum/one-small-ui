@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Drawer, type DrawerProps } from 'onesmallui';
+import { Button, Drawer, type DrawerProps } from '@onesmall/ui';
 
 type Option = { label: string; props: Partial<DrawerProps> };
 

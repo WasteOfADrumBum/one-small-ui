@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Dialog, type DialogAnimation } from 'onesmallui';
+import { Button, Dialog, type DialogAnimation } from '@onesmall/ui';
 
 const animations: DialogAnimation[] = ['scale', 'fade', 'slide-down', 'slide-up', 'none'];
 

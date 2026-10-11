@@ -1,4 +1,4 @@
-import { Badge, Button, Step, Stepper } from 'onesmallui';
+import { Badge, Button, Step, Stepper } from '@onesmall/ui';
 
 export default function Example() {
   return (

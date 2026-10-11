@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Feedback',
   summary:
     'Inline messages for status changes and things that need attention. Eight theme colors, icons, headings with additional content, styled links, and dismissal that is uncontrolled, controlled, or driven from code.',
-  importLine: "import { Alert, AlertHeading, AlertLink } from 'onesmallui';",
+  importLine: "import { Alert, AlertHeading, AlertLink } from '@onesmall/ui';",
   examples: [
     { name: 'alert-basic', title: 'Theme colors' },
     { name: 'alert-content', title: 'Headings, links, icons and additional content' },

@@ -1,4 +1,4 @@
-import { Alert, Button, ButtonGroup, Field, Input, Switch } from 'onesmallui';
+import { Alert, Button, ButtonGroup, Field, Input, Switch } from '@onesmall/ui';
 
 // Set dir="rtl" on <html> (or any element). Components use logical
 // properties, so spacing, borders, icons and toolbars mirror automatically.

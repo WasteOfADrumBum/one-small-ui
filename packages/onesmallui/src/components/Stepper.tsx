@@ -185,16 +185,16 @@ export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
       : undefined;
 
   let trigger: ReactNode;
-  if (href !== undefined) {
+  if (href !== undefined && disabled) {
+    // A disabled link has no href, so it is a span that still reads as a (disabled) link.
     trigger = (
-      <a
-        className={cls('stepper__trigger')}
-        href={disabled ? undefined : href}
-        role={disabled ? 'link' : undefined}
-        aria-disabled={disabled || undefined}
-        aria-current={current}
-        onClick={disabled ? undefined : handleClick}
-      >
+      <span className={cls('stepper__trigger')} role="link" aria-disabled="true" aria-current={current}>
+        {inner}
+      </span>
+    );
+  } else if (href !== undefined) {
+    trigger = (
+      <a className={cls('stepper__trigger')} href={href} aria-current={current} onClick={handleClick}>
         {inner}
       </a>
     );

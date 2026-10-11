@@ -1,4 +1,4 @@
-import { Checkbox, FieldGroup, Radio, RadioGroup, Switch } from 'onesmallui';
+import { Checkbox, FieldGroup, Radio, RadioGroup, Switch } from '@onesmall/ui';
 
 export default function Example() {
   return (

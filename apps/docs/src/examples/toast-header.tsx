@@ -1,4 +1,4 @@
-import { Button, useToast } from 'onesmallui';
+import { Button, useToast } from '@onesmall/ui';
 
 const Bell = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

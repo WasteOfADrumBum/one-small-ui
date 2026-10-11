@@ -1,4 +1,4 @@
-import { Tab, TabList, TabPanel, Tabs } from 'onesmallui';
+import { Tab, TabList, TabPanel, Tabs } from '@onesmall/ui';
 
 export default function Example() {
   // A list group that controls tab content: style a vertical TabList as a list group.

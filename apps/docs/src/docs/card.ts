@@ -9,7 +9,7 @@ const doc: ComponentDoc = {
   summary:
     'Groups related content: body, title, text and link parts, header and footer, images and overlays, embedded lists and tabs, horizontal layout, theme colors, translucent glass, groups and grids.',
   importLine:
-    "import { Card, CardHeader, CardBody, CardFooter, CardTitle, CardSubtitle, CardText, CardLink, CardImage, CardOverlay, CardMedia, CardGroup } from 'onesmallui';",
+    "import { Card, CardHeader, CardBody, CardFooter, CardTitle, CardSubtitle, CardText, CardLink, CardImage, CardOverlay, CardMedia, CardGroup } from '@onesmall/ui';",
   examples: [
     { name: 'card-basic', title: 'Variants' },
     { name: 'card-content', title: 'Content parts, header and footer' },

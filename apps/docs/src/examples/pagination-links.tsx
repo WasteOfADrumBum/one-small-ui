@@ -1,4 +1,4 @@
-import { Pagination } from 'onesmallui';
+import { Pagination } from '@onesmall/ui';
 
 export default function Example() {
   // Link mode: every page is a real <a href>, so it works with any router or a full page load.

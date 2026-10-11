@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Nav items that do not fit move into a "More" menu, measured with ResizeObserver. Works with tabs, underline, pills and inside a Navbar; keeps the active item visible; supports a minimum visible count, collapsing everything and a custom toggle.',
-  importLine: "import { Nav, NavItem } from 'onesmallui';",
+  importLine: "import { Nav, NavItem } from '@onesmall/ui';",
   examples: [
     { name: 'nav-overflow-basic', title: 'Tabs and underline', description: 'The active item is swapped in so it always stays visible.' },
     { name: 'nav-overflow-options', title: 'Minimum visible, custom toggle, collapse all' },

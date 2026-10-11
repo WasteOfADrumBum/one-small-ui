@@ -10,6 +10,7 @@ import {
   type RefObject,
   type SyntheticEvent,
 } from 'react';
+import { useLatestRef } from '../hooks/useLatestRef';
 import { cls } from '../utils/prefix';
 
 export type OverlayAppearance = 'default' | 'dark' | 'translucent';
@@ -64,16 +65,19 @@ export function useDialogLifecycle({
 }: DialogLifecycleOptions) {
   const ref = useRef<HTMLDialogElement>(null);
   const [closing, setClosing] = useState(false);
+  // Closing (open → false) plays the exit animation unless `instant`; reopening cancels it.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    setClosing(!open && !instant);
+  }
   const [shake, setShake] = useState(false);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-  const openRef = useRef(open);
-  openRef.current = open;
+  const onCloseRef = useLatestRef(onClose);
+  const openRef = useLatestRef(open);
   const previous = useRef<HTMLElement | null>(null);
   const locked = useRef(false);
   const pressedBackdrop = useRef(false);
-  const returnRef = useRef(returnFocus);
-  returnRef.current = returnFocus;
+  const returnRef = useLatestRef(returnFocus);
 
   const restoreFocus = () => {
     const target = returnRef.current;
@@ -88,7 +92,6 @@ export function useDialogLifecycle({
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) {
-      setClosing(false);
       previous.current = document.activeElement as HTMLElement | null;
       if (modal) {
         if (dialog.showModal) dialog.showModal();
@@ -121,7 +124,6 @@ export function useDialogLifecycle({
         finish();
         return;
       }
-      setClosing(true);
       const t = setTimeout(finish, EXIT_MS);
       return () => clearTimeout(t);
     }

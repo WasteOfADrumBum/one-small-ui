@@ -1,4 +1,4 @@
-import { Progress } from 'onesmallui';
+import { Progress } from '@onesmall/ui';
 
 export default function Example() {
   return (

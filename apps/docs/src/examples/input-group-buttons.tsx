@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { Button, Card, Field, Input, InputGroup, useFloating } from 'onesmallui';
+import { Button, Card, Field, Input, InputGroup, useFloating } from '@onesmall/ui';
 
 export default function Example() {
   const [unit, setUnit] = useState('km');

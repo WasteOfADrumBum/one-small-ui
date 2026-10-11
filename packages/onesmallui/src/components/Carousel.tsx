@@ -139,7 +139,14 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
   const [current, setCurrent] = useControllableState(index, defaultIndex, onIndexChange);
   const reduced = usePrefersReducedMotion();
   const autoMs = autoplay === true ? 5000 : autoplay || 0;
-  const [playing, setPlaying] = useState(false);
+  // Rotate only when asked, and not for reduced-motion users; re-sync when either changes.
+  const autoPlay = autoMs > 0 && !reduced;
+  const [playing, setPlaying] = useState(autoPlay);
+  const [prevAutoPlay, setPrevAutoPlay] = useState(autoPlay);
+  if (autoPlay !== prevAutoPlay) {
+    setPrevAutoPlay(autoPlay);
+    setPlaying(autoPlay);
+  }
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [edges, setEdges] = useState({ start: true, end: count <= 1 });
@@ -157,11 +164,6 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
     slide: (n: number, total: number) => `${n} of ${total}`,
     ...labels,
   };
-
-  // Start rotating only when asked, and not for reduced-motion users.
-  useEffect(() => {
-    setPlaying(autoMs > 0 && !reduced);
-  }, [autoMs, reduced]);
 
   const slideEls = () => Array.from(trackRef.current?.children ?? []) as HTMLElement[];
 
@@ -353,6 +355,7 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
   const bar = controls === 'top' || controls === 'bottom';
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- tracks focus bubbling from the slides and controls inside to pause rotation; it is never focused itself
     <section
       ref={ref}
       className={cx(cls('carousel'), className)}
@@ -381,6 +384,7 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
       )}
       {!bar && rotation}
       <div className={cls('carousel__viewport')}>
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- the scrollable slide track: focusable so keyboard users can scroll it, with arrow keys moving between slides */}
         <div
           ref={trackRef}
           id={`${id}-track`}

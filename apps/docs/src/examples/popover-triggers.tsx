@@ -1,4 +1,4 @@
-import { Button, Popover } from 'onesmallui';
+import { Button, Popover } from '@onesmall/ui';
 
 export default function Example() {
   return (

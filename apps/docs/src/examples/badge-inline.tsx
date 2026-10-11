@@ -1,4 +1,4 @@
-import { Badge, Button, VisuallyHidden } from 'onesmallui';
+import { Badge, Button, VisuallyHidden } from '@onesmall/ui';
 
 export default function Example() {
   return (

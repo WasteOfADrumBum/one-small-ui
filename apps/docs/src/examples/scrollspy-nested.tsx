@@ -1,4 +1,4 @@
-import { ScrollSpy, useScrollSpy } from 'onesmallui';
+import { ScrollSpy, useScrollSpy } from '@onesmall/ui';
 
 // Nested lists: parent links get data-active="parent" while a child section is in view.
 // This one spies on the page itself (no root).

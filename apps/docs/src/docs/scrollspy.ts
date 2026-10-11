@@ -7,7 +7,7 @@ const doc: ComponentDoc = {
   group: 'Navigation',
   summary:
     'Highlights navigation links as their sections scroll into view, using IntersectionObserver. Works with Nav, Navbar, nested lists, list groups and plain anchors; in the page or a custom scroll container; with a configurable activation line and a debug overlay. Also available as a useScrollSpy hook.',
-  importLine: "import { ScrollSpy, useScrollSpy } from 'onesmallui';",
+  importLine: "import { ScrollSpy, useScrollSpy } from '@onesmall/ui';",
   examples: [
     { name: 'scrollspy-basic', title: 'Custom container with a Nav and debug line' },
     { name: 'scrollspy-nested', title: 'Nested links on the page, and the hook' },

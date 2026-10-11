@@ -1,0 +1,568 @@
+// An axe (jest-axe) check for every component, in a realistic, labelled state.
+// jsdom has no layout, so color contrast (checked on real pages by `npm run test:a11y`
+// and on tokens by `npm run check:contrast`) and landmark rules are left to those checks.
+import { createRef, type ReactElement } from 'react';
+import { render } from '@testing-library/react';
+import { configureAxe } from 'jest-axe';
+import {
+  Accordion,
+  AccordionItem,
+  Alert,
+  AlertHeading,
+  AlertLink,
+  AspectRatio,
+  Avatar,
+  AvatarGroup,
+  Badge,
+  BadgeAnchor,
+  Blockquote,
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  ButtonGroup,
+  ButtonToolbar,
+  Calendar,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardImage,
+  CardLink,
+  CardText,
+  CardTitle,
+  Carousel,
+  CarouselCaption,
+  CarouselSlide,
+  Checkbox,
+  Chip,
+  ChipGroup,
+  ChipInput,
+  CloseButton,
+  CodeBlock,
+  Collapse,
+  CollapseTrigger,
+  Collapsible,
+  Combobox,
+  Container,
+  DatePicker,
+  Dialog,
+  Drawer,
+  DropZone,
+  Field,
+  FieldGroup,
+  FloatingLabel,
+  Form,
+  Grid,
+  Image,
+  Input,
+  InputGroup,
+  InputGroupText,
+  ListGroup,
+  ListGroupItem,
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuDivider,
+  MenuItem,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuSub,
+  MenuTrigger,
+  Modal,
+  Nav,
+  NavItem,
+  NavMenu,
+  Navbar,
+  NavbarText,
+  OtpInput,
+  Pagination,
+  PasswordStrength,
+  Placeholder,
+  Popover,
+  Progress,
+  ProgressStack,
+  Radio,
+  RadioGroup,
+  Range,
+  ScrollSpy,
+  Select,
+  Skeleton,
+  SkipLink,
+  SortableList,
+  Spinner,
+  Stack,
+  Step,
+  Stepper,
+  Switch,
+  Tab,
+  Table,
+  TabList,
+  TabPanel,
+  Tabs,
+  Textarea,
+  ThemeProvider,
+  ThemeToggle,
+  Toast,
+  ToastProvider,
+  ToastStack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Toggler,
+  Tooltip,
+  TooltipProvider,
+  Video,
+  VisuallyHidden,
+} from '../src';
+
+const axe = configureAxe({
+  rules: {
+    'color-contrast': { enabled: false },
+    'color-contrast-enhanced': { enabled: false },
+    region: { enabled: false },
+  },
+});
+
+const options = [
+  { value: 'mars', label: 'Mars' },
+  { value: 'venus', label: 'Venus' },
+  { value: 'titan', label: 'Titan', disabled: true },
+];
+
+const cases: Record<string, () => ReactElement> = {
+  Accordion: () => (
+    <Accordion type="single" defaultValue={['a']}>
+      <AccordionItem value="a" title="Open item">
+        Visible content.
+      </AccordionItem>
+      <AccordionItem value="b" title="Closed item">
+        Hidden content.
+      </AccordionItem>
+    </Accordion>
+  ),
+  Alert: () => (
+    <Alert color="warning" title="Low fuel" onDismiss={() => {}}>
+      <AlertHeading>Refuel soon</AlertHeading>
+      Reserves at 12%. <AlertLink href="#refuel">Find a station</AlertLink>
+    </Alert>
+  ),
+  Avatar: () => (
+    <AvatarGroup label="Crew" max={2}>
+      <Avatar name="Ada Lovelace" status="online" />
+      <Avatar name="Grace Hopper" />
+      <Avatar name="Mae Jemison" />
+    </AvatarGroup>
+  ),
+  Badge: () => (
+    <>
+      <Badge color="success" dot>
+        Online
+      </Badge>
+      <BadgeAnchor>
+        <Avatar name="Sally Ride" />
+        <Badge placement="top-end" color="danger" variant="solid">
+          3 new messages
+        </Badge>
+      </BadgeAnchor>
+    </>
+  ),
+  Blockquote: () => (
+    <Blockquote source="Ada Lovelace" sourceTitle="Notes">
+      <p>The engine weaves algebraic patterns.</p>
+    </Blockquote>
+  ),
+  Breadcrumb: () => (
+    <Breadcrumb>
+      <BreadcrumbItem href="#home">Home</BreadcrumbItem>
+      <BreadcrumbItem current>Fleet</BreadcrumbItem>
+    </Breadcrumb>
+  ),
+  Button: () => (
+    <>
+      <Button>Launch</Button>
+      <Button loading>Saving</Button>
+      <Button href="#docs" variant="outline">
+        Docs
+      </Button>
+    </>
+  ),
+  ButtonGroup: () => (
+    <ButtonToolbar aria-label="Formatting">
+      <ButtonGroup aria-label="History">
+        <Button>Undo</Button>
+        <Button>Redo</Button>
+      </ButtonGroup>
+      <ToggleButtonGroup aria-label="Alignment" type="single" defaultValue={['left']}>
+        <ToggleButton value="left">Left</ToggleButton>
+        <ToggleButton value="right">Right</ToggleButton>
+      </ToggleButtonGroup>
+      <ToggleButton name="bold">Bold</ToggleButton>
+    </ButtonToolbar>
+  ),
+  Calendar: () => <Calendar aria-label="Launch day" defaultMonth={new Date(2026, 9, 1)} defaultValue={new Date(2026, 9, 9)} />,
+  Card: () => (
+    <Card as="article">
+      <CardImage src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Earth from orbit" />
+      <CardHeader>
+        <CardTitle>Orbital relay</CardTitle>
+      </CardHeader>
+      <CardBody>
+        <CardText>Relays telemetry.</CardText>
+        <CardLink href="#relay">Details</CardLink>
+      </CardBody>
+      <CardFooter>
+        <Button size="sm">Connect</Button>
+      </CardFooter>
+    </Card>
+  ),
+  Carousel: () => (
+    <Carousel aria-label="Exoplanets">
+      {['Kepler-22b', 'Proxima b'].map((name) => (
+        <CarouselSlide key={name}>
+          <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt={name} />
+          <CarouselCaption>{name}</CarouselCaption>
+        </CarouselSlide>
+      ))}
+    </Carousel>
+  ),
+  Checkbox: () => (
+    <>
+      <Checkbox label="Accept" description="Required to continue." required />
+      <Checkbox label="Partly" indeterminate />
+    </>
+  ),
+  Chip: () => (
+    <>
+      <ChipGroup aria-label="Destinations" selectionMode="multiple" defaultValue={['mars']}>
+        <Chip value="mars">Mars</Chip>
+        <Chip value="europa">Europa</Chip>
+      </ChipGroup>
+      <ChipGroup aria-label="Tags">
+        <Chip onRemove={() => {}}>Removable</Chip>
+      </ChipGroup>
+      <Field label="Crew emails">
+        <ChipInput defaultValue={['ada@station.io']} placeholder="Add email" />
+      </Field>
+    </>
+  ),
+  CloseButton: () => <CloseButton label="Close panel" />,
+  CodeBlock: () => <CodeBlock title="launch.ts" language="ts" code={'export const go = () => true;'} />,
+  Collapse: () => (
+    <Collapsible defaultOpen>
+      <CollapseTrigger>Mission details</CollapseTrigger>
+      <Collapse>Launch at 06:40.</Collapse>
+    </Collapsible>
+  ),
+  Combobox: () => (
+    <Field label="Planet">
+      <Combobox options={options} defaultValue="mars" />
+    </Field>
+  ),
+  DatePicker: () => (
+    <>
+      <Field label="Launch date">
+        <DatePicker defaultValue={new Date(2026, 9, 9)} />
+      </Field>
+      <Field label="Return date">
+        <DatePicker trigger="button" />
+      </Field>
+    </>
+  ),
+  Dialog: () => (
+    <Dialog open onClose={() => {}} title="Rename vessel" description="Shown on manifests." footer={<Button>Save</Button>}>
+      <Field label="Name">
+        <Input defaultValue="Starlight" />
+      </Field>
+    </Dialog>
+  ),
+  Drawer: () => (
+    <Drawer open onClose={() => {}} title="Filters">
+      <Checkbox label="Only active" />
+    </Drawer>
+  ),
+  DropZone: () => <DropZone accept="image/*" maxFiles={3} />,
+  Field: () => (
+    <FieldGroup legend="Contact" description="How we reach you.">
+      <Field label="Email" hint="Never shared." error="Enter an email" required>
+        <Input type="email" />
+      </Field>
+      <FloatingLabel label="Phone">
+        <Input type="tel" />
+      </FloatingLabel>
+    </FieldGroup>
+  ),
+  Form: () => (
+    <Form aria-label="Register">
+      <Field label="Callsign" required>
+        <Input />
+      </Field>
+      <Button type="submit">Register</Button>
+    </Form>
+  ),
+  Input: () => (
+    <Field label="Budget">
+      <Input type="number" startAdornment="CR" defaultValue={1200} />
+    </Field>
+  ),
+  InputGroup: () => (
+    <Field label="Handle">
+      <InputGroup>
+        <InputGroupText>@</InputGroupText>
+        <Input />
+        <Button>Check</Button>
+      </InputGroup>
+    </Field>
+  ),
+  Layout: () => (
+    <Container>
+      <Stack gap={4}>
+        <Grid columns={{ base: 1, md: 2 }}>
+          <p>One</p>
+          <p>Two</p>
+        </Grid>
+      </Stack>
+    </Container>
+  ),
+  ListGroup: () => (
+    <ListGroup aria-label="Decks">
+      <ListGroupItem active onClick={() => {}}>
+        Bridge
+      </ListGroupItem>
+      <ListGroupItem onClick={() => {}}>Engineering</ListGroupItem>
+      <ListGroupItem disabled onClick={() => {}}>
+        Cargo
+      </ListGroupItem>
+    </ListGroup>
+  ),
+  Media: () => (
+    <>
+      <Image src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="A spiral galaxy" ratio={4 / 3} caption="Galaxy" />
+      <Video
+        label="Launch footage"
+        sources={[{ src: 'launch.mp4', type: 'video/mp4' }]}
+        tracks={[{ src: 'launch.vtt', srcLang: 'en', label: 'English', kind: 'captions', default: true }]}
+      />
+      <AspectRatio ratio={1}>
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Saturn" />
+      </AspectRatio>
+    </>
+  ),
+  Menu: () => (
+    <Menu defaultOpen>
+      <MenuTrigger>
+        <Button>Ship actions</Button>
+      </MenuTrigger>
+      <MenuContent>
+        <MenuItem shortcut="⌘R">Rename</MenuItem>
+        <MenuItem disabled>Hyperjump</MenuItem>
+        <MenuDivider />
+        <MenuCheckboxItem checked onCheckedChange={() => {}}>
+          Show grid
+        </MenuCheckboxItem>
+        <MenuRadioGroup label="Sort by" value="name" onValueChange={() => {}}>
+          <MenuRadioItem value="name">Name</MenuRadioItem>
+          <MenuRadioItem value="fuel">Fuel</MenuRadioItem>
+        </MenuRadioGroup>
+        <MenuSub label="More">
+          <MenuItem>Archive</MenuItem>
+        </MenuSub>
+      </MenuContent>
+    </Menu>
+  ),
+  Modal: () => (
+    <Modal open onClose={() => {}} title="Legacy modal">
+      Still works.
+    </Modal>
+  ),
+  Nav: () => (
+    <Nav aria-label="Sections" variant="tabs">
+      <NavItem href="#a" active>
+        Overview
+      </NavItem>
+      <NavItem href="#b">Fleet</NavItem>
+      <NavMenu label="Systems">
+        <MenuItem href="#c">Life support</MenuItem>
+      </NavMenu>
+    </Nav>
+  ),
+  Navbar: () => (
+    <Navbar brand="Starlight" brandHref="#home" aria-label="Main">
+      <Nav as="div">
+        <NavItem href="#home" active>
+          Home
+        </NavItem>
+      </Nav>
+      <NavbarText>Signed in as Vega</NavbarText>
+    </Navbar>
+  ),
+  OtpInput: () => (
+    <Field label="Verification code">
+      <OtpInput length={6} groupSize={3} />
+    </Field>
+  ),
+  Pagination: () => <Pagination count={20} defaultPage={6} showFirstLast aria-label="Log pages" />,
+  PasswordStrength: () => <PasswordStrength value="Orbit-2026!" showRules />,
+  Popover: () => (
+    <Popover defaultOpen title="Docking bay 7" content="Clear for landing.">
+      <Button>Bay status</Button>
+    </Popover>
+  ),
+  Progress: () => (
+    <>
+      <Progress label="Charging" value={40} showValue />
+      <Progress label="Scanning" />
+      <ProgressStack
+        label="Cargo"
+        legend
+        segments={[
+          { label: 'Food', value: 30, color: 'success' },
+          { label: 'Fuel', value: 20, color: 'warning' },
+        ]}
+      />
+    </>
+  ),
+  Radio: () => (
+    <RadioGroup label="Plan" defaultValue="a" error="Pick a plan">
+      <Radio value="a" label="Basic" />
+      <Radio value="b" label="Pro" description="More cargo." />
+    </RadioGroup>
+  ),
+  Range: () => (
+    <Field label="Thrust">
+      <Range defaultValue={40} showValue showMinMax ticks={[0, 50, 100]} />
+    </Field>
+  ),
+  ScrollSpy: () => (
+    <>
+      <ScrollSpy>
+        <Nav aria-label="Phases" orientation="vertical">
+          <NavItem href="#spy-a">Launch</NavItem>
+          <NavItem href="#spy-b">Orbit</NavItem>
+        </Nav>
+      </ScrollSpy>
+      <section id="spy-a" aria-label="Launch">
+        Launch
+      </section>
+      <section id="spy-b" aria-label="Orbit">
+        Orbit
+      </section>
+    </>
+  ),
+  Select: () => (
+    <Field label="Planet">
+      <Select placeholder="Choose" options={options} />
+    </Field>
+  ),
+  Skeleton: () => (
+    <div role="group" aria-busy="true" aria-label="Loading profile">
+      <Skeleton shape="circle" />
+      <Skeleton lines={2} />
+      <Placeholder width={60} />
+    </div>
+  ),
+  SortableList: () => (
+    <SortableList
+      label="Tasks"
+      items={[
+        { id: 'a', title: 'Calibrate' },
+        { id: 'b', title: 'Refuel' },
+      ]}
+      getKey={(t) => t.id}
+      getItemLabel={(t) => t.title}
+      onReorder={() => {}}
+      renderItem={(t) => t.title}
+    />
+  ),
+  Spinner: () => <Spinner label="Loading" />,
+  Stepper: () => (
+    <Stepper activeStep={1} aria-label="Checkout" onStepClick={() => {}}>
+      <Step title="Cart" />
+      <Step title="Shipping" />
+      <Step title="Payment" status="error" description="Card declined" />
+    </Stepper>
+  ),
+  Switch: () => <Switch label="Shields" description="Raise deflectors." defaultChecked />,
+  Table: () => (
+    <Table caption="Crew" responsive>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Ada</th>
+          <td>Analyst</td>
+        </tr>
+      </tbody>
+    </Table>
+  ),
+  Tabs: () => (
+    <Tabs defaultValue="a">
+      <TabList aria-label="Systems">
+        <Tab value="a">Overview</Tab>
+        <Tab value="b">Engines</Tab>
+        <Tab value="c" disabled>
+          Cargo
+        </Tab>
+      </TabList>
+      <TabPanel value="a">All nominal.</TabPanel>
+      <TabPanel value="b">82%.</TabPanel>
+    </Tabs>
+  ),
+  Textarea: () => (
+    <Field label="Notes">
+      <Textarea autoResize />
+    </Field>
+  ),
+  Theme: () => (
+    <ThemeProvider>
+      <ThemeToggle />
+    </ThemeProvider>
+  ),
+  Toast: () => (
+    <ToastProvider>
+      <ToastStack placement="inline" label="Inline notifications">
+        <Toast title="Saved" description="Your changes are live." onDismiss={() => {}} />
+        <Toast color="danger" title="Failed" action={{ label: 'Retry', onClick: () => {} }} onDismiss={() => {}} />
+      </ToastStack>
+    </ToastProvider>
+  ),
+  Toggler: () => {
+    const target = createRef<HTMLDivElement>();
+    return (
+      <>
+        <Toggler target={target} toggleClass="os-shadow-glow">
+          Glow
+        </Toggler>
+        <div ref={target} id="toggler-panel">
+          Panel
+        </div>
+      </>
+    );
+  },
+  Tooltip: () => (
+    <TooltipProvider>
+      <Tooltip content="Launch now" defaultOpen>
+        <Button>Go</Button>
+      </Tooltip>
+    </TooltipProvider>
+  ),
+  VisuallyHidden: () => (
+    <>
+      <SkipLink />
+      <main id="main">
+        <Button>
+          <VisuallyHidden>Open settings</VisuallyHidden>⚙
+        </Button>
+      </main>
+    </>
+  ),
+};
+
+describe('axe: every component', () => {
+  it.each(Object.keys(cases))('%s has no detectable accessibility violations', async (name) => {
+    const { container } = render(cases[name]!());
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});

@@ -66,10 +66,14 @@ export const CardText = part('text', 'p');
 
 /** A link inside a card body. Several sit side by side. */
 export const CardLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function CardLink(
-  { className, ...rest },
+  { className, children, ...rest },
   ref,
 ) {
-  return <a ref={ref} className={cx(cls('card__link'), className)} {...rest} />;
+  return (
+    <a ref={ref} className={cx(cls('card__link'), className)} {...rest}>
+      {children}
+    </a>
+  );
 });
 
 export interface CardImageProps extends ImgHTMLAttributes<HTMLImageElement> {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Progress } from 'onesmallui';
+import { Progress } from '@onesmall/ui';
 
 const colors = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'] as const;
 

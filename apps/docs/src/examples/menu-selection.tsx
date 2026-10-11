@@ -9,7 +9,7 @@ import {
   MenuRadioGroup,
   MenuRadioItem,
   MenuTrigger,
-} from 'onesmallui';
+} from '@onesmall/ui';
 
 export default function Example() {
   const [grid, setGrid] = useState(true);

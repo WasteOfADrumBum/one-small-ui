@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from 'onesmallui';
+import { Button, ButtonGroup } from '@onesmall/ui';
 
 export default function Example() {
   return (

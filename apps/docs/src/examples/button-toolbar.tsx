@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, ButtonToolbar, ToggleButton, ToggleButtonGroup } from 'onesmallui';
+import { Button, ButtonGroup, ButtonToolbar, ToggleButton, ToggleButtonGroup } from '@onesmall/ui';
 
 // One Tab stop for the whole toolbar; arrow keys move between controls.
 export default function Example() {

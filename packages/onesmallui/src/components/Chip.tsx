@@ -185,6 +185,7 @@ export const ChipGroup = forwardRef<HTMLDivElement, ChipGroupProps>(function Chi
         };
   return (
     <ChipGroupContext.Provider value={{ selected, toggle, size, color, variant, disabled }}>
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- arrow keys and Delete bubble up from the chip buttons inside, which handle focus themselves */}
       <div
         ref={ref}
         role="group"
@@ -368,6 +369,7 @@ export const ChipInput = forwardRef<HTMLInputElement, ChipInputProps>(function C
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- styling wrapper: mousedown forwards focus to the input; arrow keys and Delete bubble up from the chip buttons inside
     <div
       className={cx(cls('chip-input'), className)}
       data-size={size ?? 'md'}

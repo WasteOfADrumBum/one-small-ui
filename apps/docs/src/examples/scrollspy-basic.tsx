@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Nav, NavItem, ScrollSpy, Switch } from 'onesmallui';
+import { Nav, NavItem, ScrollSpy, Switch } from '@onesmall/ui';
 
 const sections = [
   { id: 'spy-launch', title: 'Launch' },

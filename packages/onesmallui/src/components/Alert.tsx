@@ -115,8 +115,12 @@ export const AlertHeading = forwardRef<HTMLHeadingElement, AlertHeadingProps>(fu
 
 /** A link styled to match the alert's color, underlined so it is not identified by color alone. */
 export const AlertLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function AlertLink(
-  { className, ...rest },
+  { className, children, ...rest },
   ref,
 ) {
-  return <a ref={ref} className={cx(cls('alert__link'), className)} {...rest} />;
+  return (
+    <a ref={ref} className={cx(cls('alert__link'), className)} {...rest}>
+      {children}
+    </a>
+  );
 });

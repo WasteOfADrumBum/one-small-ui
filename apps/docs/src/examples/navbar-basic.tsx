@@ -1,4 +1,4 @@
-import { Button, Input, Nav, NavItem, Navbar, NavbarText } from 'onesmallui';
+import { Button, Input, Nav, NavItem, Navbar, NavbarText } from '@onesmall/ui';
 
 const here = '#components/navbar';
 

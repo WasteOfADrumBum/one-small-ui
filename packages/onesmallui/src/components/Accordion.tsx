@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useId, useRef, type HTMLAttributes, type ReactNode } from 'react';
+import { useLatestRef } from '../hooks/useLatestRef';
 import { useControllableState } from '../hooks/useControllableState';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
@@ -55,16 +56,15 @@ export function Accordion({
   const [open, setOpen] = useControllableState(value, defaultValue, onValueChange);
   const name = `os-acc-${useId().replace(/:/g, '')}`;
   // Native <details> fire several toggle events in one tick; track the latest value between renders.
-  const latest = useRef(open);
-  latest.current = open;
+  const latestRef = useLatestRef(open);
   const setItem = (v: string, next: boolean) => {
-    const cur = latest.current;
+    const cur = latestRef.current;
     if (cur.includes(v) === next) return;
     const updated = type === 'single' ? (next ? [v] : []) : next ? [...cur, v] : cur.filter((x) => x !== v);
-    latest.current = updated;
+    latestRef.current = updated;
     setOpen(updated);
   };
-  const toggle = (v: string) => setItem(v, !latest.current.includes(v));
+  const toggle = (v: string) => setItem(v, !latestRef.current.includes(v));
   return (
     <AccordionContext.Provider
       value={{ open, toggle, setItem, headingLevel, native, name: native && type === 'single' ? name : undefined, indicator }}

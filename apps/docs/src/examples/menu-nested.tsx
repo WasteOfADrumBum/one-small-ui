@@ -1,4 +1,4 @@
-import { Button, Menu, MenuContent, MenuItem, MenuSub, MenuTrigger } from 'onesmallui';
+import { Button, Menu, MenuContent, MenuItem, MenuSub, MenuTrigger } from '@onesmall/ui';
 
 const sectors = Array.from({ length: 24 }, (_, i) => `Sector ${i + 1}`);
 

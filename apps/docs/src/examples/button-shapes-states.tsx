@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from 'onesmallui';
+import { Button } from '@onesmall/ui';
 
 export default function Example() {
   const [muted, setMuted] = useState(false);

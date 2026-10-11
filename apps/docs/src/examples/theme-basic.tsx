@@ -1,4 +1,4 @@
-import { Button, ThemeToggle, useTheme } from 'onesmallui';
+import { Button, ThemeToggle, useTheme } from '@onesmall/ui';
 
 // <ThemeProvider> wraps the app once (see Getting started).
 export default function Example() {

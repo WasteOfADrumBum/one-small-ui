@@ -1,5 +1,5 @@
 import {
-  cloneElement,
+  type ElementType,
   createContext,
   isValidElement,
   forwardRef,
@@ -137,6 +137,8 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(function TabList
         else if (ref) ref.current = el;
       }}
       role="tablist"
+      // Focus lives on the tabs (roving tabindex); -1 keeps the list itself out of the tab order.
+      tabIndex={-1}
       aria-orientation={orientation}
       className={cx(cls('tabs__list'), className)}
       onKeyDown={onKeyDown}
@@ -168,24 +170,29 @@ export const Tab = forwardRef<HTMLButtonElement, TabProps>(function Tab(
   if (asChild && isValidElement(children)) {
     const child = children as ReactElement<Record<string, unknown>>;
     const childClick = child.props.onClick as ((e: MouseEvent<HTMLButtonElement>) => void) | undefined;
-    return cloneElement(child, {
-      ref,
-      role: 'tab',
-      id: `${baseId}-tab-${safe(value)}`,
-      'aria-selected': selected,
-      'aria-controls': `${baseId}-panel-${safe(value)}`,
-      tabIndex: selected ? 0 : -1,
-      disabled,
-      'data-state': selected ? 'active' : 'inactive',
-      'data-tab': '',
-      className: cx(child.props.className as string | undefined, className),
-      onClick: (e: MouseEvent<HTMLButtonElement>) => {
-        childClick?.(e);
-        setValue(value);
-        onClick?.(e);
-      },
-      ...rest,
-    });
+    // JSX rather than cloneElement, so the forwarded ref is a plain prop.
+    const Child = child.type as ElementType;
+    return (
+      <Child
+        {...child.props}
+        ref={ref}
+        role="tab"
+        id={`${baseId}-tab-${safe(value)}`}
+        aria-selected={selected}
+        aria-controls={`${baseId}-panel-${safe(value)}`}
+        tabIndex={selected ? 0 : -1}
+        disabled={disabled}
+        data-state={selected ? 'active' : 'inactive'}
+        data-tab=""
+        className={cx(child.props.className as string | undefined, className)}
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          childClick?.(e);
+          setValue(value);
+          onClick?.(e);
+        }}
+        {...rest}
+      />
+    );
   }
   return (
     <button

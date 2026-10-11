@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'DropZone',
   group: 'Drag & drop',
   summary: 'Upload areas with drag and drop, validation, previews, progress, and a headless hook for custom UIs.',
-  importLine: "import { DropZone, useDropZone } from 'onesmallui';",
+  importLine: "import { DropZone, useDropZone } from '@onesmall/ui';",
   examples: [
     { name: 'dropzone-basic', title: 'Validated drop zone', description: 'Images, video and PDF up to 10 MB, max 6 files. Try dropping something else.' },
     { name: 'dropzone-upload', title: 'Compact with upload progress' },

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Combobox, Field } from 'onesmallui';
+import { Combobox, Field } from '@onesmall/ui';
 
 const planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'].map((p) => ({
   value: p.toLowerCase(),

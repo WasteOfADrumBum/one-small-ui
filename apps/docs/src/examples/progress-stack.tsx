@@ -1,4 +1,4 @@
-import { ProgressStack } from 'onesmallui';
+import { ProgressStack } from '@onesmall/ui';
 
 export default function Example() {
   return (

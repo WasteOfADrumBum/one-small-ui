@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Toggler, useToggler } from 'onesmallui';
+import { Toggler, useToggler } from '@onesmall/ui';
 
 export default function Example() {
   const panel = useRef<HTMLDivElement>(null);

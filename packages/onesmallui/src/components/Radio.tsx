@@ -63,6 +63,7 @@ export function RadioGroup({
   const groupName = name ?? `os-radio-${auto}`;
   const hintId = hint ? `os-rg-${auto}-hint` : undefined;
   const errorId = error ? `os-rg-${auto}-error` : undefined;
+  const legendId = `os-rg-${auto}-label`;
   const [current, setCurrent] = useControllableState<string | undefined>(value, defaultValue, (v) =>
     onValueChange?.(v as string),
   );
@@ -70,7 +71,12 @@ export function RadioGroup({
     <RadioGroupContext.Provider
       value={{ name: groupName, value: current, setValue: setCurrent, disabled, color, size, variant, invalid: !!error, required }}
     >
+      {/* radiogroup (not the fieldset's implicit group) so the invalid and required states are valid ARIA. */}
       <fieldset
+        role="radiogroup"
+        aria-labelledby={legendId}
+        aria-invalid={error ? true : undefined}
+        aria-required={required || undefined}
         className={cx(cls('radio-group'), className)}
         data-orientation={orientation}
         data-variant={variant === 'card' ? 'card' : undefined}
@@ -78,7 +84,7 @@ export function RadioGroup({
         disabled={disabled}
         aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}
       >
-        <legend className={cls('field__label')}>
+        <legend id={legendId} className={cls('field__label')}>
           {label}
           {required && (
             <span className={cls('field__required')} aria-hidden="true">
@@ -148,7 +154,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         value={value}
         className={cls('check__input')}
         aria-describedby={descId}
-        aria-invalid={isInvalid || undefined}
         {...rest}
         {...groupProps}
       />

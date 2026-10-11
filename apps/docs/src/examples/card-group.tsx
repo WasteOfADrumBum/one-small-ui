@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, CardGroup, CardText, CardTitle } from 'onesmallui';
+import { Card, CardBody, CardFooter, CardGroup, CardText, CardTitle } from '@onesmall/ui';
 
 const plans = [
   { name: 'Orbit', text: 'Day trips to the station.' },

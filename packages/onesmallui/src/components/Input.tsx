@@ -71,7 +71,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const isInvalid = invalid || (controlProps as { 'aria-invalid'?: boolean })['aria-invalid'];
   const isValid = !isInvalid && (valid || field?.valid);
   return (
+    // Presentation: a styling wrapper; its mousedown only forwards focus to the input inside.
     <div
+      role="presentation"
       className={cx(cls('input'), className)}
       style={style}
       data-size={size ?? groupSize ?? 'md'}

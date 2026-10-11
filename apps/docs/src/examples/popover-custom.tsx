@@ -1,4 +1,4 @@
-import { Badge, Button, Popover } from 'onesmallui';
+import { Badge, Button, Popover } from '@onesmall/ui';
 
 export default function Example() {
   return (

@@ -1,4 +1,4 @@
-import { Blockquote } from 'onesmallui';
+import { Blockquote } from '@onesmall/ui';
 
 // Blockquote renders figure › blockquote + figcaption › cite when you give it a source.
 export default function Example() {

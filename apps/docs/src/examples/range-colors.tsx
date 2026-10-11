@@ -1,4 +1,4 @@
-import { Field, Range, type ThemeColor } from 'onesmallui';
+import { Field, Range, type ThemeColor } from '@onesmall/ui';
 
 const colors: ThemeColor[] = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'info', 'inverse'];
 

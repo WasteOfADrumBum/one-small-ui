@@ -8,7 +8,7 @@ const doc: ComponentDoc = {
   group: 'Actions',
   summary:
     'Join related buttons into one control, horizontally or vertically, with optional dividers. Groups pass size, variant, color and shape to every button inside, nest freely, and combine into keyboard-friendly toolbars.',
-  importLine: "import { ButtonGroup, ButtonToolbar } from 'onesmallui';",
+  importLine: "import { ButtonGroup, ButtonToolbar } from '@onesmall/ui';",
   examples: [
     { name: 'button-group', title: 'Groups', description: 'Horizontal, dividers, sizes, themes, vertical and nested.' },
     { name: 'button-toolbar', title: 'Toolbar', description: 'Tab into it once, then use arrow keys, Home and End.' },
