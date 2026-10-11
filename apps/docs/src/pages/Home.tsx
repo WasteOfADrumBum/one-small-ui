@@ -45,7 +45,7 @@ export function Home() {
       <section className="docs-hero" aria-labelledby="hero-title">
         <div className="docs-hero__copy">
           <Badge color="accent" dot pulse>
-            v0.1 · React · TypeScript · SCSS
+            v{__OS_VERSION__} · React · TypeScript · SCSS
           </Badge>
           <h1 id="hero-title" className="docs-hero__title">
             <span className="os-gradient-text">OneSmallUI</span>

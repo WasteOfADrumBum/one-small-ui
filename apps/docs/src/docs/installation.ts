@@ -1,6 +1,6 @@
 import type { ComponentDoc } from '../site/docTypes';
 
-const v = '0.2.0';
+const v = __OS_VERSION__;
 
 const doc: ComponentDoc = {
   slug: 'installation',
