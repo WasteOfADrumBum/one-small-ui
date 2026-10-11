@@ -10,6 +10,7 @@ export const groupOrder = [
   'Content',
   'Layout & media',
   'Utilities',
+  'Accessibility',
   'Drag & drop',
   'Theming',
   'Framework',
@@ -32,6 +33,12 @@ export interface ComponentDoc {
   /** Code snippets shown after the examples (install commands, SCSS, HTML). */
   snippets?: { title: string; language: string; code: string; description?: string }[];
   a11y: string[];
+  /** Keyboard interaction table. `keys` like "Shift + Tab" or "Enter / Space"; "None" for no keys. */
+  keyboard?: { keys: string; action: string }[];
+  /** What screen reader users hear, and how it is wired. */
+  screenReader?: string[];
+  dos?: string[];
+  donts?: string[];
   classes?: string;
 }
 

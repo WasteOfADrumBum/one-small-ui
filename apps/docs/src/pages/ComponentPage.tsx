@@ -80,14 +80,81 @@ export function ComponentPage({ doc }: { doc: ComponentDoc }) {
         </>
       )}
 
-      {doc.a11y.length > 0 && (
+      {(doc.a11y.length > 0 || doc.keyboard || doc.screenReader) && (
         <>
           <h2 id="accessibility">Accessibility</h2>
-          <ul>
-            {doc.a11y.map((a) => (
-              <li key={a}>{a}</li>
-            ))}
-          </ul>
+          {doc.a11y.length > 0 && (
+            <ul>
+              {doc.a11y.map((a) => (
+                <li key={a}>{a}</li>
+              ))}
+            </ul>
+          )}
+
+          {doc.keyboard && (
+            <>
+              <h3 id="keyboard">Keyboard interaction</h3>
+              <div className="docs-props">
+                <table aria-labelledby="keyboard">
+                  <thead>
+                    <tr>
+                      <th scope="col">Keys</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {doc.keyboard.map((k) => (
+                      <tr key={k.keys}>
+                        <th scope="row">
+                          <Keys keys={k.keys} />
+                        </th>
+                        <td>{k.action}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {doc.screenReader && (
+            <>
+              <h3 id="screen-reader">Screen reader notes</h3>
+              <ul>
+                {doc.screenReader.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
+      )}
+
+      {(doc.dos || doc.donts) && (
+        <>
+          <h2 id="do-dont">Do and don't</h2>
+          <div className="docs-dos">
+            {doc.dos && (
+              <section className="docs-dos__col" data-kind="do" aria-labelledby="do-list">
+                <h3 id="do-list">Do</h3>
+                <ul>
+                  {doc.dos.map((d) => (
+                    <li key={d}>{d}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {doc.donts && (
+              <section className="docs-dos__col" data-kind="dont" aria-labelledby="dont-list">
+                <h3 id="dont-list">Don't</h3>
+                <ul>
+                  {doc.donts.map((d) => (
+                    <li key={d}>{d}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
         </>
       )}
 
@@ -98,5 +165,25 @@ export function ComponentPage({ doc }: { doc: ComponentDoc }) {
         </>
       )}
     </article>
+  );
+}
+
+/** "Shift + Tab" → <kbd>Shift</kbd> + <kbd>Tab</kbd>; "Enter / Space" → alternatives. "None" stays plain text. */
+function Keys({ keys }: { keys: string }) {
+  if (keys === 'None') return <>None</>;
+  return (
+    <>
+      {keys.split(' / ').map((combo, i) => (
+        <span key={combo}>
+          {i > 0 && ' or '}
+          {combo.split(' + ').map((key, j) => (
+            <span key={key}>
+              {j > 0 && ' + '}
+              <kbd>{key}</kbd>
+            </span>
+          ))}
+        </span>
+      ))}
+    </>
   );
 }

@@ -44,8 +44,10 @@ const doc: ComponentDoc = {
         { name: 'appearance', type: "'default' | 'dark' | 'translucent'", default: "'default'", description: 'Surface style.' },
         { name: 'duration', type: 'number | null', default: 'null', description: 'Auto-hide after ms; pauses on hover and focus.' },
         { name: 'instant', type: 'boolean', description: 'No enter/exit animation.' },
+        { name: 'announcement (toast)', type: 'string', description: 'What screen readers hear. Defaults to the title and description text.' },
         { name: 'onDismiss (Toast)', type: '() => void', description: 'Shows the close button; called by it, the action and the timer.' },
         { name: 'role (Toast)', type: "'status' | 'alert'", default: "alert for danger, else status", description: 'Live-region politeness.' },
+        { name: 'live (Toast)', type: 'boolean', default: 'true', description: 'Make a standalone Toast its own live region. ToastProvider sets false and announces instead.' },
       ],
     },
     {
@@ -54,7 +56,8 @@ const doc: ComponentDoc = {
     },
   ],
   a11y: [
-    'Toasts are announced politely (role="status"); danger toasts assertively (role="alert").',
+    'ToastProvider announces each toast through the announcer (useAnnouncer): politely, danger toasts assertively. It uses your AnnouncerProvider, or mounts its own if there is none. Set announcement to change what is read.',
+    'A standalone <Toast> is its own live region: role="status", or role="alert" for danger.',
     'By default toasts never time out (WCAG 2.2.3 No Timing). Auto-hide is opt-in and pauses on hover and focus.',
     'Solid toasts use the on-<color> token for every part, including the focus ring, so text stays at 7:1.',
     'The close and action buttons are 44px targets with visible labels or aria-labels.',

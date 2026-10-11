@@ -99,7 +99,7 @@ export function App() {
 
   return (
     <div className="docs-shell">
-      <SkipLink targetId="main" />
+      <SkipLink href="#main" />
       <header className="docs-header">
         <Button
           className="docs-menu-btn"
