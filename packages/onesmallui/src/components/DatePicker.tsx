@@ -277,7 +277,6 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
             aria-labelledby={field ? `${field.labelId} ${valueId}` : undefined}
             aria-label={field ? undefined : ariaLabel && `${ariaLabel}${display ? `, ${display}` : ''}`}
             aria-describedby={controlProps['aria-describedby']}
-            aria-invalid={isInvalid || undefined}
             onClick={() => setOpen(!open)}
           >
             <CalendarIcon />
@@ -297,34 +296,36 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
         data-os-theme={appearance === 'dark' ? 'dark' : undefined}
         data-appearance={appearance === 'translucent' ? 'translucent' : undefined}
         hidden={!open}
-        onKeyDown={onDialogKey}
       >
-        {open && (
-          <Calendar
-            {...({ mode: m, value: current, onValueChange: onCalendarChange } as CalendarSingleProps)}
-            min={min}
-            max={max}
-            isDateDisabled={isDateDisabled}
-            months={months}
-            firstDayOfWeek={firstDayOfWeek}
-            locale={locale}
-            color={color}
-            labels={labels}
-            autoFocus
-            footer={
-              m !== 'single' || !closeOnSelect ? (
-                <>
-                  <button type="button" className={cls('datepicker__action')} onClick={() => setCurrent(fromNorm(m, m === 'range' ? [null, null] : []))}>
-                    Clear
-                  </button>
-                  <button type="button" className={cls('datepicker__action')} data-primary onClick={() => setOpen(false)}>
-                    Done
-                  </button>
-                </>
-              ) : undefined
-            }
-          />
-        )}
+        {/* Presentation: catches Escape and Tab from the controls inside to close the dialog and keep focus in it. */}
+        <div role="presentation" onKeyDown={onDialogKey}>
+          {open && (
+            <Calendar
+              {...({ mode: m, value: current, onValueChange: onCalendarChange } as CalendarSingleProps)}
+              min={min}
+              max={max}
+              isDateDisabled={isDateDisabled}
+              months={months}
+              firstDayOfWeek={firstDayOfWeek}
+              locale={locale}
+              color={color}
+              labels={labels}
+              autoFocus
+              footer={
+                m !== 'single' || !closeOnSelect ? (
+                  <>
+                    <button type="button" className={cls('datepicker__action')} onClick={() => setCurrent(fromNorm(m, m === 'range' ? [null, null] : []))}>
+                      Clear
+                    </button>
+                    <button type="button" className={cls('datepicker__action')} data-primary onClick={() => setOpen(false)}>
+                      Done
+                    </button>
+                  </>
+                ) : undefined
+              }
+            />
+          )}
+        </div>
       </div>
       {name &&
         (m === 'single' ? (

@@ -115,19 +115,20 @@ export function Menu({
   const [isOpen, setIsOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const id = useId().replace(/:/g, '');
   const focusIntent = useRef<FocusIntent>(null);
-  const floating = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset, matchWidth: false });
+  const { anchorRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset, matchWidth: false });
 
   const setOpen = useCallback<MenuContextValue['setOpen']>(
     (next, opts = {}) => {
       focusIntent.current = opts.focus ?? null;
       setIsOpen(next);
-      if (!next && opts.returnFocus) floating.anchorRef.current?.focus();
+      if (!next && opts.returnFocus) anchorRef.current?.focus();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [setIsOpen],
   );
 
   const value = useMemo<MenuContextValue>(() => {
+    // `root: null` marks the top-level menu; consumers resolve it with `ctx.root ?? ctx`.
     const v: MenuContextValue = {
       open: isOpen,
       setOpen,
@@ -135,16 +136,15 @@ export function Menu({
       autoClose,
       contentRole,
       appearance,
-      triggerRef: floating.anchorRef,
-      contentRef: floating.floatingRef,
+      triggerRef: anchorRef,
+      contentRef: floatingRef,
       triggerId: `os-menu-${id}-trigger`,
       contentId: `os-menu-${id}`,
       focusIntent,
       isSub: false,
     };
-    v.root = v;
     return v;
-  }, [isOpen, setOpen, autoClose, contentRole, appearance, floating.anchorRef, floating.floatingRef, id]);
+  }, [isOpen, setOpen, autoClose, contentRole, appearance, anchorRef, floatingRef, id]);
 
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>;
 }
@@ -218,7 +218,7 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function
       (target ?? el).focus({ preventScroll: true });
     }
     return () => hideFromTopLayer(el);
-  }, [ctx.open, ctx.contentRef, ctx.contentRole, ctx.focusIntent]);
+  }, [ctx.open, ctx.contentRef, ctx.contentRole, ctx.focusIntent, ctx.isSub]);
 
   // Outside clicks; focus leaving a dialog-style menu.
   useEffect(() => {
@@ -291,6 +291,7 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- role is "menu" or "dialog" from contentRole, which the rule cannot read from a variable
     <div
       ref={mergeRefs(ctx.contentRef, ref)}
       id={ctx.contentId}
@@ -616,7 +617,7 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
   const [rtl, setRtl] = useState(false);
   const id = useId().replace(/:/g, '');
   const focusIntent = useRef<FocusIntent>(null);
-  const floating = useFloating<HTMLElement, HTMLDivElement>({
+  const { anchorRef, floatingRef } = useFloating<HTMLButtonElement, HTMLDivElement>({
     open,
     placement: placement ?? (rtl ? 'left-start' : 'right-start'),
     offset: 2,
@@ -627,9 +628,9 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
     (next, opts = {}) => {
       focusIntent.current = opts.focus ?? null;
       setOpenState(next);
-      if (!next && opts.returnFocus) floating.anchorRef.current?.focus();
+      if (!next && opts.returnFocus) anchorRef.current?.focus();
     },
-    [floating.anchorRef],
+    [anchorRef],
   );
 
   // Close when focus moves to a sibling item in the parent menu.
@@ -638,15 +639,17 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
     const parentEl = parent.contentRef.current;
     const onFocus = (e: FocusEvent) => {
       const t = e.target as Node;
-      if (floating.anchorRef.current?.contains(t) || floating.floatingRef.current?.contains(t)) return;
+      if (anchorRef.current?.contains(t) || floatingRef.current?.contains(t)) return;
       setOpenState(false);
     };
     parentEl?.addEventListener('focusin', onFocus);
     return () => parentEl?.removeEventListener('focusin', onFocus);
-  }, [open, parent.contentRef, floating.anchorRef, floating.floatingRef]);
+  }, [open, parent.contentRef, anchorRef, floatingRef]);
 
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
+  const triggerId = `os-menu-${id}-trigger`;
+  const contentId = `os-menu-${id}`;
   const value = useMemo<MenuContextValue>(
     () => ({
       open,
@@ -655,14 +658,14 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
       autoClose: root.autoClose,
       contentRole: 'menu',
       appearance: root.appearance,
-      triggerRef: floating.anchorRef,
-      contentRef: floating.floatingRef,
-      triggerId: `os-menu-${id}-trigger`,
-      contentId: `os-menu-${id}`,
+      triggerRef: anchorRef,
+      contentRef: floatingRef,
+      triggerId,
+      contentId,
       focusIntent,
       isSub: true,
     }),
-    [open, setOpen, root, floating.anchorRef, floating.floatingRef, id],
+    [open, setOpen, root, anchorRef, floatingRef, triggerId, contentId],
   );
 
   const openFrom = (el: HTMLElement, focus: FocusIntent) => {
@@ -673,16 +676,14 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
   return (
     <div role="none" className={cls('menu__sub')}>
       <button
-        ref={(el) => {
-          floating.anchorRef.current = el;
-        }}
-        id={value.triggerId}
+        ref={anchorRef}
+        id={triggerId}
         type="button"
         role="menuitem"
         tabIndex={-1}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-controls={open ? value.contentId : undefined}
+        aria-controls={open ? contentId : undefined}
         aria-disabled={disabled || undefined}
         aria-labelledby={`os-mi-${id}`}
         aria-describedby={description ? `os-mi-${id}-d` : undefined}

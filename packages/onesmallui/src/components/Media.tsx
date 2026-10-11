@@ -120,6 +120,7 @@ export const Video = forwardRef<HTMLVideoElement, VideoProps>(function Video(
 ) {
   return (
     <div className={cx(cls('video'), className)} style={{ aspectRatio: String(ratio) }}>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- caption <track>s come from the `tracks` prop, mapped below */}
       <video ref={ref} controls={controls} preload={preload} aria-label={label} playsInline {...rest}>
         {sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
         {tracks?.map((t) => (

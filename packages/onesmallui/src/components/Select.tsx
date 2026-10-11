@@ -79,7 +79,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   const { placeholder: _ignored, ...selectProps } = controlProps as typeof controlProps & { placeholder?: string };
   void _ignored;
   return (
+    // Presentation: a styling wrapper; its mousedown only forwards focus to the select inside.
     <div
+      role="presentation"
       className={cx(cls('select'), className)}
       data-size={size ?? groupSize ?? 'md'}
       data-variant={variant === 'default' ? undefined : variant}

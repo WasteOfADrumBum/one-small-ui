@@ -86,15 +86,15 @@ export function Tooltip({
 }: TooltipProps) {
   const id = `os-tip-${useId().replace(/:/g, '')}`;
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
-  const floating = useFloating<HTMLSpanElement, HTMLSpanElement>({ open: isOpen, placement, offset });
+  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLSpanElement, HTMLSpanElement>({ open: isOpen, placement, offset });
   const { show, showNow, hide, cancel } = useTooltipState(delay, setOpen);
 
   useLayoutEffect(() => {
-    const el = floating.floatingRef.current;
+    const el = floatingRef.current;
     if (!isOpen || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [isOpen, floating.floatingRef]);
+  }, [isOpen, floatingRef]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -112,8 +112,10 @@ export function Tooltip({
   });
 
   return (
+    // Presentation: wraps the trigger and listens to its bubbled hover and focus events.
     <span
-      ref={floating.anchorRef}
+      ref={anchorRef}
+      role="presentation"
       className={cx(cls('tooltip'), className)}
       data-state={isOpen ? 'open' : 'closed'}
       onPointerEnter={show}
@@ -126,7 +128,7 @@ export function Tooltip({
     >
       {trigger}
       <span
-        ref={floating.floatingRef}
+        ref={floatingRef}
         role={interactive ? undefined : 'tooltip'}
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'), contentClassName)}
@@ -140,7 +142,7 @@ export function Tooltip({
         {arrow && (
           <span
             ref={(el) => {
-              floating.arrowRef.current = el;
+              arrowRef.current = el;
             }}
             className={cls('floating__arrow')}
             aria-hidden="true"
@@ -167,7 +169,7 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
   const id = `os-tip-${useId().replace(/:/g, '')}`;
   const [state, setState] = useState<{ el: HTMLElement; text: string; placement?: Placement } | null>(null);
   const open = state !== null;
-  const floating = useFloating<HTMLElement, HTMLSpanElement>({ open, placement: state?.placement ?? placement, offset: 8 });
+  const { floatingRef, setAnchor } = useFloating<HTMLElement, HTMLSpanElement>({ open, placement: state?.placement ?? placement, offset: 8 });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const current = useRef<HTMLElement | null>(null);
 
@@ -184,7 +186,7 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
       if (current.current && current.current !== el) describe(current.current, false);
       current.current = el;
       describe(el, true);
-      floating.setAnchor(el);
+      setAnchor(el);
       setState({
         el,
         text: el.dataset.osTooltip ?? '',
@@ -204,11 +206,11 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
   };
 
   useLayoutEffect(() => {
-    const el = floating.floatingRef.current;
+    const el = floatingRef.current;
     if (!open || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [open, floating.floatingRef]);
+  }, [open, floatingRef]);
 
   useEffect(() => {
     if (!open) return;
@@ -224,7 +226,9 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
   const find = (t: EventTarget | null) => (t instanceof Element ? t.closest<HTMLElement>('[data-os-tooltip]') : null);
 
   return (
+    // Presentation: listens to bubbled hover and focus events from the triggers inside.
     <div
+      role="presentation"
       className={cls('tooltip-provider')}
       onPointerOver={(e) => {
         const el = find(e.target);
@@ -244,7 +248,7 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
     >
       {children}
       <span
-        ref={floating.floatingRef}
+        ref={floatingRef}
         role="tooltip"
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'))}

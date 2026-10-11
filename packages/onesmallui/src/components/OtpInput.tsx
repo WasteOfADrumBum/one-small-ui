@@ -1,4 +1,4 @@
-import { forwardRef, Fragment, useId, useRef, type ClipboardEvent, type HTMLAttributes, type KeyboardEvent } from 'react';
+import { forwardRef, Fragment, useEffect, useId, useRef, type ClipboardEvent, type HTMLAttributes, type KeyboardEvent } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
@@ -82,6 +82,11 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(function OtpIn
     setCode(v);
     if (v.length === length && next.every(Boolean)) onComplete?.(v);
   };
+
+  // Opt-in focus of the first slot on mount (React's autoFocus does the same, after mount).
+  useEffect(() => {
+    if (autoFocus) refs.current[0]?.focus();
+  }, [autoFocus]);
 
   const focusAt = (i: number) => {
     const el = refs.current[Math.max(0, Math.min(length - 1, i))];
@@ -187,7 +192,6 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(function OtpIn
             aria-label={slotLabel(i, length)}
             aria-invalid={isInvalid || undefined}
             disabled={disabled}
-            autoFocus={autoFocus && i === 0}
             data-filled={c ? true : undefined}
             value={c}
             onChange={(e) => onInput(i, e.target.value)}

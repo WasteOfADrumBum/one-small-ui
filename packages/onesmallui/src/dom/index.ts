@@ -3,7 +3,7 @@
  * HTML (using the same `os-` classes as the React components) and exposes
  * programmatic controls with events.
  *
- *   import { init } from 'onesmallui/dom';
+ *   import { init } from '@onesmall/ui/dom';
  *   init();             // delegated listeners on document; call once
  *
  * Triggers:   data-os-toggle="collapse|dialog|drawer|menu|popover|tab|class|attr"
@@ -247,7 +247,10 @@ export function scrollSpy(nav: HTMLElement): () => void {
   const visible = new Set<Element>();
   const io = new IntersectionObserver(
     (entries) => {
-      for (const e of entries) (e.isIntersecting ? visible.add(e.target) : visible.delete(e.target));
+      for (const e of entries) {
+        if (e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      }
       const current = sections.find((s) => visible.has(s));
       if (!current) return;
       for (const a of links) {

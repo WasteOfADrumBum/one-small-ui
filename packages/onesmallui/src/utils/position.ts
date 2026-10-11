@@ -57,7 +57,9 @@ export function computePosition(anchor: AnchorLike, floating: HTMLElement, optio
   const rtl =
     anchor instanceof Element ? getComputedStyle(anchor).direction === 'rtl' : document.documentElement.dir === 'rtl';
 
-  let [side, align] = splitPlacement(placement);
+  const split = splitPlacement(placement);
+  let side = split[0];
+  const align = split[1];
 
   const room: Record<Side, number> = {
     top: a.top - padding,

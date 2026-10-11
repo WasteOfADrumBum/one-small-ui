@@ -51,7 +51,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
           {copied ? 'Code copied to clipboard' : ''}
         </span>
       </div>
-      <pre className={cls('code__pre')} tabIndex={0} aria-label={typeof title === 'string' ? title : language ? `${language} code` : 'Code'}>
+      <pre className={cls('code__pre')} role="region" tabIndex={0} aria-label={typeof title === 'string' ? title : language ? `${language} code` : 'Code'}>
         <code data-language={language}>{renderCode ? renderCode(trimmed, language) : trimmed}</code>
       </pre>
     </div>

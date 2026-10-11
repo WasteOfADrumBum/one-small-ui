@@ -124,12 +124,11 @@ export const PasswordStrength = forwardRef<HTMLDivElement, PasswordStrengthProps
   const names = { ...defaultStrengthLabels, ...labels };
   const levelText = names[result.level];
   const [announcement, setAnnouncement] = useState('');
+  // Clearing the field clears the announcement right away; new values are announced after a pause.
+  if (!value && announcement) setAnnouncement('');
 
   useEffect(() => {
-    if (!value) {
-      setAnnouncement('');
-      return;
-    }
+    if (!value) return;
     const t = setTimeout(() => setAnnouncement(`${meterLabel}: ${levelText}`), announceDelay);
     return () => clearTimeout(t);
   }, [value, levelText, meterLabel, announceDelay]);

@@ -233,7 +233,6 @@ export const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(run) : null;
     ro?.observe(root);
     return () => ro?.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canOverflow, collapse, minVisible, items.length]);
 
   // Which items stay visible: the first `count`, swapping in the active one.

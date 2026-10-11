@@ -10,6 +10,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
+import { useLatestRef } from '../hooks/useLatestRef';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { CloseButton } from './CloseButton';
@@ -128,9 +129,8 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
 ) {
   const [paused, setPaused] = useState(false);
   const remaining = useRef(duration ?? 0);
-  const started = useRef(Date.now());
-  const dismissRef = useRef(onDismiss);
-  dismissRef.current = onDismiss;
+  const started = useRef(0); // set when the timer starts
+  const dismissRef = useLatestRef(onDismiss);
   const leaving = state === 'closing';
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
       clearTimeout(t);
       remaining.current -= Date.now() - started.current;
     };
-  }, [duration, paused, leaving]);
+  }, [duration, paused, leaving, dismissRef]);
 
   const hasHeader = icon || time;
   const titleEl = title != null && <p className={cls('toast__title')}>{title}</p>;

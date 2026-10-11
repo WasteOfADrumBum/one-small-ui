@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useLatestRef } from '../hooks/useLatestRef';
 import { useDropZone, type DropZoneOptions, type FileRejection } from '../hooks/useDropZone';
 import { cx } from '../utils/cx';
 import { formatBytes } from '../utils/format';
@@ -61,8 +62,7 @@ export function DropZone({
   const [files, setFiles] = useState<DropZoneFile[]>([]);
   const [rejections, setRejections] = useState<FileRejection[]>([]);
   const [announcement, setAnnouncement] = useState('');
-  const filesRef = useRef(files);
-  filesRef.current = files;
+  const filesRef = useLatestRef(files);
 
   const update = (next: DropZoneFile[]) => {
     setFiles(next);
@@ -98,7 +98,7 @@ export function DropZone({
     () => () => {
       filesRef.current.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
     },
-    [],
+    [filesRef],
   );
 
   const remove = (f: DropZoneFile) => {
