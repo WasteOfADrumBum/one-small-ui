@@ -103,10 +103,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       title: 'What ships',
       language: 'bash',
       code: `@onesmall/ui                ESM + CJS React components, bundled TypeScript declarations
+@onesmall/ui/icons          Tree-shakable icon components (also exported from the root)
 @onesmall/ui/dom            Vanilla data-attribute controls, methods and events (no React)
 @onesmall/ui/styles.css     Compiled CSS (also styles.min.css)
 @onesmall/ui/scss           Sass entry: modules, maps, mixins, functions
-@onesmall/ui/tokens.json    Color tokens for both themes
+@onesmall/ui/tokens.json    Color tokens for both themes, plus motion tokens (durations, easings)
 @onesmall/ui/agent/SKILL.md Usage guide for AI coding agents`,
     },
   ],

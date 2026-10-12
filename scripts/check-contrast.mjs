@@ -1,11 +1,9 @@
 // Verifies every text/background pairing in the theme tokens meets WCAG 2.2 AAA
 // (7:1 for body text) and every UI boundary meets 3:1 (SC 1.4.11).
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+// Only theme palettes are checked; the `motion` key is skipped (see tokens-lib.mjs).
+import { readTokens } from './tokens-lib.mjs';
 
-const themes = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../packages/onesmallui/tokens/themes.json', import.meta.url)), 'utf8'),
-);
+const { themes } = readTokens();
 
 const luminance = (hex) => {
   const n = hex.replace('#', '');

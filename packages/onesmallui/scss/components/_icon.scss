@@ -1,0 +1,38 @@
+@use '../abstracts' as *;
+
+// Icons (<Icon>, <ChevronDownIcon>…): 24×24 stroked SVGs that take the text color,
+// so they follow themes and forced-colors mode with no extra rules.
+//
+// The size presets only set a private custom property, never width/height at
+// higher specificity: component rules like `.os-close-btn svg` keep sizing the
+// icons they contain, and this partial loads first so they also win ties.
+:root {
+  --#{$prefix}-icon-sm: 1rem;
+  --#{$prefix}-icon-md: 1.25rem;
+  --#{$prefix}-icon-lg: 1.5rem;
+}
+
+.#{$prefix}-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  width: var(--_icon-size, var(--#{$prefix}-icon-md, 1.25rem));
+  height: var(--_icon-size, var(--#{$prefix}-icon-md, 1.25rem));
+
+  &[data-size='sm'] {
+    --_icon-size: var(--#{$prefix}-icon-sm, 1rem);
+  }
+
+  &[data-size='md'] {
+    --_icon-size: var(--#{$prefix}-icon-md, 1.25rem);
+  }
+
+  &[data-size='lg'] {
+    --_icon-size: var(--#{$prefix}-icon-lg, 1.5rem);
+  }
+
+  // <LoaderIcon> spins by default. Reduced motion is handled globally (base/animations).
+  &[data-spin] {
+    animation: #{$prefix}-spin 0.9s linear infinite;
+  }
+}

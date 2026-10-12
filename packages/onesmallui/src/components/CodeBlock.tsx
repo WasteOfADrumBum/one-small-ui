@@ -1,5 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
+import { CheckIcon } from '../icons/CheckIcon';
+import { CopyIcon } from '../icons/CopyIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -34,16 +36,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
             onClick={() => copy(trimmed)}
             aria-label={copied ? 'Copied to clipboard' : `Copy ${language ?? ''} code`.replace('  ', ' ')}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {copied ? (
-                <path d="m5 12.5 4.5 4.5L19 7.5" />
-              ) : (
-                <>
-                  <rect x="9" y="9" width="11" height="11" rx="2" />
-                  <path d="M5 15V6a2 2 0 0 1 2-2h9" />
-                </>
-              )}
-            </svg>
+            {copied ? <CheckIcon /> : <CopyIcon />}
             <span aria-hidden="true">{copied ? 'Copied' : 'Copy'}</span>
           </button>
         )}

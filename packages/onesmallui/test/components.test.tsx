@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import {
@@ -171,10 +171,12 @@ describe('Toast', () => {
       </ToastProvider>,
     );
     await userEvent.click(screen.getByText('notify'));
-    expect(screen.getByRole('status')).toHaveTextContent('Course plotted');
+    // Shown as a list item and announced through the provider's live region.
+    expect(screen.getByRole('listitem')).toHaveTextContent('Course plotted');
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Course plotted'));
     await userEvent.click(screen.getByRole('button', { name: 'Dismiss notification' }));
     await act(() => new Promise((r) => setTimeout(r, 300)));
-    expect(screen.queryByText('Course plotted')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
   });
 });
 

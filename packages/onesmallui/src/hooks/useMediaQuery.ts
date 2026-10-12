@@ -23,7 +23,7 @@ export function useBreakpoint(bp: Breakpoint): boolean {
   return useMediaQuery(`(min-width: ${breakpoints[bp]}px)`);
 }
 
-/** `true` when the user has asked the OS to reduce motion. */
+/** @deprecated Use `useReducedMotion()`. */
 export function usePrefersReducedMotion(): boolean {
   return useMediaQuery('(prefers-reduced-motion: reduce)');
 }

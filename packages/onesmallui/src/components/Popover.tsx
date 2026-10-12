@@ -16,6 +16,9 @@ import {
 import { useMergedRefs } from '../hooks/useMergedRefs';
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
+import { useFocusReturn } from '../hooks/useFocusReturn';
+import { useTransition } from '../hooks/useTransition';
+import { motion } from '../tokens';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
@@ -85,8 +88,12 @@ export function Popover({
   const id = useId().replace(/:/g, '');
   const panelId = `os-popover-${id}`;
   const titleId = `${panelId}-title`;
-  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset });
+  // Stays mounted through a short exit animation.
+  const { state, mounted } = useTransition(isOpen, { duration: motion.duration.fast });
+  const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: mounted, placement, offset });
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Escape and the close button send focus back to the trigger; light dismiss leaves it where the user clicked.
+  const { restore: returnFocus } = useFocusReturn({ active: isOpen, target: anchorRef, restoreOnDeactivate: false });
 
   const show = (wait = 0) => {
     clearTimeout(timer.current);
@@ -102,10 +109,10 @@ export function Popover({
 
   useLayoutEffect(() => {
     const el = floatingRef.current;
-    if (!isOpen || !el) return;
+    if (!mounted || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
-  }, [isOpen, floatingRef]);
+  }, [mounted, floatingRef]);
 
   // Light dismiss: a click outside the trigger and panel, or Escape anywhere.
   useEffect(() => {
@@ -119,7 +126,7 @@ export function Popover({
       if (e.key !== 'Escape') return;
       const hadFocus = inside(document.activeElement);
       setOpen(false);
-      if (hadFocus) anchorRef.current?.focus();
+      if (hadFocus) returnFocus();
     };
     document.addEventListener('pointerdown', onDown, true);
     document.addEventListener('keydown', onKey);
@@ -127,7 +134,7 @@ export function Popover({
       document.removeEventListener('pointerdown', onDown, true);
       document.removeEventListener('keydown', onKey);
     };
-  }, [isOpen, setOpen, floatingRef, anchorRef]);
+  }, [isOpen, setOpen, floatingRef, anchorRef, returnFocus]);
 
   const childRef = isValidElement(children) ? (children.props as { ref?: Ref<HTMLElement> }).ref : undefined;
   const triggerRef = useMergedRefs(anchorRef, childRef);
@@ -185,11 +192,14 @@ export function Popover({
   return (
     <>
       {triggerEl}
-      {isOpen && (
+      {mounted && (
         <div
           ref={floatingRef}
           id={panelId}
           role="dialog"
+          data-state={state === 'closing' ? 'closing' : 'open'}
+          // Leaving: hidden from assistive tech while it fades out.
+          aria-hidden={state === 'closing' || undefined}
           aria-labelledby={title ? titleId : undefined}
           aria-label={title ? undefined : ariaLabel}
           className={cx(cls('floating'), cls('popover'), className)}
@@ -228,7 +238,7 @@ export function Popover({
                   label="Close"
                   onClick={() => {
                     setOpen(false);
-                    anchorRef.current?.focus();
+                    returnFocus();
                   }}
                 />
               )}

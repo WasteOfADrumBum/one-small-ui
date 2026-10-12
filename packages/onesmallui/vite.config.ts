@@ -11,7 +11,8 @@ export default defineConfig({
     sourcemap: true,
     minify: false,
     lib: {
-      entry: 'src/index.ts',
+      // Two public entry points: the package root and the tree-shakable `@onesmall/ui/icons`.
+      entry: { index: 'src/index.ts', icons: 'src/icons/index.ts' },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },

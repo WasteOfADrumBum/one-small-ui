@@ -117,3 +117,23 @@ export type ColorToken = keyof (typeof themes)["light"];
 
 /** Returns a `var(--os-*)` reference for a color token. */
 export const cssVar = (token: ColorToken): string => `var(--os-${token})`;
+
+/**
+ * Motion tokens: durations in ms (`--os-duration-<key>`) and easings (`--os-ease-<key>`).
+ * Durations collapse to ~0 under reduced motion.
+ */
+export const motion = {
+  "duration": {
+    "fast": 120,
+    "base": 200,
+    "slow": 360
+  },
+  "easing": {
+    "standard": "cubic-bezier(0.2, 0, 0, 1)",
+    "enter": "cubic-bezier(0, 0, 0, 1)",
+    "exit": "cubic-bezier(0.4, 0, 1, 1)"
+  }
+} as const;
+
+export type MotionDuration = keyof (typeof motion)["duration"];
+export type MotionEasing = keyof (typeof motion)["easing"];

@@ -23,6 +23,8 @@ Index: https://one-small-ui.vercel.app/llms.txt · Structured data: https://one-
 - Themes: `data-os-theme="light|dark"` on `<html>` or any element; tokens are CSS variables `--os-<token>`.
 - Controlled/uncontrolled pattern: `value` / `defaultValue` / `onValueChange`; overlays use `open` / `onOpenChange` or `onClose`.
 - Placement props accept `top | bottom | left | right` with `-start`/`-end`, or per-breakpoint objects `{ base: 'bottom', md: 'right' }`.
+- Icons: `import { ChevronDownIcon } from '@onesmall/ui/icons'` (also from the root). `size="sm|md|lg"` or a number; decorative unless you pass `label`.
+- Motion: `<Transition show enter="fade">` sets `data-state="opening|open|closing|closed"` on its child, the same states every overlay uses. Motion tokens: `--os-duration-fast|base|slow`, `--os-ease-standard|enter|exit`.
 - Without React, `@onesmall/ui/dom` wires up `data-os-toggle`, `data-os-target` and `data-os-dismiss` attributes and dispatches `os:show/os:shown/os:hide/os:hidden` events.
 
 ## Accessibility rules (the library targets WCAG 2.2 AAA — keep it that way)
@@ -30,4 +32,5 @@ Index: https://one-small-ui.vercel.app/llms.txt · Structured data: https://one-
 - Always give form controls a label: wrap them in `<Field label="…">` (it wires hints and errors).
 - Icon-only buttons need `aria-label`. Images need `alt` (the type requires it).
 - Don't override colors with raw values; use tokens or the color props so contrast stays at 7:1.
+- Custom overlays: `useFocusTrap`, `useFocusReturn`, `useScrollLock`; announce status changes with `useAnnouncer().announce(msg)` (wrap the app in `<AnnouncerProvider>`); put `<SkipLink href="#main">` first in the page.
 - Keep toasts persistent and carousels non-autoplaying unless the user can pause them.

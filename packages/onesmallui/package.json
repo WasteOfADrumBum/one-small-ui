@@ -1,6 +1,6 @@
 {
   "name": "@onesmall/ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA accessible React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
   "keywords": [
     "react",
@@ -47,6 +47,16 @@
     },
     "./styles.css": "./dist/onesmallui.css",
     "./styles.min.css": "./dist/onesmallui.min.css",
+    "./icons": {
+      "import": {
+        "types": "./dist/icons.d.ts",
+        "default": "./dist/icons.js"
+      },
+      "require": {
+        "types": "./dist/icons.d.cts",
+        "default": "./dist/icons.cjs"
+      }
+    },
     "./dom": {
       "import": {
         "types": "./dist/dom.d.ts",

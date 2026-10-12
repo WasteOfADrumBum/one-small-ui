@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useMemo, useState, type HTMLAttributes, type ReactNode } from 'react';
+import { CheckIcon } from '../icons/CheckIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -88,11 +89,6 @@ export interface PasswordStrengthProps extends HTMLAttributes<HTMLDivElement> {
   score?: UsePasswordStrengthOptions['score'];
 }
 
-const Tick = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12.5 4.5 4.5L19 7.5" />
-  </svg>
-);
 const Dot = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <circle cx="12" cy="12" r="6" />
@@ -168,7 +164,7 @@ export const PasswordStrength = forwardRef<HTMLDivElement, PasswordStrengthProps
         <ul className={cls('password-strength__rules')}>
           {result.rules.map((r) => (
             <li key={r.id} className={cls('password-strength__rule')} data-met={r.met || undefined}>
-              {r.met ? <Tick /> : <Dot />}
+              {r.met ? <CheckIcon strokeWidth={2.5} /> : <Dot />}
               <span>{r.label}</span>
               <span className={cls('sr-only')}>{r.met ? ' (done)' : ' (not yet)'}</span>
             </li>

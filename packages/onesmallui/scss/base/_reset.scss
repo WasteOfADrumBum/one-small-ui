@@ -325,4 +325,12 @@ progress {
   &:focus {
     transform: translateY(0);
   }
+
+  // A ring in the focus token plus an inner on-primary ring, so the indicator
+  // contrasts with both the link and the page behind it (WCAG 2.4.13, AAA).
+  &:focus-visible {
+    outline: 3px solid token('focus');
+    outline-offset: 2px;
+    box-shadow: inset 0 0 0 2px token('on-primary'), 0 0 0 6px token('glow');
+  }
 }

@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Motion & transitions',
   group: 'Framework',
   summary:
-    'Every component animates through shared duration and easing tokens, so motion can be tuned, switched off per element, or disabled at build time. Reduced-motion preferences are honoured automatically.',
+    'Every component animates through shared duration and easing tokens (--os-duration-fast/base/slow, --os-ease-standard/enter/exit, and `motion` in JS), so motion can be tuned, switched off per element, or disabled at build time. Reduced-motion preferences are honoured automatically. To animate your own elements, see Transition.',
   examples: [{ name: 'motion-basic', title: 'Switching motion off for a subtree' }],
   snippets: [
     {

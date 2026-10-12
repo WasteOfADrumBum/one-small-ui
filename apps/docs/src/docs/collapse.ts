@@ -39,6 +39,7 @@ const doc: ComponentDoc = {
         { name: 'open', type: 'boolean', description: 'Controlled state when used outside a Collapsible.' },
         { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Animate height or width.' },
         { name: 'id', type: 'string', description: 'Panel id (generated if omitted).' },
+        { name: 'onEntered / onExited', type: '() => void', description: 'Called when the open / close animation has finished (at once under reduced motion).' },
       ],
     },
     {

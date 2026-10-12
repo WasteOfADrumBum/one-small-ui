@@ -4,8 +4,10 @@
 import { createRef, type ReactElement } from 'react';
 import { render } from '@testing-library/react';
 import { configureAxe } from 'jest-axe';
+import { CloseIcon, InfoIcon, SearchIcon } from '../src/icons';
 import {
   Accordion,
+  AnnouncerProvider,
   AccordionItem,
   Alert,
   AlertHeading,
@@ -58,6 +60,7 @@ import {
   InputGroup,
   InputGroupText,
   ListGroup,
+  LiveRegion,
   ListGroupItem,
   Menu,
   MenuCheckboxItem,
@@ -79,6 +82,7 @@ import {
   PasswordStrength,
   Placeholder,
   Popover,
+  Portal,
   Progress,
   ProgressStack,
   Radio,
@@ -110,6 +114,7 @@ import {
   Toggler,
   Tooltip,
   TooltipProvider,
+  Transition,
   Video,
   VisuallyHidden,
 } from '../src';
@@ -547,6 +552,39 @@ const cases: Record<string, () => ReactElement> = {
         <Button>Go</Button>
       </Tooltip>
     </TooltipProvider>
+  ),
+  Announcer: () => (
+    <AnnouncerProvider>
+      <p>Content</p>
+      <LiveRegion>3 results</LiveRegion>
+    </AnnouncerProvider>
+  ),
+  Icons: () => (
+    <>
+      <Button>
+        <SearchIcon /> Search
+      </Button>
+      <InfoIcon label="Information" />
+      <button type="button" aria-label="Close">
+        <CloseIcon />
+      </button>
+    </>
+  ),
+  Portal: () => (
+    <Portal>
+      <p>Rendered in body</p>
+    </Portal>
+  ),
+  SkipLink: () => (
+    <>
+      <SkipLink href="#content" />
+      <main id="content">Main</main>
+    </>
+  ),
+  Transition: () => (
+    <Transition show enter="slide-up">
+      <div role="note">Saved</div>
+    </Transition>
   ),
   VisuallyHidden: () => (
     <>

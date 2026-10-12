@@ -9,6 +9,8 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
+import { ErrorIcon } from '../icons/ErrorIcon';
+import { SuccessIcon } from '../icons/SuccessIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -69,19 +71,6 @@ export interface FieldProps extends HTMLAttributes<HTMLDivElement> {
   id?: string;
   children: ReactNode;
 }
-
-const ErrorIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-    <path d="M12 8v5m0 3h.01M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z" />
-  </svg>
-);
-
-const SuccessIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18Z" />
-    <path d="m8 12.5 2.8 2.8L16.5 9" />
-  </svg>
-);
 
 type ValidatableTarget = EventTarget & { validity?: ValidityState; validationMessage?: string };
 

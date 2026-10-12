@@ -4,6 +4,19 @@ $statuses: $theme-colors;
 
 html.#{$prefix}-scroll-locked {
   overflow: hidden;
+
+  // The body is padded by the scrollbar width while scrolling is locked (useScrollLock);
+  // fixed elements sit outside it, so they shift by the same amount to stay put.
+  // Sticky elements live inside the padded body and need nothing.
+  .#{$prefix}-navbar[data-placement^='fixed'],
+  .#{$prefix}-fixed-top,
+  .#{$prefix}-fixed-bottom {
+    padding-inline-end: var(--#{$prefix}-scrollbar-width, 0px);
+  }
+
+  .#{$prefix}-toast-viewport:not([data-placement='inline']) {
+    margin-inline-end: var(--#{$prefix}-scrollbar-width, 0px);
+  }
 }
 
 // Dialog and Drawer live in _dialog.scss; Menu in _menu.scss; Tooltip and Popover in _popover.scss.

@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useResponsiveValue, type ResponsiveValue } from '../hooks/useResponsiveValue';
+import { CheckIcon } from '../icons/CheckIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import type { ThemeColor } from './types';
@@ -138,11 +139,8 @@ export interface StepProps extends Omit<HTMLAttributes<HTMLLIElement>, 'title' |
   disabled?: boolean;
 }
 
-const check = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="m5 12.5 4.5 4.5L19 7.5" />
-  </svg>
-);
+const check = <CheckIcon strokeWidth={3} />;
+// A bare "!" (no ring) to fit inside the indicator circle; the icon set has no such glyph.
 const bang = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
     <path d="M12 6v8m0 4h.01" />

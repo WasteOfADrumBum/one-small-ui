@@ -24,6 +24,8 @@ import {
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
+import { CheckIcon } from '../icons/CheckIcon';
+import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
@@ -433,12 +435,6 @@ export const MenuItem = forwardRef<HTMLElement, MenuItemProps>(function MenuItem
   );
 });
 
-const Check = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12 5 5 9-10" />
-  </svg>
-);
-
 export interface MenuCheckboxItemProps extends ItemOwnProps, Omit<HTMLAttributes<HTMLButtonElement>, 'onSelect'> {
   checked?: boolean;
   defaultChecked?: boolean;
@@ -480,7 +476,7 @@ export const MenuCheckboxItem = forwardRef<HTMLButtonElement, MenuCheckboxItemPr
         descId={description ? `os-mi-${id}-d` : undefined}
         indicator={
           <span className={cls('menu__indicator')} aria-hidden="true">
-            {on && <Check />}
+            {on && <CheckIcon strokeWidth={2.5} />}
           </span>
         }
       >
@@ -717,9 +713,7 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
         >
           {label}
         </ItemContent>
-        <svg className={cls('menu__chevron')} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="m9 6 6 6-6 6" />
-        </svg>
+        <ChevronRightIcon className={cls('menu__chevron')} />
       </button>
       <MenuContext.Provider value={value}>
         <MenuContent maxHeight={maxHeight}>{children}</MenuContent>

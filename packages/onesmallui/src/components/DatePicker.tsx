@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useId, useLayoutEffect, useRef, useState, type K
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
+import { CalendarIcon } from '../icons/CalendarIcon';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
@@ -57,13 +58,6 @@ export type DatePickerProps =
   | (DatePickerBaseProps & Pick<CalendarSingleProps, CalendarPassThrough | 'mode' | 'value' | 'defaultValue' | 'onValueChange'>)
   | (DatePickerBaseProps & Pick<CalendarMultipleProps, CalendarPassThrough | 'mode' | 'value' | 'defaultValue' | 'onValueChange'>)
   | (DatePickerBaseProps & Pick<CalendarRangeProps, CalendarPassThrough | 'mode' | 'value' | 'defaultValue' | 'onValueChange'>);
-
-const CalendarIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="5" width="18" height="16" rx="2" />
-    <path d="M3 10h18M8 3v4M16 3v4" />
-  </svg>
-);
 
 const defaultParse = (text: string) => {
   const iso = parseISODate(text);

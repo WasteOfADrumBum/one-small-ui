@@ -1,4 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { CloseIcon } from '../icons/CloseIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -27,9 +28,7 @@ export const CloseButton = forwardRef<HTMLButtonElement, CloseButtonProps>(funct
       data-os-theme={variant === 'overlay' ? 'dark' : undefined}
       {...rest}
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <path d="M6 6l12 12M18 6 6 18" />
-      </svg>
+      <CloseIcon />
     </button>
   );
 });

@@ -10,8 +10,11 @@ import {
   type RefObject,
   type SyntheticEvent,
 } from 'react';
+import { useFocusReturn } from '../hooks/useFocusReturn';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useLatestRef } from '../hooks/useLatestRef';
-import { cls } from '../utils/prefix';
+import { useScrollLock } from '../hooks/useScrollLock';
+import { useTransition } from '../hooks/useTransition';
 
 export type OverlayAppearance = 'default' | 'dark' | 'translucent';
 export type Backdrop = boolean | 'static';
@@ -22,16 +25,6 @@ export function appearanceProps(appearance: OverlayAppearance | undefined) {
     'data-os-theme': appearance === 'dark' ? 'dark' : undefined,
     'data-appearance': appearance === 'translucent' ? 'translucent' : undefined,
   } as const;
-}
-
-let locks = 0;
-function lockScroll() {
-  locks++;
-  document.documentElement.classList.add(cls('scroll-locked'));
-}
-function unlockScroll() {
-  locks = Math.max(0, locks - 1);
-  if (locks === 0) document.documentElement.classList.remove(cls('scroll-locked'));
 }
 
 export const EXIT_MS = 220;
@@ -64,44 +57,41 @@ export function useDialogLifecycle({
   returnFocus = true,
 }: DialogLifecycleOptions) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [closing, setClosing] = useState(false);
-  // Closing (open → false) plays the exit animation unless `instant`; reopening cancels it.
+  // Set when the browser closed the dialog itself (e.g. a repeated Escape): nothing left to animate.
+  const [closedNatively, setClosedNatively] = useState(false);
   const [prevOpen, setPrevOpen] = useState(open);
   if (open !== prevOpen) {
     setPrevOpen(open);
-    setClosing(!open && !instant);
+    if (open) setClosedNatively(false);
   }
+  // Closing (open → false) plays the exit animation unless `instant`; reopening cancels it.
+  const { state } = useTransition(open, { duration: instant || closedNatively ? 0 : EXIT_MS });
+  const closing = state === 'closing';
   const [shake, setShake] = useState(false);
   const onCloseRef = useLatestRef(onClose);
   const openRef = useLatestRef(open);
-  const previous = useRef<HTMLElement | null>(null);
-  const locked = useRef(false);
   const pressedBackdrop = useRef(false);
-  const returnRef = useLatestRef(returnFocus);
+  // Shown from opening until the exit animation ends.
+  const visible = state !== 'closed';
 
-  const restoreFocus = () => {
-    const target = returnRef.current;
-    if (target === false) return;
-    const el = typeof target === 'object' ? target.current : previous.current;
-    const active = document.activeElement;
-    const lost = !active || active === document.body || ref.current?.contains(active);
-    if (el && el.isConnected && lost) el.focus({ preventScroll: true });
-  };
+  // Declared before the open effect below, so the opener is saved before focus moves in.
+  useFocusReturn({
+    active: visible,
+    target: typeof returnFocus === 'object' ? returnFocus : undefined,
+    container: ref,
+    restoreOnDeactivate: returnFocus !== false,
+  });
+  useScrollLock(scrollLock && visible);
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) {
-      previous.current = document.activeElement as HTMLElement | null;
       if (modal) {
         if (dialog.showModal) dialog.showModal();
         else dialog.setAttribute('open', '');
       } else if (dialog.show) dialog.show();
       else dialog.setAttribute('open', '');
-      if (scrollLock && !locked.current) {
-        lockScroll();
-        locked.current = true;
-      }
       const target = initialFocus?.current;
       if (target) target.focus();
       else if (!dialog.contains(document.activeElement) || document.activeElement === dialog) {
@@ -109,35 +99,16 @@ export function useDialogLifecycle({
         const auto = dialog.querySelector<HTMLElement>('[autofocus]');
         (auto ?? dialog.querySelector<HTMLElement>(`[data-dialog-panel]`))?.focus();
       }
-    } else if (!open && dialog.open) {
-      const finish = () => {
-        if (dialog.close) dialog.close();
-        else dialog.removeAttribute('open');
-        setClosing(false);
-        if (locked.current) {
-          unlockScroll();
-          locked.current = false;
-        }
-        restoreFocus();
-      };
-      if (instant) {
-        finish();
-        return;
-      }
-      const t = setTimeout(finish, EXIT_MS);
-      return () => clearTimeout(t);
+    } else if (state === 'closed' && dialog.open) {
+      if (dialog.close) dialog.close();
+      else dialog.removeAttribute('open');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, modal]);
+  }, [open, modal, state]);
 
-  // Unlock on unmount.
-  useEffect(
-    () => () => {
-      if (locked.current) unlockScroll();
-      locked.current = false;
-    },
-    [],
-  );
+  // Tab and Shift+Tab wrap inside modal dialogs, also where showModal() is unavailable.
+  // Declared after the open effect, so the dialog is open before the trap starts.
+  useFocusTrap(ref, { active: open && modal, initialFocus: false, returnFocus: false });
 
   useEffect(() => {
     if (!shake) return;
@@ -157,10 +128,9 @@ export function useDialogLifecycle({
     },
     onClose: () => {
       // The browser closed it on its own (e.g. a repeated Escape): sync state.
-      if (openRef.current) onCloseRef.current();
-      if (locked.current) {
-        unlockScroll();
-        locked.current = false;
+      if (openRef.current) {
+        setClosedNatively(true);
+        onCloseRef.current();
       }
     },
     onKeyDown: (e: KeyboardEvent<HTMLDialogElement>) => {

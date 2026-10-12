@@ -13,6 +13,8 @@ import {
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
+import { CheckIcon } from '../icons/CheckIcon';
+import { ChevronDownIcon } from '../icons/ChevronDownIcon';
 import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
@@ -69,12 +71,6 @@ export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
 
 const toArray = (v: string | string[] | null | undefined): string[] | undefined =>
   v === undefined ? undefined : v === null ? [] : Array.isArray(v) ? v : [v];
-
-const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12.5 4.5 4.5L19 7.5" />
-  </svg>
-);
 
 /**
  * A custom select with live search, following the WAI-ARIA combobox pattern with a
@@ -280,7 +276,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
         }}
       >
         <span className={cls('combobox__check')} aria-hidden="true">
-          {isSel && <CheckIcon />}
+          {isSel && <CheckIcon strokeWidth={2.5} />}
         </span>
         {o.icon && (
           <span className={cls('combobox__icon')} aria-hidden="true">
@@ -361,9 +357,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
           }}
         />
         <span className={cls('combobox__chevron')} aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+          <ChevronDownIcon />
         </span>
       </div>
       <div ref={floatingRef} className={cx(cls('floating'), cls('combobox__popup'))} hidden={!open}>

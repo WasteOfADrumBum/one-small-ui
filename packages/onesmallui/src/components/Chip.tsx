@@ -11,23 +11,13 @@ import {
   type ReactNode,
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
+import { CheckIcon } from '../icons/CheckIcon';
+import { CloseIcon } from '../icons/CloseIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { useFieldContext, useFieldControl } from './Field';
 import { focusControlOnPress } from './Input';
 import type { Color, Size } from './types';
-
-const RemoveIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <path d="M7 7l10 10M17 7 7 17" />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m5 12.5 4.5 4.5L19 7.5" />
-  </svg>
-);
 
 interface ChipGroupContextValue {
   selected?: string[];
@@ -98,7 +88,7 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(function Chip(
     <>
       {toggleable && (
         <span className={cls('chip__check')}>
-          <CheckIcon />
+          <CheckIcon strokeWidth={3} />
         </span>
       )}
       {avatar && <span className={cls('chip__avatar')}>{avatar}</span>}
@@ -147,7 +137,7 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(function Chip(
           disabled={isDisabled}
           onClick={onRemove}
         >
-          <RemoveIcon />
+          <CloseIcon strokeWidth={2.5} />
         </button>
       )}
     </span>

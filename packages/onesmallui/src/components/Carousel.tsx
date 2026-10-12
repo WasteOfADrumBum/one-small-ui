@@ -17,6 +17,8 @@ import {
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { usePrefersReducedMotion } from '../hooks/useMediaQuery';
+import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
+import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -96,12 +98,6 @@ export const CarouselSlide = forwardRef<HTMLDivElement, CarouselSlideProps>(func
 export function CarouselCaption({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cx(cls('carousel__caption'), className)} {...rest} />;
 }
-
-const Chevron = ({ dir }: { dir: 'prev' | 'next' }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" data-dir={dir}>
-    <path d={dir === 'prev' ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6'} />
-  </svg>
-);
 
 const isRtl = (el: Element | null) => !!el && getComputedStyle(el).direction === 'rtl';
 
@@ -322,7 +318,7 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
       disabled={end === 'stop' && atStart}
       onClick={prev}
     >
-      <Chevron dir="prev" />
+      <ChevronLeftIcon data-dir="prev" />
     </button>
   );
   const nextBtn = controls && (
@@ -334,7 +330,7 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
       disabled={end === 'stop' && atEnd}
       onClick={next}
     >
-      <Chevron dir="next" />
+      <ChevronRightIcon data-dir="next" />
     </button>
   );
   const dots = indicators && positions > 1 && (

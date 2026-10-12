@@ -18,6 +18,7 @@ export default defineConfig({
       { find: /^@onesmall\/ui\/scss$/, replacement: lib('scss/index.scss') },
       { find: /^@onesmall\/ui\/scss\/(.*)$/, replacement: lib('scss/$1') },
       { find: /^@onesmall\/ui\/dom$/, replacement: lib('src/dom/index.ts') },
+      { find: /^@onesmall\/ui\/icons$/, replacement: lib('src/icons/index.ts') },
       { find: /^@onesmall\/ui$/, replacement: lib('src/index.ts') },
     ],
   },

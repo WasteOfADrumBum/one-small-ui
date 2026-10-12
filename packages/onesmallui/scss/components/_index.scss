@@ -1,3 +1,5 @@
+// Icons load first so component rules that size the SVGs inside them win ties.
+@use 'icon';
 @use 'button';
 @use 'feedback';
 @use 'card';
@@ -14,6 +16,7 @@
 @use 'close-button';
 @use 'breadcrumb';
 @use 'collapse';
+@use 'transition';
 @use 'list-group';
 @use 'pagination';
 @use 'stepper';

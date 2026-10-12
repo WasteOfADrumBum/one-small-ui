@@ -219,9 +219,16 @@ body {
     font-size: var(--os-text-2xl);
   }
 
+  // Sub-sections such as "Keyboard interaction" and "Screen reader notes".
+  > h3 {
+    margin-top: 2rem;
+    font-size: var(--os-text-xl);
+  }
+
   > .os-code,
   > .docs-example,
-  > .docs-props {
+  > .docs-props,
+  > .docs-dos {
     margin-block: 1rem;
   }
 
@@ -354,6 +361,41 @@ body {
 
   code {
     white-space: normal;
+  }
+}
+
+// ---------- Do and don't ----------
+.docs-dos {
+  display: grid;
+  gap: 1rem;
+
+  @media (min-width: 48rem) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.docs-dos__col {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--os-border);
+  border-inline-start-width: 4px;
+  border-radius: var(--os-radius-lg);
+  background: var(--os-surface);
+
+  &[data-kind='do'] {
+    border-inline-start-color: var(--os-success);
+  }
+
+  &[data-kind='dont'] {
+    border-inline-start-color: var(--os-danger);
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: var(--os-text-lg);
+  }
+
+  ul {
+    margin: 0;
   }
 }
 

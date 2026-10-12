@@ -1,4 +1,5 @@
 import { forwardRef, type ReactNode, type SelectHTMLAttributes } from 'react';
+import { ChevronDownIcon } from '../icons/ChevronDownIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { useFieldContext, useFieldControl } from './Field';
@@ -114,9 +115,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         {children}
       </select>
       {!listBox && (
-        <svg className={cls('select__chevron')} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDownIcon className={cls('select__chevron')} />
       )}
     </div>
   );

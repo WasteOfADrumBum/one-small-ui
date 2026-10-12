@@ -1,4 +1,6 @@
 import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type HTMLAttributes, type ReactNode } from 'react';
+import { ArrowRightIcon } from '../icons/ArrowRightIcon';
+import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 
@@ -8,16 +10,8 @@ export type BreadcrumbSeparator = 'chevron' | 'slash' | 'dot' | 'arrow' | ReactN
 const BreadcrumbContext = createContext<{ separator: BreadcrumbSeparator }>({ separator: 'chevron' });
 
 const builtIn: Record<string, ReactNode> = {
-  chevron: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m9 6 6 6-6 6" />
-    </svg>
-  ),
-  arrow: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14m-5-5 5 5-5 5" />
-    </svg>
-  ),
+  chevron: <ChevronRightIcon />,
+  arrow: <ArrowRightIcon />,
   slash: '/',
   dot: '·',
 };

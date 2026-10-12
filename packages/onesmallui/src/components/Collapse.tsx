@@ -13,6 +13,8 @@ import {
   type ReactNode,
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
+import { useTransition } from '../hooks/useTransition';
+import { motion } from '../tokens';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { Button, type ButtonProps } from './Button';
@@ -52,6 +54,10 @@ export interface CollapseProps extends HTMLAttributes<HTMLDivElement> {
   open?: boolean;
   /** `horizontal` animates the width instead of the height. */
   orientation?: 'vertical' | 'horizontal';
+  /** Called when the open animation has finished. */
+  onEntered?: () => void;
+  /** Called when the close animation has finished. */
+  onExited?: () => void;
 }
 
 /**
@@ -59,7 +65,7 @@ export interface CollapseProps extends HTMLAttributes<HTMLDivElement> {
  * `inert`, so it leaves the tab order and the accessibility tree.
  */
 export const Collapse = forwardRef<HTMLDivElement, CollapseProps>(function Collapse(
-  { open: openProp, orientation = 'vertical', id, className, children, ...rest },
+  { open: openProp, orientation = 'vertical', onEntered, onExited, id, className, children, ...rest },
   ref,
 ) {
   const ctx = useContext(CollapsibleContext);
@@ -68,6 +74,7 @@ export const Collapse = forwardRef<HTMLDivElement, CollapseProps>(function Colla
   const open = ctx ? ctx.open : Boolean(openProp);
   const inner = useRef<HTMLDivElement | null>(null);
   const register = ctx?.register;
+  const { state } = useTransition(open, { duration: motion.duration.slow, onEntered, onExited });
 
   useEffect(() => register?.(panelId), [register, panelId]);
   useEffect(() => {
@@ -83,7 +90,7 @@ export const Collapse = forwardRef<HTMLDivElement, CollapseProps>(function Colla
       }}
       id={panelId}
       className={cx(cls('collapse'), className)}
-      data-state={open ? 'open' : 'closed'}
+      data-state={state === 'opening' ? 'open' : state}
       data-orientation={orientation}
       {...rest}
     >

@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
+import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import type { ThemeColor } from './types';
@@ -123,12 +124,6 @@ export interface CalendarRangeProps extends CalendarBaseProps {
   onValueChange?: (value: DateRange) => void;
 }
 export type CalendarProps = CalendarSingleProps | CalendarMultipleProps | CalendarRangeProps;
-
-const Chevron = ({ flip }: { flip?: boolean }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" data-flip={flip || undefined}>
-    <path d="m15 6-6 6 6 6" />
-  </svg>
-);
 
 /**
  * A month grid following the WAI-ARIA date picker grid pattern: one tab stop, arrow
@@ -306,7 +301,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
             setFocused(addMonths(focused, -1));
           }}
         >
-          <Chevron />
+          <ChevronLeftIcon />
         </button>
         <button
           type="button"
@@ -318,7 +313,8 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
             setFocused(addMonths(focused, 1));
           }}
         >
-          <Chevron flip />
+          {/* Same glyph mirrored by CSS (`[data-flip]`), so both buttons follow the text direction. */}
+          <ChevronLeftIcon data-flip="" />
         </button>
       </div>
       <div className={cls('calendar__months')}>

@@ -49,6 +49,10 @@
     animation: #{$prefix}-fade-in dur('base') ease('standard') both;
   }
 
+  &[data-state='closing'] {
+    animation: #{$prefix}-fade-out dur('fast') ease('exit') both;
+  }
+
   // Not positioned yet: invisible for a frame instead of flashing at 0,0.
   &:not([data-side]) {
     opacity: 0;
@@ -76,6 +80,11 @@
   color: token('text');
   box-shadow: var(--#{$prefix}-shadow-lg), 0 0 0 1px color-mix(in srgb, token('primary-text') 10%, transparent);
   animation: #{$prefix}-scale-in dur('base') ease('emphasized') both;
+
+  &[data-state='closing'] {
+    animation: #{$prefix}-scale-out dur('fast') ease('exit') both;
+    pointer-events: none;
+  }
 
   &:not([data-side]) {
     opacity: 0;
