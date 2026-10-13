@@ -64,6 +64,24 @@ body {
   margin-left: auto;
 }
 
+.docs-search-btn {
+  margin-inline-end: 0.25rem;
+
+  // Narrow screens: the icon alone, with "Search docs" kept as the accessible name.
+  @include os.down(sm) {
+    .docs-search-btn__label {
+      @include os.visually-hidden;
+    }
+  }
+}
+
+// The shortcut hint (aria-hidden; the button has aria-keyshortcuts) only where there's room.
+.docs-search-btn .os-btn__icon:has(.docs-search-btn__kbd) {
+  @include os.down(md) {
+    display: none;
+  }
+}
+
 .docs-header__link {
   display: none;
   align-items: center;
