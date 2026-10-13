@@ -81,7 +81,7 @@ rules for the accessibility hooks, icons, Transition and motion tokens added in 
 - Physical sizes in new SCSS and inline styles are logical (`inline-size`, `block-size`,
   `max-block-size`).
 - Layout that jsdom can't measure goes in `npm run test:layout`: add a fixture to
-  `packages/onesmallui/test/layout/fixtures.tsx` and its checks to `scripts/layout-test.mjs`. It isn't in CI
-  (CI has no Playwright browser), so run it locally with `test:a11y`.
+  `packages/onesmallui/test/layout/fixtures.tsx` and its checks to `scripts/layout-test.mjs`. CI runs it and
+  `test:a11y` as the `Playwright (layout)` and `Playwright (a11y)` jobs; a failure uploads `playwright-report/`.
 - The avatar is an exact square (`inline-size` = `block-size` = `--_size`). The image and initials sit in
   `.os-avatar__frame`, which clips, and the status dot is outside the frame.
