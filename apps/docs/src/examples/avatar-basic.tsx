@@ -22,7 +22,7 @@ export default function Example() {
           name="Mae Jemison"
           size="lg"
           status="busy"
-          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=70"
+          src="avatars/portrait.svg"
         />
         <Avatar name="Neil Armstrong" size="xl" shape="square" status="offline" />
         <Avatar name="Sally Ride" size="2xl" status="online" />

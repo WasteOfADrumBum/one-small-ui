@@ -23,13 +23,9 @@ body {
   height: 4rem;
   padding: 0 clamp(0.75rem, 2vw, 1.5rem);
   border-bottom: 1px solid var(--os-border);
-  // Opaque below lg: through the translucent glass, hero buttons scrolled under the
-  // header showed behind the menu button and logo on phones.
+  // Opaque at every width: through translucent glass, content scrolled under the header
+  // showed behind its text and could drop it below AAA contrast.
   background: var(--os-bg);
-
-  @include os.up(lg) {
-    @include os.glass('bg');
-  }
 }
 
 .docs-menu-btn {

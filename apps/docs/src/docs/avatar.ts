@@ -10,6 +10,11 @@ const doc: ComponentDoc = {
   importLine: "import { Avatar, AvatarGroup } from '@onesmall/ui';",
   examples: [
     { name: 'avatar-basic', title: 'Sizes, status, images and initials colors' },
+    {
+      name: 'avatar-images',
+      title: 'Images of any shape',
+      description: 'Portrait, landscape and square images are cropped with `object-fit: cover` to an exact circle or square. A broken image falls back to initials.',
+    },
     { name: 'avatar-group', title: 'Stacks and overflow count', description: '`max` limits the visible avatars; `total` counts people you have not loaded.' },
   ],
   props: [
@@ -40,9 +45,10 @@ const doc: ComponentDoc = {
   a11y: [
     'Each avatar is an image named "Name (status)", so status is not conveyed by color alone.',
     'AvatarGroup is a named group; the counter is an image named "N more" (customize with overflowLabel).',
+    'Images have empty alt text because the avatar itself is the named image; a broken image shows initials instead.',
     'Initials colors use <color>-text on <color>-soft, which meets 7:1 in both themes.',
   ],
-  classes: '.os-avatar[data-size][data-shape][data-color][data-overflow] > .os-avatar__img | .os-avatar__initials, .os-avatar__status[data-status]\n.os-avatar-group[data-size][data-spacing]',
+  classes: '.os-avatar[data-size][data-shape][data-color][data-overflow] > .os-avatar__frame > .os-avatar__img | .os-avatar__initials; .os-avatar > .os-avatar__status[data-status]\n.os-avatar-group[data-size][data-spacing]',
 };
 
 export default doc;
