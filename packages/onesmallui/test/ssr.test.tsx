@@ -17,6 +17,7 @@ import {
   SkipLink,
   ToastProvider,
   Transition,
+  TreeView,
   useAnnouncer,
   useFocusReturn,
   useFocusTrap,
@@ -103,5 +104,22 @@ describe('SSR', () => {
     const html = renderToString(<Shortcut />);
     expect(html).toContain('data-platform="other"');
     expect(html).toContain('Control K');
+  });
+
+  it('renders TreeView with selection, checkboxes and lazy nodes on the server', () => {
+    const items = [
+      { id: 'docs', label: 'Documents', children: [{ id: 'cv', label: 'CV.pdf', href: '/cv' }] },
+      { id: 'remote', label: 'Remote', hasChildren: true },
+    ];
+    const html = renderToString(
+      <AnnouncerProvider>
+        <TreeView aria-label="Files" items={items} defaultExpandedKeys={['docs']} defaultSelectedKeys={['cv']} />
+        <TreeView aria-label="Checks" items={items} checkboxes defaultCheckedKeys={['cv']} loadChildren={async () => []} />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('role="tree"');
+    expect(html).toContain('aria-selected="true"');
+    expect(html).toContain('aria-checked="true"');
+    expect(html).toContain('href="/cv"');
   });
 });
