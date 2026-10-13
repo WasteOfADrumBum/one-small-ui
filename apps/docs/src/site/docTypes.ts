@@ -26,6 +26,8 @@ export interface ComponentDoc {
   group: DocGroup;
   summary: string;
   importLine?: string;
+  /** A prominent notice under the summary, for guidance readers must not miss. */
+  callout?: { title: string; body: string; color?: 'info' | 'warning' | 'danger' };
   examples: { name: string; title: string; description?: string }[];
   props?: { title: string; props: PropDoc[] }[];
   /** Reference tables, e.g. utility class lists: rows of cells, first column rendered as code. */

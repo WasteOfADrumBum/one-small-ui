@@ -127,6 +127,164 @@ check(Math.abs(table.pinned) < 1, `data-table: header is ${table.pinned}px from 
 check(table.onTop, 'data-table: body content paints over the sticky header');
 check(!/rgba\(.*, 0\)|transparent/.test(table.bg), `data-table: sticky header background is transparent (${table.bg})`);
 
+// ---------- ContextMenu: opened at every corner and edge, it stays inside the viewport ----------
+const menuBox = () =>
+  page.evaluate(async () => {
+    const el = document.querySelector('[data-test="context-menu"]');
+    if (!el || !el.hasAttribute('data-side')) return null;
+    await Promise.all(el.getAnimations().map((a) => a.finished));
+    const r = el.getBoundingClientRect();
+    return {
+      left: r.left,
+      top: r.top,
+      right: r.right,
+      bottom: r.bottom,
+      scrolls: el.scrollHeight > el.clientHeight,
+      focus: document.activeElement?.getAttribute('role'),
+    };
+  });
+const waitForMenu = () => page.waitForSelector('[data-test="context-menu"][data-side]', { timeout: 2000 }).catch(() => null);
+
+for (const viewport of [
+  { width: 1280, height: 900 },
+  { width: 375, height: 667 },
+  { width: 640, height: 320 },
+]) {
+  await page.setViewportSize(viewport);
+  await open('context-menu');
+  const { width: w, height: h } = viewport;
+  const points = {
+    'top-left': [2, 2],
+    top: [w / 2, 2],
+    'top-right': [w - 2, 2],
+    right: [w - 2, h / 2],
+    'bottom-right': [w - 2, h - 2],
+    bottom: [w / 2, h - 2],
+    'bottom-left': [2, h - 2],
+    left: [2, h / 2],
+    center: [w / 2, h / 2],
+  };
+  for (const [name, [x, y]] of Object.entries(points)) {
+    const label = `context-menu ${w}×${h} ${name}`;
+    await page.mouse.click(x, y, { button: 'right' });
+    await waitForMenu();
+    const box = await menuBox();
+    check(!!box, `${label}: menu did not open on right-click`);
+    if (box) {
+      const inside = box.left >= 0 && box.top >= 0 && box.right <= w && box.bottom <= h;
+      check(inside, `${label}: menu ${JSON.stringify(box)} leaves the ${w}×${h} viewport`);
+      check(box.focus === 'menuitem', `${label}: focus is on ${box.focus}, not the first item`);
+      // At the pointer: its top or bottom edge on the pointer, and the pointer within its width
+      // (narrow viewports shift the menu sideways to fit).
+      if (name === 'center') {
+        const nearY = Math.min(Math.abs(box.top - y), Math.abs(box.bottom - y)) < 4;
+        const spansX = box.left - 4 <= x && x <= box.right + 4;
+        check(nearY && spansX, `${label}: menu ${JSON.stringify(box)} is not at the pointer (${x}, ${y})`);
+      }
+    }
+    await page.keyboard.press('Escape');
+    const back = await page.evaluate(() => ({
+      open: !!document.querySelector('[data-test="context-menu"]'),
+      focus: document.activeElement?.getAttribute('data-test'),
+    }));
+    check(!back.open && back.focus === 'context-target', `${label}: Escape left ${JSON.stringify(back)}`);
+  }
+
+  // Keyboard: Shift+F10 on the focused full-viewport target anchors inside it, not below the viewport.
+  await page.focus('[data-test="context-target"]');
+  await page.keyboard.press('Shift+F10');
+  await waitForMenu();
+  const kb = await menuBox();
+  check(!!kb, `context-menu ${w}×${h} Shift+F10: menu did not open`);
+  if (kb) check(kb.left >= 0 && kb.top >= 0 && kb.right <= w && kb.bottom <= h, `context-menu ${w}×${h} Shift+F10: menu ${JSON.stringify(kb)} leaves the viewport`);
+  await page.keyboard.press('Escape');
+}
+
+// ---------- Sidebar: expanded width, rail width, drawer below lg, RTL mirror ----------
+const sidebarAt = async (query, width) => {
+  current = `sidebar ${query || 'expanded'} @${width}`;
+  await page.setViewportSize({ width, height: 900 });
+  await page.goto(`${base}?fixture=sidebar${query ? `&${query}` : ''}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(50);
+};
+const measureSidebar = () =>
+  page.evaluate(() => {
+    const nav = document.querySelector('nav.os-sidebar');
+    const box = nav?.getBoundingClientRect();
+    const link = document.querySelector('[data-test="first-item"]');
+    const label = link?.querySelector('.os-sidebar__label')?.getBoundingClientRect();
+    return {
+      mode: nav?.dataset.mode,
+      visible: !!nav && nav.checkVisibility(),
+      left: box?.left,
+      right: box?.right,
+      width: box?.width,
+      vw: document.documentElement.clientWidth,
+      rem: parseFloat(getComputedStyle(document.documentElement).fontSize),
+      linkHeight: link?.getBoundingClientRect().height,
+      labelWidth: label?.width,
+    };
+  });
+const tooltipBox = async () => {
+  await page.focus('[data-test="first-item"]');
+  await page.waitForTimeout(300);
+  return page.evaluate(() => {
+    const link = document.querySelector('[data-test="first-item"]');
+    const tip = link.closest('.os-sidebar__tip').querySelector('.os-tooltip__content');
+    const l = link.getBoundingClientRect();
+    const t = tip.getBoundingClientRect();
+    return { open: tip.dataset.state === 'open' && t.width > 0, linkLeft: l.left, linkRight: l.right, tipLeft: t.left, tipRight: t.right };
+  });
+};
+const near = (a, b, tol = 1) => Math.abs(a - b) <= tol;
+
+for (const dir of ['ltr', 'rtl']) {
+  const q = dir === 'rtl' ? 'dir=rtl' : '';
+  // Expanded at 1280px: 16rem wide, against the inline-start edge.
+  await sidebarAt(q, 1280);
+  let s = await measureSidebar();
+  check(s.mode === 'expanded' && s.visible, `sidebar ${dir}: expected a visible expanded sidebar, got ${s.mode}`);
+  check(near(s.width, 16 * s.rem), `sidebar ${dir}: expanded width ${s.width}px, expected ${16 * s.rem}px`);
+  if (dir === 'ltr') check(near(s.left, 0), `sidebar ltr: left edge at ${s.left}px, expected 0`);
+  else check(near(s.right, s.vw), `sidebar rtl: right edge at ${s.right}px, expected ${s.vw}px (mirrored)`);
+  check(s.linkHeight >= 44, `sidebar ${dir}: item is ${s.linkHeight}px tall, below the 44px target`);
+
+  // The toggle collapses it to the rail (after the width transition).
+  await page.click('[data-test="inner-toggle"]');
+  await page.waitForTimeout(500);
+  s = await measureSidebar();
+  check(s.mode === 'collapsed' && near(s.width, 4.5 * s.rem), `sidebar ${dir}: rail width ${s.width}px after toggling, expected ${4.5 * s.rem}px`);
+
+  // Starting as a rail: 4.5rem, labels hidden, tooltip on the inline-end side.
+  await sidebarAt(q ? `${q}&collapsed=1` : 'collapsed=1', 1280);
+  s = await measureSidebar();
+  check(s.mode === 'collapsed' && near(s.width, 4.5 * s.rem), `sidebar ${dir}: rail width ${s.width}px, expected ${4.5 * s.rem}px`);
+  check(s.labelWidth <= 1, `sidebar ${dir}: rail label is ${s.labelWidth}px wide, expected visually hidden`);
+  if (dir === 'rtl') check(near(s.right, s.vw), `sidebar rtl: rail right edge at ${s.right}px, expected ${s.vw}px`);
+  const tip = await tooltipBox();
+  check(tip.open, `sidebar ${dir}: rail tooltip did not open on focus`);
+  if (dir === 'ltr') check(tip.tipLeft >= tip.linkRight, `sidebar ltr: tooltip (left ${tip.tipLeft}) is not right of the item (right ${tip.linkRight})`);
+  else check(tip.tipRight <= tip.linkLeft, `sidebar rtl: tooltip (right ${tip.tipRight}) is not left of the item (left ${tip.linkLeft})`);
+
+  // Below lg (800px): no inline sidebar; the outside toggle opens a drawer from the inline-start edge.
+  await sidebarAt(q, 800);
+  s = await measureSidebar();
+  check(!s.visible, `sidebar ${dir}: sidebar is visible at 800px before the drawer opens`);
+  check(s.mode === 'drawer', `sidebar ${dir}: expected drawer mode at 800px, got ${s.mode}`);
+  await page.click('[data-test="outer-toggle"]');
+  await page.waitForTimeout(500);
+  const drawer = await page.evaluate(() => {
+    const dialog = document.querySelector('dialog.os-sidebar-drawer');
+    const panel = dialog?.querySelector('.os-drawer__panel')?.getBoundingClientRect();
+    const nav = dialog?.querySelector('nav.os-sidebar');
+    return { open: !!dialog?.open, left: panel?.left, right: panel?.right, navVisible: !!nav?.checkVisibility(), vw: document.documentElement.clientWidth };
+  });
+  check(drawer.open && drawer.navVisible, `sidebar ${dir}: drawer did not open with the nav inside`);
+  if (dir === 'ltr') check(near(drawer.left, 0), `sidebar ltr: drawer panel left edge at ${drawer.left}px, expected 0`);
+  else check(near(drawer.right, drawer.vw), `sidebar rtl: drawer panel right edge at ${drawer.right}px, expected ${drawer.vw}px`);
+}
+await page.setViewportSize({ width: 1280, height: 900 });
+
 if (failures.length) {
   const items = [{ title: 'Failed checks', details: failures }];
   for (const [fixture, shot] of shots) items.push({ title: `Fixture: ${fixture}`, screenshot: await shot });

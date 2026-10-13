@@ -15,7 +15,6 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type MouseEvent,
-  type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
   type ReactElement,
   type ReactNode,
@@ -30,42 +29,18 @@ import { cx } from '../utils/cx';
 import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
 import { appearanceProps, type OverlayAppearance } from './DialogBase';
+import {
+  MenuContext,
+  mergeRefs,
+  useMenu,
+  useMenuRoot,
+  type FocusIntent,
+  type MenuAutoClose,
+  type MenuContextValue,
+} from './MenuBase';
 import type { Placement } from './types';
 
-/** When the menu closes by itself: `true` on item select or outside click, `'inside'` only on select, `'outside'` only on outside click, `false` never. */
-export type MenuAutoClose = boolean | 'inside' | 'outside';
-type FocusIntent = 'first' | 'last' | null;
-
-interface MenuContextValue {
-  open: boolean;
-  setOpen: (open: boolean, opts?: { focus?: FocusIntent; returnFocus?: boolean }) => void;
-  root: MenuContextValue | null;
-  autoClose: MenuAutoClose;
-  contentRole: 'menu' | 'dialog';
-  appearance: OverlayAppearance;
-  triggerRef: MutableRefObject<HTMLElement | null>;
-  contentRef: MutableRefObject<HTMLDivElement | null>;
-  triggerId: string;
-  contentId: string;
-  focusIntent: MutableRefObject<FocusIntent>;
-  isSub: boolean;
-}
-
-const MenuContext = createContext<MenuContextValue | null>(null);
-const useMenu = (part: string) => {
-  const ctx = useContext(MenuContext);
-  if (!ctx) throw new Error(`<${part}> must be inside <Menu>.`);
-  return ctx;
-};
-
-function mergeRefs<T>(...refs: (Ref<T> | undefined)[]) {
-  return (el: T | null) => {
-    for (const r of refs) {
-      if (typeof r === 'function') r(el);
-      else if (r) (r as MutableRefObject<T | null>).current = el;
-    }
-  };
-}
+export type { MenuAutoClose } from './MenuBase';
 
 const ITEM = '[role="menuitem"],[role="menuitemcheckbox"],[role="menuitemradio"]';
 const FOCUSABLE =
@@ -115,39 +90,7 @@ export function Menu({
   children,
 }: MenuProps) {
   const [isOpen, setIsOpen] = useControllableState(open, defaultOpen, onOpenChange);
-  const id = useId().replace(/:/g, '');
-  const focusIntent = useRef<FocusIntent>(null);
-  const { anchorRef, floatingRef } = useFloating<HTMLElement, HTMLDivElement>({ open: isOpen, placement, offset, matchWidth: false });
-
-  const setOpen = useCallback<MenuContextValue['setOpen']>(
-    (next, opts = {}) => {
-      focusIntent.current = opts.focus ?? null;
-      setIsOpen(next);
-      if (!next && opts.returnFocus) anchorRef.current?.focus();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setIsOpen],
-  );
-
-  const value = useMemo<MenuContextValue>(() => {
-    // `root: null` marks the top-level menu; consumers resolve it with `ctx.root ?? ctx`.
-    const v: MenuContextValue = {
-      open: isOpen,
-      setOpen,
-      root: null,
-      autoClose,
-      contentRole,
-      appearance,
-      triggerRef: anchorRef,
-      contentRef: floatingRef,
-      triggerId: `os-menu-${id}-trigger`,
-      contentId: `os-menu-${id}`,
-      focusIntent,
-      isSub: false,
-    };
-    return v;
-  }, [isOpen, setOpen, autoClose, contentRole, appearance, anchorRef, floatingRef, id]);
-
+  const { value } = useMenuRoot({ open: isOpen, setOpenState: setIsOpen, placement, offset, autoClose, contentRole, appearance });
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>;
 }
 
@@ -226,10 +169,19 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function
   useEffect(() => {
     if (!ctx.open || ctx.isSub) return;
     const closesOutside = ctx.autoClose === true || ctx.autoClose === 'outside';
+    const context = ctx.kind === 'context';
     const inside = (t: EventTarget | null) =>
       t instanceof Node && (!!ctx.contentRef.current?.contains(t) || !!ctx.triggerRef.current?.contains(t));
     const onDown = (e: PointerEvent) => {
-      if (closesOutside && !inside(e.target)) ctx.setOpen(false);
+      if (!closesOutside) return;
+      const t = e.target;
+      if (t instanceof Node && ctx.contentRef.current?.contains(t)) return;
+      if (t instanceof Node && ctx.triggerRef.current?.contains(t)) {
+        // A menu button toggles itself. On a context menu target, a right click (or Ctrl+click on a Mac)
+        // reopens the menu at the new point, and any other press closes it.
+        if (!context || e.button === 2 || (e.button === 0 && e.ctrlKey)) return;
+      }
+      ctx.setOpen(false, context ? { returnFocus: 'if-lost' } : undefined);
     };
     const onFocus = (e: FocusEvent) => {
       if (closesOutside && !inside(e.target)) ctx.setOpen(false);
@@ -660,6 +612,7 @@ export function MenuSub({ label, icon, description, disabled, placement, maxHeig
       contentId,
       focusIntent,
       isSub: true,
+      kind: root.kind,
     }),
     [open, setOpen, root, anchorRef, floatingRef, triggerId, contentId],
   );

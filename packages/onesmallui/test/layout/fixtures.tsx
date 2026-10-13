@@ -1,5 +1,27 @@
 import type { ComponentType } from 'react';
-import { Avatar, AvatarGroup, DataTable, type AvatarSize } from '../../src';
+import {
+  Avatar,
+  AvatarGroup,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+  DataTable,
+  MenuCheckboxItem,
+  MenuDivider,
+  MenuItem,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuSub,
+  Sidebar,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarProvider,
+  SidebarSection,
+  SidebarToggle,
+  type AvatarSize,
+} from '../../src';
+import { HomeIcon, SettingsIcon, UserIcon } from '../../src/icons';
 
 // Solid-color SVGs with explicit intrinsic sizes: the aspect ratios that used to stretch avatars.
 const svg = (w: number, h: number) =>
@@ -74,7 +96,71 @@ function DataTableFixture() {
   );
 }
 
+// A target that fills the viewport, so the runner can right-click at every corner and edge.
+function ContextMenuFixture() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div role="region" tabIndex={0} aria-label="Canvas" data-test="context-target" style={{ position: 'fixed', inset: 0 }}>
+          Right-click anywhere
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent aria-label="Canvas actions" data-test="context-menu">
+        <MenuItem shortcut="Ctrl+X">Cut</MenuItem>
+        <MenuItem shortcut="Ctrl+C">Copy</MenuItem>
+        <MenuItem shortcut="Ctrl+V">Paste</MenuItem>
+        <MenuItem disabled>Paste as plain text</MenuItem>
+        <MenuDivider />
+        <MenuCheckboxItem defaultChecked>Snap to grid</MenuCheckboxItem>
+        <MenuRadioGroup label="Zoom" defaultValue="100">
+          <MenuRadioItem value="50">50%</MenuRadioItem>
+          <MenuRadioItem value="100">100%</MenuRadioItem>
+          <MenuRadioItem value="200">200%</MenuRadioItem>
+        </MenuRadioGroup>
+        <MenuSub label="Arrange">
+          <MenuItem>Bring to front</MenuItem>
+          <MenuItem>Send to back</MenuItem>
+        </MenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
+// App shell: `?collapsed=1` starts as a rail, `?dir=rtl` mirrors it. Below lg it is a drawer.
+function SidebarFixture() {
+  const params = new URLSearchParams(location.search);
+  return (
+    <div dir={params.get('dir') ?? 'ltr'} style={{ display: 'flex', blockSize: '100vh' }}>
+      <SidebarProvider defaultCollapsed={params.get('collapsed') === '1'}>
+        <Sidebar aria-label="App">
+          <SidebarHeader>
+            <span className="os-sidebar__label">Starlight</span>
+            <SidebarToggle data-test="inner-toggle" />
+          </SidebarHeader>
+          <SidebarSection heading="Workspace">
+            <SidebarItem href="#home" icon={<HomeIcon />} active data-test="first-item">
+              Dashboard
+            </SidebarItem>
+            <SidebarItem href="#crew" icon={<UserIcon />} badge="3">
+              Crew
+            </SidebarItem>
+            <SidebarGroup label="Settings" icon={<SettingsIcon />}>
+              <SidebarItem href="#profile">Profile</SidebarItem>
+            </SidebarGroup>
+          </SidebarSection>
+        </Sidebar>
+        <div style={{ flex: 1, padding: 16 }}>
+          <SidebarToggle data-test="outer-toggle" />
+          <p>Content</p>
+        </div>
+      </SidebarProvider>
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
+  'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'data-table': DataTableFixture,
+  sidebar: SidebarFixture,
 };
