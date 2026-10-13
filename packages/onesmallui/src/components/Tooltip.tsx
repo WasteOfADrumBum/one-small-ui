@@ -47,6 +47,12 @@ export interface TooltipProps {
   /** `'default'` is high-contrast inverted; `'dark'` and `'translucent'` match the other overlays. */
   appearance?: OverlayAppearance;
   offset?: number;
+  /**
+   * `true` (default): the trigger is described by the tooltip (`aria-describedby`).
+   * `false`: a visual-only label for a trigger whose accessible name already says the same,
+   * such as an icon rail; the tooltip is hidden from assistive tech so the text isn't read twice.
+   */
+  describe?: boolean;
 }
 
 /** Tooltip `data-state`: `opening` shows as `open` (its CSS animates on mount). */
@@ -88,6 +94,7 @@ export function Tooltip({
   arrow = true,
   appearance = 'default',
   offset = 8,
+  describe = true,
 }: TooltipProps) {
   const id = `os-tip-${useId().replace(/:/g, '')}`;
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
@@ -113,9 +120,9 @@ export function Tooltip({
 
   if (!isValidElement(children)) return children;
   const existing = children.props['aria-describedby'] as string | undefined;
-  const trigger = cloneElement(children, {
-    'aria-describedby': [existing, id].filter(Boolean).join(' '),
-  });
+  const trigger = describe
+    ? cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })
+    : children;
 
   return (
     // Presentation: wraps the trigger and listens to its bubbled hover and focus events.
@@ -135,7 +142,8 @@ export function Tooltip({
       {trigger}
       <span
         ref={floatingRef}
-        role={interactive ? undefined : 'tooltip'}
+        role={interactive || !describe ? undefined : 'tooltip'}
+        aria-hidden={describe ? undefined : true}
         id={id}
         className={cx(cls('floating'), cls('tooltip__content'), contentClassName)}
         data-state={tooltipState(state)}
