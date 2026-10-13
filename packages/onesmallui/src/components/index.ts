@@ -63,5 +63,6 @@ export * from './Toast';
 export * from './Toggler';
 export * from './Tooltip';
 export * from './Transition';
+export * from './TreeView';
 export * from './VisuallyHidden';
 export * from './types';

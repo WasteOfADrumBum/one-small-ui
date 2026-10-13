@@ -130,6 +130,7 @@ import {
   Tooltip,
   TooltipProvider,
   Transition,
+  TreeView,
   Video,
   VisuallyHidden,
 } from '../src';
@@ -675,6 +676,35 @@ const cases: Record<string, () => ReactElement> = {
     <Portal>
       <p>Rendered in body</p>
     </Portal>
+  ),
+  TreeView: () => (
+    <AnnouncerProvider>
+      <TreeView
+        aria-label="Files"
+        selectionMode="multiple"
+        items={[
+          {
+            id: 'docs',
+            label: 'Documents',
+            icon: <InfoIcon />,
+            children: [
+              { id: 'cv', label: 'CV.pdf' },
+              { id: 'old', label: 'Old.pdf', disabled: true },
+            ],
+          },
+          { id: 'home', label: 'Home', href: '#home' },
+        ]}
+        defaultExpandedKeys={['docs']}
+        defaultSelectedKeys={['cv']}
+      />
+      <TreeView
+        aria-label="Sync"
+        checkboxes
+        items={[{ id: 'a', label: 'Album', children: [{ id: 'a1', label: 'Track 1' }, { id: 'a2', label: 'Track 2' }] }]}
+        defaultExpandedKeys={['a']}
+        defaultCheckedKeys={['a1']}
+      />
+    </AnnouncerProvider>
   ),
   Kbd: () => (
     <p>
