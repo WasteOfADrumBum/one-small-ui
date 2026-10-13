@@ -46,6 +46,9 @@ import {
   Collapsible,
   Combobox,
   Container,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
   DatePicker,
   Dialog,
   Drawer,
@@ -266,6 +269,28 @@ const cases: Record<string, () => ReactElement> = {
     <Field label="Planet">
       <Combobox options={options} defaultValue="mars" />
     </Field>
+  ),
+  ContextMenu: () => (
+    <ContextMenu defaultOpen>
+      <ContextMenuTrigger>
+        <button type="button">Cargo manifest</button>
+      </ContextMenuTrigger>
+      <ContextMenuContent aria-label="Manifest actions">
+        <MenuItem shortcut="Ctrl+C">Copy</MenuItem>
+        <MenuItem disabled>Jettison</MenuItem>
+        <MenuDivider />
+        <MenuCheckboxItem checked onCheckedChange={() => {}}>
+          Pinned
+        </MenuCheckboxItem>
+        <MenuRadioGroup label="Sort by" value="mass" onValueChange={() => {}}>
+          <MenuRadioItem value="mass">Mass</MenuRadioItem>
+          <MenuRadioItem value="name">Name</MenuRadioItem>
+        </MenuRadioGroup>
+        <MenuSub label="Share">
+          <MenuItem>Copy link</MenuItem>
+        </MenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
   ),
   DatePicker: () => (
     <>

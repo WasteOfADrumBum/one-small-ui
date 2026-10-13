@@ -14,6 +14,13 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   platform-aware `Mod` key. It ignores text fields, selects, contenteditable and IME composition unless
   `allowInInputs`, and removes its listener on unmount.
 - Hotkey helpers `parseHotkey`, `matchesHotkey`, `formatHotkey`, `isApplePlatform` and `isEditableTarget`.
+- `ContextMenu`, `ContextMenuTrigger` and `ContextMenuContent`: a menu that opens on right-click, Shift+F10, the
+  Menu key or a touch long press (`longPressDelay`, 500ms by default, cancelled by moving, lifting or scrolling).
+  It opens at the pointer, or at the focused element from the keyboard, through `useFloating` with a virtual
+  anchor, and flips, shifts and caps its height so it stays inside the viewport. Items are Menu's own, so
+  checkbox and radio items, groups, separators, submenus, typeahead and disabled items behave as they do in
+  `Menu`. Escape and outside clicks return focus to the target. `disabled` attaches nothing, so the browser's
+  menu shows. The docs say plainly that every action also needs a visible button, Menu or keyboard shortcut.
 
 ### Deprecated
 

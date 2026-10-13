@@ -1,0 +1,20 @@
+@use '../abstracts' as *;
+
+// ---------- Context menu ----------
+// The panel is `.os-floating.os-menu.os-context-menu`: Menu's own styles, placed at the pointer.
+// ContextMenuContent sets --os-context-menu-max to the taller side of the anchor, so the menu
+// fits after flipping and scrolls instead of leaving the viewport.
+.#{$prefix}-context-menu {
+  max-block-size: min(var(--#{$prefix}-context-menu-max, 100dvh), calc(100dvh - 1rem));
+  // Grow from the pointer: the start corner (left in LTR, right in RTL), top or bottom after a flip.
+  transform-origin: calc(50% - 50% * var(--#{$prefix}-dir, 1)) 0;
+
+  &[data-side='top'] {
+    transform-origin: calc(50% - 50% * var(--#{$prefix}-dir, 1)) 100%;
+  }
+}
+
+// The target: no iOS callout or link preview on long press, which would cover the menu.
+[data-context-menu-trigger] {
+  -webkit-touch-callout: none;
+}

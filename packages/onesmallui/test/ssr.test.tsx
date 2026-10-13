@@ -5,10 +5,14 @@ import { renderToString } from 'react-dom/server';
 import {
   AnnouncerProvider,
   Collapse,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
   DataTable,
   Dialog,
   Field,
   Kbd,
+  MenuItem,
   NumberInput,
   TagInput,
   TimePicker,
@@ -103,5 +107,20 @@ describe('SSR', () => {
     const html = renderToString(<Shortcut />);
     expect(html).toContain('data-platform="other"');
     expect(html).toContain('Control K');
+  });
+  it('renders an open ContextMenu without touching the DOM', () => {
+    const html = renderToString(
+      <ContextMenu defaultOpen>
+        <ContextMenuTrigger>
+          <button type="button">Cargo</button>
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="Cargo actions">
+          <MenuItem>Inspect</MenuItem>
+        </ContextMenuContent>
+      </ContextMenu>,
+    );
+    expect(html).toContain('data-context-menu-trigger');
+    expect(html).toContain('role="menu"');
+    expect(html).toContain('os-context-menu');
   });
 });
