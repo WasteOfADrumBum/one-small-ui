@@ -10,7 +10,9 @@ export * from './Calendar';
 export * from './Card';
 export * from './Carousel';
 export * from './Checkbox';
-export * from './Chip';
+// Named exports: Chip.tsx also holds the internal `chipKeyNav` helper shared with TagInput.
+export { Chip, ChipGroup, ChipInput } from './Chip';
+export type { ChipGroupProps, ChipInputProps, ChipProps, ChipVariant } from './Chip';
 export * from './CloseButton';
 export * from './CodeBlock';
 export * from './Collapse';
@@ -47,6 +49,7 @@ export * from './Stepper';
 export * from './Switch';
 export * from './Table';
 export * from './Tabs';
+export * from './TagInput';
 export * from './Textarea';
 export * from './Toast';
 export * from './Toggler';

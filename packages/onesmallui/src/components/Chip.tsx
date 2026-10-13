@@ -192,8 +192,11 @@ export const ChipGroup = forwardRef<HTMLDivElement, ChipGroupProps>(function Chi
   );
 });
 
-/** Roving arrow-key focus and Delete/Backspace removal across chip buttons in a container. */
-function chipKeyNav(e: KeyboardEvent<HTMLElement>, onLeaveEnd?: () => void): boolean {
+/**
+ * Internal: roving arrow-key focus and Delete/Backspace removal across chip buttons in a container.
+ * Shared by ChipGroup, ChipInput and TagInput; not exported from the package root.
+ */
+export function chipKeyNav(e: KeyboardEvent<HTMLElement>, onLeaveEnd?: () => void): boolean {
   const target = e.target as HTMLElement;
   if (!target.matches(`.${cls('chip__main')}, .${cls('chip__remove')}`)) return false;
   const items = Array.from(
@@ -234,6 +237,7 @@ function chipKeyNav(e: KeyboardEvent<HTMLElement>, onLeaveEnd?: () => void): boo
 
 // ---------- ChipInput ----------
 
+/** @deprecated Use `TagInput` and `TagInputProps`. */
 export interface ChipInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'defaultValue' | 'onChange'> {
   value?: string[];
@@ -261,6 +265,9 @@ export interface ChipInputProps
 }
 
 /**
+ * @deprecated Use `TagInput`, which adds suggestions, a suggestions-only mode, case-insensitive
+ * dedupe and announcements through `useAnnouncer`. ChipInput keeps working unchanged.
+ *
  * A text input that turns entries into chips. Type and press Enter or a comma to add,
  * paste a comma-separated list to add many, Backspace in the empty input removes the
  * last chip, and arrow keys move between chips (Delete removes the focused one).
