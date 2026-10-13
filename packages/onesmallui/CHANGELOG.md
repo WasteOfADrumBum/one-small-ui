@@ -5,6 +5,8 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-13
+
 ### Added
 
 - `Kbd`, a keyboard key or shortcut on the semantic `<kbd>` element. `combo="Mod+K"` shows ⌘K on Apple platforms
