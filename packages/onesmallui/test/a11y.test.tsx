@@ -59,6 +59,7 @@ import {
   Input,
   InputGroup,
   InputGroupText,
+  Kbd,
   ListGroup,
   LiveRegion,
   ListGroupItem,
@@ -620,6 +621,11 @@ const cases: Record<string, () => ReactElement> = {
     <Portal>
       <p>Rendered in body</p>
     </Portal>
+  ),
+  Kbd: () => (
+    <p>
+      Open search with <Kbd combo="Mod+K" />, close with <Kbd>Esc</Kbd>.
+    </p>
   ),
   SkipLink: () => (
     <>

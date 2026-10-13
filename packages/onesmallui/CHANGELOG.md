@@ -5,6 +5,16 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- `Kbd`, a keyboard key or shortcut on the semantic `<kbd>` element. `combo="Mod+K"` shows ⌘K on Apple platforms
+  and Ctrl K elsewhere (detected after hydration, so SSR markup matches), with the keys spelled out for screen
+  readers ("Control K").
+- `useHotkeys(combo, handler, { enabled, preventDefault, allowInInputs, target, event })`, with a
+  platform-aware `Mod` key. It ignores text fields, selects, contenteditable and IME composition unless
+  `allowInInputs`, and removes its listener on unmount.
+- Hotkey helpers `parseHotkey`, `matchesHotkey`, `formatHotkey`, `isApplePlatform` and `isEditableTarget`.
+
 ### Deprecated
 
 - `ChipInput` will be removed in 1.0.0. It now logs a one-time `console.warn` in development builds

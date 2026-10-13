@@ -8,6 +8,7 @@ import {
   DataTable,
   Dialog,
   Field,
+  Kbd,
   NumberInput,
   TagInput,
   TimePicker,
@@ -19,6 +20,7 @@ import {
   useAnnouncer,
   useFocusReturn,
   useFocusTrap,
+  useHotkeys,
   useReducedMotion,
   useScrollLock,
   useTransition,
@@ -92,5 +94,14 @@ describe('SSR', () => {
     expect(html).toContain('9:30 AM');
     expect(html).toContain('role="spinbutton"');
     expect(html).toContain('aria-busy="true"');
+  });
+  it('renders Kbd with the non-Apple labels and runs useHotkeys without a document', () => {
+    function Shortcut() {
+      useHotkeys('Mod+K', () => {});
+      return <Kbd combo="Mod+K" />;
+    }
+    const html = renderToString(<Shortcut />);
+    expect(html).toContain('data-platform="other"');
+    expect(html).toContain('Control K');
   });
 });
