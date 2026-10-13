@@ -84,7 +84,7 @@ describe('DataTable structure', () => {
     expect(table).toHaveAttribute('data-density', 'compact');
     expect(table).toHaveAttribute('data-sticky-header');
     const region = screen.getByRole('region');
-    expect(region.style.maxHeight).toBe('20rem');
+    expect(region.style.maxBlockSize).toBe('20rem');
     expect(region).toHaveAttribute('data-scroll-y');
   });
 

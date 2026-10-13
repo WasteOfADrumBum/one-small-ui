@@ -7,8 +7,8 @@
   @include fm.control-sizes;
   position: relative;
   display: block;
-  width: 100%;
-  min-width: 0;
+  inline-size: 100%;
+  min-inline-size: 0;
 }
 
 .#{$prefix}-tag-input__control {
@@ -54,8 +54,8 @@
 
 .#{$prefix}-tag-input__input {
   flex: 1 0 8rem;
-  min-width: 6rem;
-  min-height: calc(var(--_h) - 0.5rem - 2px);
+  min-inline-size: 6rem;
+  min-block-size: calc(var(--_h) - 0.5rem - 2px);
   padding-block: 0;
   padding-inline: 0.5rem;
   border: 0;

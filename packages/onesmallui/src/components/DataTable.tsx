@@ -481,7 +481,7 @@ function DataTableInner<Row>(
         aria-sort={ariaSort}
         data-align={col.align}
         data-sortable={col.sortable || undefined}
-        style={col.width !== undefined ? { width: col.width } : undefined}
+        style={col.width !== undefined ? { inlineSize: col.width } : undefined}
       >
         {col.sortable ? sortButton(col) : col.header}
       </th>
@@ -613,7 +613,7 @@ function DataTableInner<Row>(
         role="region"
         tabIndex={0}
         aria-labelledby={captionId}
-        style={maxHeight !== undefined ? { maxHeight } : undefined}
+        style={maxHeight !== undefined ? { maxBlockSize: maxHeight } : undefined}
         data-scroll-y={maxHeight !== undefined || undefined}
       >
         <Table

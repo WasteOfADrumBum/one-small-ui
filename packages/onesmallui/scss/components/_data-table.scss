@@ -11,7 +11,7 @@
 .#{$prefix}-data-table {
   display: grid;
   gap: 0.75rem;
-  min-width: 0;
+  min-inline-size: 0;
   margin-block-end: 1rem;
 }
 
@@ -25,7 +25,7 @@
 
 .#{$prefix}-data-table__search {
   flex: 1 1 14rem;
-  max-width: 22rem;
+  max-inline-size: 22rem;
 }
 
 .#{$prefix}-data-table__columns {
@@ -93,8 +93,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  width: 100%;
-  min-height: $target-size;
+  inline-size: 100%;
+  min-block-size: $target-size;
   padding-block: 0.25rem;
   padding-inline: 0.5rem;
   border: 0;
@@ -123,8 +123,8 @@
 
 .#{$prefix}-data-table__sort-icon {
   flex-shrink: 0;
-  width: 1em;
-  height: 1em;
+  inline-size: 1em;
+  block-size: 1em;
   color: token('text-muted');
   opacity: 0.55;
   @include transition(opacity, color);
@@ -143,8 +143,8 @@
 .#{$prefix}-data-table__sort-priority {
   display: inline-grid;
   place-items: center;
-  min-width: 1.25em;
-  height: 1.25em;
+  min-inline-size: 1.25em;
+  block-size: 1.25em;
   border-radius: radius('full');
   background: token('primary-soft');
   color: token('primary-text');
@@ -156,14 +156,14 @@
 // Selection column: a narrow column whose checkbox keeps a 44px target. Rows that hold
 // controls stay at least 44px tall, even when compact (table cells treat height as a minimum).
 .#{$prefix}-data-table__table > :not(caption) > tr > .#{$prefix}-data-table__select {
-  width: calc(#{$target-size} + var(--_pad-x));
-  height: $target-size;
+  inline-size: calc(#{$target-size} + var(--_pad-x));
+  block-size: $target-size;
   padding-block: 0;
   vertical-align: middle;
 
   .#{$prefix}-check {
     justify-content: center;
-    min-height: $target-size;
+    min-block-size: $target-size;
     padding-block: 0;
     align-items: center;
     gap: 0;
@@ -230,8 +230,8 @@
   }
 
   > .#{$prefix}-select {
-    width: auto;
-    min-width: 5.5rem;
+    inline-size: auto;
+    min-inline-size: 5.5rem;
   }
 }
 
