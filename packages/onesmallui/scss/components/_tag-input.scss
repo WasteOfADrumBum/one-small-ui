@@ -1,0 +1,91 @@
+@use '../abstracts' as *;
+@use 'form-mixins' as fm;
+
+// ---------- Tag input ----------
+// Chips come from _chips.scss and the suggestion list from _combobox.scss (.os-combobox__popup / __option).
+.#{$prefix}-tag-input {
+  @include fm.control-sizes;
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.#{$prefix}-tag-input__control {
+  @include fm.control;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  // Row gap keeps the 44px hit areas of chip rows apart.
+  gap: 0.75rem 0.375rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.375rem;
+  cursor: text;
+
+  &:focus-within {
+    @include fm.control-focus;
+  }
+
+  [data-invalid] > & {
+    @include fm.control-invalid;
+  }
+
+  // Native `required` failing after a submit attempt or once the field is touched.
+  &:has(.#{$prefix}-tag-input__input:user-invalid) {
+    @include fm.control-invalid;
+  }
+  .#{$prefix}-form[data-validated] &:has(.#{$prefix}-tag-input__input:invalid),
+  .#{$prefix}-field[data-touched] &:has(.#{$prefix}-tag-input__input:invalid) {
+    @include fm.control-invalid;
+  }
+
+  // Read-only: a dashed border, keeping the surface so text contrast is unchanged.
+  [data-readonly] > & {
+    border-style: dashed;
+    cursor: default;
+  }
+
+  [data-disabled] > & {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.#{$prefix}-tag-input__input {
+  flex: 1 0 8rem;
+  min-inline-size: 6rem;
+  min-block-size: calc(var(--_h) - 0.5rem - 2px);
+  padding-block: 0;
+  padding-inline: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+
+  &::placeholder {
+    color: token('text-muted');
+    opacity: 1;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  [data-readonly] & {
+    cursor: default;
+  }
+}
+
+.#{$prefix}-tag-input__notice {
+  margin: 0;
+  margin-block-start: 0.375rem;
+  font-size: token('text-sm');
+  color: token('text-muted');
+
+  &[data-kind='error'] {
+    font-weight: 600;
+    color: fm.$invalid-color;
+  }
+}

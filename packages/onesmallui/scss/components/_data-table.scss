@@ -1,0 +1,242 @@
+// DataTable: <div class="os-data-table"> wrapping a toolbar, a scroll region holding an
+// .os-table, and a pagination footer.
+//   .os-data-table[data-density][data-loading][data-disabled][data-readonly][data-invalid]
+//     > .os-data-table__toolbar > .os-data-table__search + … + .os-data-table__columns
+//     > .os-data-table__scroll[role=region][data-scroll-y] > .os-table.os-data-table__table
+//         th[aria-sort] > .os-data-table__sort[data-state="ascending|descending"]
+//         tr[data-selected], td.os-data-table__select, td.os-data-table__empty
+//     > .os-data-table__footer > .os-data-table__page-size + .os-data-table__range + .os-pagination
+@use '../abstracts' as *;
+
+.#{$prefix}-data-table {
+  display: grid;
+  gap: 0.75rem;
+  min-inline-size: 0;
+  margin-block-end: 1rem;
+}
+
+// ---------- Toolbar ----------
+.#{$prefix}-data-table__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.#{$prefix}-data-table__search {
+  flex: 1 1 14rem;
+  max-inline-size: 22rem;
+}
+
+.#{$prefix}-data-table__columns {
+  margin-inline-start: auto;
+}
+
+// ---------- Scroll region ----------
+.#{$prefix}-data-table__scroll {
+  overflow-x: auto;
+  border-radius: radius('sm');
+  -webkit-overflow-scrolling: touch;
+  @include focus-ring;
+
+  // A height cap makes this the vertical scroller too, so a sticky header pins to it.
+  &[data-scroll-y] {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  > .#{$prefix}-table {
+    margin-block-end: 0;
+  }
+}
+
+// ---------- Cells ----------
+.#{$prefix}-data-table__table {
+  > :not(caption) > tr > [data-align='start'] {
+    text-align: start;
+  }
+
+  > :not(caption) > tr > [data-align='center'] {
+    text-align: center;
+  }
+
+  > :not(caption) > tr > [data-align='end'] {
+    text-align: end;
+  }
+
+  > tbody > tr > th[scope='row'] {
+    font-weight: 600;
+  }
+
+  // Sortable headers: the button fills the cell so the whole header is the target.
+  > thead > tr > th[data-sortable] {
+    padding-block: 0;
+    padding-inline: calc(var(--_pad-x) - 0.5rem);
+  }
+
+  // Selected rows: the active tint plus a leading bar, so selection never relies on color alone.
+  > tbody > tr[data-selected] > * {
+    --_state: var(--_active);
+  }
+
+  > tbody > tr[data-selected] > :first-child {
+    --_mark: #{token('primary')};
+  }
+
+  > tbody > tr[data-loading] > * {
+    vertical-align: middle;
+  }
+}
+
+.#{$prefix}-data-table__sort {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  inline-size: 100%;
+  min-block-size: $target-size;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+  border: 0;
+  border-radius: radius('sm');
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  @include transition(background-color, color);
+  @include focus-ring;
+
+  [data-align='center'] > & {
+    justify-content: center;
+  }
+
+  [data-align='end'] > & {
+    flex-direction: row-reverse;
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, #{token('text')} 9%, transparent);
+  }
+}
+
+.#{$prefix}-data-table__sort-icon {
+  flex-shrink: 0;
+  inline-size: 1em;
+  block-size: 1em;
+  color: token('text-muted');
+  opacity: 0.55;
+  @include transition(opacity, color);
+
+  .#{$prefix}-data-table__sort:hover &,
+  .#{$prefix}-data-table__sort:focus-visible & {
+    opacity: 1;
+  }
+
+  .#{$prefix}-data-table__sort[data-state] & {
+    color: token('primary-text');
+    opacity: 1;
+  }
+}
+
+.#{$prefix}-data-table__sort-priority {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.25em;
+  block-size: 1.25em;
+  border-radius: radius('full');
+  background: token('primary-soft');
+  color: token('primary-text');
+  font-size: token('text-xs');
+  font-weight: 700;
+  line-height: 1;
+}
+
+// Selection column: a narrow column whose checkbox keeps a 44px target. Rows that hold
+// controls stay at least 44px tall, even when compact (table cells treat height as a minimum).
+.#{$prefix}-data-table__table > :not(caption) > tr > .#{$prefix}-data-table__select {
+  inline-size: calc(#{$target-size} + var(--_pad-x));
+  block-size: $target-size;
+  padding-block: 0;
+  vertical-align: middle;
+
+  .#{$prefix}-check {
+    justify-content: center;
+    min-block-size: $target-size;
+    padding-block: 0;
+    align-items: center;
+    gap: 0;
+  }
+
+  .#{$prefix}-check__box {
+    margin-top: 0;
+  }
+
+  .#{$prefix}-check__input {
+    inset-block-start: 0;
+    inset-inline-start: 50%;
+    transform: translateX(calc(-50% * var(--#{$prefix}-dir)));
+  }
+
+  .#{$prefix}-check__text {
+    display: contents;
+  }
+}
+
+.#{$prefix}-data-table__table > thead > .#{$prefix}-data-table__filters > td {
+  padding-block-start: 0;
+  border-block-end-width: 2px;
+  border-block-end-color: token('border-strong');
+  font-weight: 400;
+}
+
+// The first header row loses its thick rule when a filter row sits under it.
+.#{$prefix}-data-table__table > thead > tr:has(+ .#{$prefix}-data-table__filters) > * {
+  border-block-end-width: 0;
+}
+
+.#{$prefix}-data-table__empty {
+  padding-block: 2.5rem;
+  color: token('text-muted');
+  text-align: center;
+}
+
+.#{$prefix}-data-table[data-readonly] .#{$prefix}-check__input {
+  cursor: default;
+}
+
+// ---------- Footer ----------
+.#{$prefix}-data-table__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+
+  > .#{$prefix}-pagination {
+    margin-inline-start: auto;
+  }
+}
+
+.#{$prefix}-data-table__page-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: token('text-sm');
+
+  > label {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  > .#{$prefix}-select {
+    inline-size: auto;
+    min-inline-size: 5.5rem;
+  }
+}
+
+.#{$prefix}-data-table__range {
+  color: token('text-muted');
+  font-size: token('text-sm');
+  font-variant-numeric: tabular-nums;
+}

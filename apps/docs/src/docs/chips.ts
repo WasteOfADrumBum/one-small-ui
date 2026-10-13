@@ -11,7 +11,7 @@ const doc: ComponentDoc = {
   importLine: "import { Chip, ChipGroup, ChipInput } from '@onesmall/ui';",
   examples: [
     { name: 'chips-basic', title: 'Tags, colors, icons, avatars and dismissible chips' },
-    { name: 'chips-input', title: 'Toggle chips and chip input', description: 'Selectable groups use aria-pressed; ChipInput turns typed text into chips.' },
+    { name: 'chips-input', title: 'Toggle chips and chip input', description: 'Selectable groups use aria-pressed; ChipInput turns typed text into chips. ChipInput is deprecated: use TagInput for new forms.' },
   ],
   props: [
     {

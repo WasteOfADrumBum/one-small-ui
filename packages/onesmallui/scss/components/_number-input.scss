@@ -1,0 +1,79 @@
+@use '../abstracts' as *;
+
+// ---------- NumberInput ----------
+// The root also carries `.os-input`, so sizes, borders, focus, validation, adornments
+// and floating labels come from _forms.scss. This adds the stepper buttons.
+.#{$prefix}-number-input {
+  // The stepper sits flush against the end edge.
+  &:not([data-hide-stepper]) {
+    padding-inline-end: 0;
+  }
+}
+
+.#{$prefix}-number-input__control {
+  font-variant-numeric: tabular-nums;
+}
+
+.#{$prefix}-number-input__stepper {
+  display: flex;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.#{$prefix}-number-input__button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: $target-size;
+  padding: 0;
+  border: 0;
+  border-inline-start: 1px solid token('border');
+  background: transparent;
+  color: token('text-muted');
+  font: inherit;
+  cursor: pointer;
+  // Press-and-hold: no double-tap zoom, text selection or callout menu on touch.
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: background-color dur('fast') ease('standard'), color dur('fast') ease('standard');
+  @include focus-ring;
+
+  svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  // Keep a 44px hit area on controls shorter than 44px (WCAG 2.5.5, AAA).
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block: min(0px, calc((var(--_h) - #{$target-size}) / 2));
+  }
+
+  &:last-child {
+    border-start-end-radius: calc(#{radius('md')} - 1px);
+    border-end-end-radius: calc(#{radius('md')} - 1px);
+  }
+
+  &:hover:not(:disabled) {
+    background: token('surface-3');
+    color: token('text');
+  }
+
+  &:active:not(:disabled) {
+    background: token('surface-2');
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .#{$prefix}-number-input[data-disabled] & {
+    // The wrapper already dims the whole control.
+    opacity: 1;
+  }
+}

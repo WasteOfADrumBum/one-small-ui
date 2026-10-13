@@ -39,6 +39,13 @@ export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
   responsive?: boolean;
   /** Accessible name for the scroll region when there is no `caption`. */
   regionLabel?: string;
+  /**
+   * Keep the header row visible while the rows scroll. It sticks to the nearest scrolling
+   * ancestor, so pair it with a height-capped scroll container (or the page).
+   */
+  stickyHeader?: boolean;
+  /** Cell padding: `compact`, `default` or `comfortable`. Rows that hold controls stay at least 44px tall. */
+  density?: 'compact' | 'default' | 'comfortable';
 }
 
 function assignRef<T>(ref: Ref<T> | undefined, value: T) {
@@ -93,6 +100,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
     stacked,
     responsive,
     regionLabel,
+    stickyHeader,
+    density = 'default',
     className,
     children,
     ...rest
@@ -128,6 +137,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
       data-color={color}
       data-caption={caption && captionSide === 'bottom' ? 'bottom' : undefined}
       data-stacked={stackAt}
+      data-sticky-header={stickyHeader || undefined}
+      data-density={density === 'default' ? undefined : density}
       {...rest}
     >
       {caption && <caption id={captionId}>{caption}</caption>}
