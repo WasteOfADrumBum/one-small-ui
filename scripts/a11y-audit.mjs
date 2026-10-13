@@ -10,6 +10,7 @@ import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { chromium } from 'playwright';
+import { writeReport } from './report-lib.mjs';
 
 const require = createRequire(import.meta.url);
 const axeSource = await readFile(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -50,6 +51,7 @@ const browser = await chromium.launch({
     : undefined,
 });
 let total = 0;
+const reportItems = [];
 for (const theme of ['dark', 'light']) {
   const context = await browser.newContext({ colorScheme: theme, reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
@@ -72,11 +74,22 @@ for (const theme of ['dark', 'light']) {
       console.log(`  FAIL ${tag}: [${v.impact}] ${v.id} — ${v.help}`);
       for (const n of v.nodes.slice(0, 3)) console.log(`         ${n.target.join(' ')}  ${n.failureSummary?.split('\n')[1] ?? ''}`);
     }
+    if (violations.length) {
+      reportItems.push({
+        title: tag,
+        details: violations.flatMap((v) => [
+          `[${v.impact}] ${v.id}: ${v.help}`,
+          ...v.nodes.slice(0, 5).map((n) => `  ${n.target.join(' ')}`),
+        ]),
+        screenshot: await page.screenshot({ fullPage: true }),
+      });
+    }
     if (shots) await page.screenshot({ path: join(shots, `${theme}-${route.replace('/', '-')}.png`), fullPage: true });
   }
   await context.close();
 }
 await browser.close();
 server.close();
+if (total) await writeReport('a11y', reportItems, `${total} violation(s)`);
 console.log(total ? `\n${total} violation(s).` : '\nNo axe violations at WCAG A, AA or AAA.');
 process.exit(total ? 1 : 0);

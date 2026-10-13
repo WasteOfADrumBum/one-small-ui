@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
 import react from '@vitejs/plugin-react';
 import { chromium } from 'playwright';
+import { writeReport } from './report-lib.mjs';
 
 const fixtureRoot = fileURLToPath(new URL('../packages/onesmallui/test/layout/', import.meta.url));
 const outDir = await mkdtemp(join(tmpdir(), 'os-layout-'));
@@ -37,12 +38,19 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const failures = [];
+const shots = new Map();
 let passed = 0;
+let current = '';
 const check = (ok, message) => {
   if (ok) passed++;
-  else failures.push(message);
+  else {
+    failures.push(message);
+    // One screenshot per failing fixture, taken while the page still shows it.
+    if (!shots.has(current)) shots.set(current, page.screenshot({ fullPage: true }));
+  }
 };
 const open = async (fixture) => {
+  current = fixture;
   await page.goto(`${base}?fixture=${fixture}`, { waitUntil: 'networkidle' });
   // Let images decode and React swap broken ones for initials.
   await page.waitForFunction(() => Array.from(document.images).every((i) => i.complete));
@@ -119,6 +127,11 @@ check(Math.abs(table.pinned) < 1, `data-table: header is ${table.pinned}px from 
 check(table.onTop, 'data-table: body content paints over the sticky header');
 check(!/rgba\(.*, 0\)|transparent/.test(table.bg), `data-table: sticky header background is transparent (${table.bg})`);
 
+if (failures.length) {
+  const items = [{ title: 'Failed checks', details: failures }];
+  for (const [fixture, shot] of shots) items.push({ title: `Fixture: ${fixture}`, screenshot: await shot });
+  await writeReport('layout', items, `${failures.length} failed, ${passed} passed`);
+}
 await browser.close();
 server.close();
 await rm(outDir, { recursive: true, force: true });
