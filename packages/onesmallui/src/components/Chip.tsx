@@ -2,6 +2,7 @@ import {
   createContext,
   forwardRef,
   useContext,
+  useEffect,
   useId,
   useRef,
   useState,
@@ -237,6 +238,17 @@ export function chipKeyNav(e: KeyboardEvent<HTMLElement>, onLeaveEnd?: () => voi
 
 // ---------- ChipInput ----------
 
+// Consumer bundlers replace `process.env.NODE_ENV`; unbundled ESM has no `process`, so stay quiet there.
+declare const process: { env: { NODE_ENV?: string } };
+const isDev = () => {
+  try {
+    return process.env.NODE_ENV !== 'production';
+  } catch {
+    return false;
+  }
+};
+let chipInputWarned = false;
+
 /** @deprecated Use `TagInput` and `TagInputProps`. */
 export interface ChipInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'defaultValue' | 'onChange'> {
@@ -266,7 +278,8 @@ export interface ChipInputProps
 
 /**
  * @deprecated Use `TagInput`, which adds suggestions, a suggestions-only mode, case-insensitive
- * dedupe and announcements through `useAnnouncer`. ChipInput keeps working unchanged.
+ * dedupe and announcements through `useAnnouncer`. ChipInput keeps working unchanged until it is
+ * removed in 1.0.0.
  *
  * A text input that turns entries into chips. Type and press Enter or a comma to add,
  * paste a comma-separated list to add many, Backspace in the empty input removes the
@@ -295,6 +308,11 @@ export const ChipInput = forwardRef<HTMLInputElement, ChipInputProps>(function C
   },
   ref,
 ) {
+  useEffect(() => {
+    if (chipInputWarned || !isDev()) return;
+    chipInputWarned = true;
+    console.warn('[@onesmall/ui] ChipInput is deprecated and will be removed in 1.0.0. Use TagInput instead.');
+  }, []);
   const field = useFieldContext();
   const [chips, setChips] = useControllableState<string[]>(value, defaultValue, onValueChange);
   const [draft, setDraft] = useState('');

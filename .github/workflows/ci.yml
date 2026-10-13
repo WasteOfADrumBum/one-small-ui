@@ -27,3 +27,44 @@ jobs:
         run: npm run check
       - name: Build (library and docs)
         run: npm run build
+
+  # Browser checks run on Ubuntu only. Each suite is its own job, so "Playwright (layout)" and
+  # "Playwright (a11y)" are stable names for branch protection.
+  playwright:
+    name: Playwright (${{ matrix.suite }})
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [layout, a11y]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      # Runs on a cache hit too: the browser download is skipped but the OS packages still install.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build (library and docs)
+        run: npm run build
+      - name: Test (${{ matrix.suite }})
+        run: npm run test:${{ matrix.suite }}
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.suite }}
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14

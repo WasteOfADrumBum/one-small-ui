@@ -3,6 +3,13 @@
 All notable changes to `@onesmall/ui` are documented here. This project follows
 [Semantic Versioning](https://semver.org/) and the [Keep a Changelog](https://keepachangelog.com/) format.
 
+## [Unreleased]
+
+### Deprecated
+
+- `ChipInput` will be removed in 1.0.0. It now logs a one-time `console.warn` in development builds
+  (nothing in production) pointing to `TagInput`.
+
 ## [0.3.0] - 2026-10-13
 
 ### Added
