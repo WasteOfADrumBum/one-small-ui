@@ -7,6 +7,7 @@
 @use 'forms';
 @use 'overlay';
 @use 'navigation';
+@use 'sidebar';
 @use 'layout';
 @use 'media';
 @use 'dropzone';
@@ -19,6 +20,7 @@
 @use 'collapse';
 @use 'transition';
 @use 'list-group';
+@use 'tree';
 @use 'pagination';
 @use 'stepper';
 @use 'table';
@@ -38,6 +40,7 @@
 @use 'password-strength';
 @use 'dialog';
 @use 'menu';
+@use 'context-menu';
 @use 'popover';
 @use 'carousel';
 @use 'forced-colors';

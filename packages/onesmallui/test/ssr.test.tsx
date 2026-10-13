@@ -6,18 +6,29 @@ import {
   AnnouncerProvider,
   Collapse,
   CommandPalette,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
   DataTable,
   Dialog,
   Field,
   Kbd,
+  MenuItem,
   NumberInput,
   TagInput,
   TimePicker,
   LiveRegion,
   Portal,
+  Sidebar,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSection,
+  SidebarToggle,
   SkipLink,
   ToastProvider,
   Transition,
+  TreeView,
   useAnnouncer,
   useFocusReturn,
   useFocusTrap,
@@ -118,5 +129,61 @@ describe('SSR', () => {
     const html = renderToString(<Shortcut />);
     expect(html).toContain('data-platform="other"');
     expect(html).toContain('Control K');
+  });
+
+  it('renders TreeView with selection, checkboxes and lazy nodes on the server', () => {
+    const items = [
+      { id: 'docs', label: 'Documents', children: [{ id: 'cv', label: 'CV.pdf', href: '/cv' }] },
+      { id: 'remote', label: 'Remote', hasChildren: true },
+    ];
+    const html = renderToString(
+      <AnnouncerProvider>
+        <TreeView aria-label="Files" items={items} defaultExpandedKeys={['docs']} defaultSelectedKeys={['cv']} />
+        <TreeView aria-label="Checks" items={items} checkboxes defaultCheckedKeys={['cv']} loadChildren={async () => []} />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('role="tree"');
+    expect(html).toContain('aria-selected="true"');
+    expect(html).toContain('aria-checked="true"');
+    expect(html).toContain('href="/cv"');
+  });
+
+  it('renders an open ContextMenu without touching the DOM', () => {
+    const html = renderToString(
+      <ContextMenu defaultOpen>
+        <ContextMenuTrigger>
+          <button type="button">Cargo</button>
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="Cargo actions">
+          <MenuItem>Inspect</MenuItem>
+        </ContextMenuContent>
+      </ContextMenu>,
+    );
+    expect(html).toContain('data-context-menu-trigger');
+    expect(html).toContain('role="menu"');
+    expect(html).toContain('os-context-menu');
+  });
+  it('renders Sidebar inline (never the drawer) and reads no storage on the server', () => {
+    const html = renderToString(
+      <Sidebar aria-label="App" persistKey="app-sidebar">
+        <SidebarHeader>
+          <SidebarToggle />
+        </SidebarHeader>
+        <SidebarSection heading="Workspace">
+          <SidebarItem href="/" active>
+            Home
+          </SidebarItem>
+          <SidebarGroup label="Settings">
+            <SidebarItem href="/profile">Profile</SidebarItem>
+          </SidebarGroup>
+        </SidebarSection>
+      </Sidebar>,
+    );
+    expect(html).toContain('<nav');
+    expect(html).toContain('data-mode="expanded"');
+    expect(html).toContain('data-drawer-below="lg"');
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain('aria-label="Collapse sidebar"');
+    expect(html).not.toContain('<dialog');
   });
 });

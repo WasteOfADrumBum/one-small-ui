@@ -1,3 +1,4 @@
+import { Alert } from '@onesmall/ui';
 import type { ComponentDoc } from '../site/componentDocs';
 import { Code } from '../site/Code';
 import { Example } from '../site/Example';
@@ -9,6 +10,11 @@ export function ComponentPage({ doc }: { doc: ComponentDoc }) {
       <p className="docs-eyebrow">{doc.group}</p>
       <h1>{doc.name}</h1>
       <p className="docs-lead">{doc.summary}</p>
+      {doc.callout && (
+        <Alert color={doc.callout.color ?? 'warning'} title={doc.callout.title} live="off" className="os-mb-6">
+          {doc.callout.body}
+        </Alert>
+      )}
       {doc.importLine && <Code language="tsx" title="Import" code={doc.importLine} />}
 
       {doc.examples.length > 0 && (

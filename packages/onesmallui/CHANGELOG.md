@@ -28,6 +28,38 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   scorer behind CommandPalette. Word starts and consecutive runs score higher, and it returns the matched
   indices for highlighting.
 - `npm run test:layout` checks that CommandPalette fits the viewport at 360px, 768px and desktop widths.
+- `TreeView`, a hierarchical list on the WAI-ARIA tree view pattern (`ul role="tree"` → `li role="treeitem"` →
+  `ul role="group"` with `aria-level`, `aria-setsize` and `aria-posinset`). It has roving focus, arrow keys
+  (swapped in RTL), Home/End, `*` to open siblings and a 600ms typeahead. Selection is `none`, `single` or
+  `multiple` (Shift + Arrow and Shift + click ranges, Ctrl/Cmd + A), and `checkboxes` adds tri-state
+  checkboxes where leaf keys are the source of truth and parents report `mixed`. Expanded, selected and
+  checked keys can be controlled. `loadChildren` loads children lazily, with `aria-busy`, a loading row, an
+  error row with Retry and announcements through `useAnnouncer`. Nodes take an `icon`, and nodes with `href`
+  render links that accept `as`/`render` (or the tree-wide `linkAs`) for router links such as Next.js `Link`.
+  Rows are memoized and subscribe to their own state, so a focus move re-renders two rows even in trees with
+  thousands of open nodes.
+- `ContextMenu`, `ContextMenuTrigger` and `ContextMenuContent`: a menu that opens on right-click, Shift+F10, the
+  Menu key or a touch long press (`longPressDelay`, 500ms by default, cancelled by moving, lifting or scrolling).
+  It opens at the pointer, or at the focused element from the keyboard, through `useFloating` with a virtual
+  anchor, and flips, shifts and caps its height so it stays inside the viewport. Items are Menu's own, so
+  checkbox and radio items, groups, separators, submenus, typeahead and disabled items behave as they do in
+  `Menu`. Escape and outside clicks return focus to the target. `disabled` attaches nothing, so the browser's
+  menu shows. The docs say plainly that every action also needs a visible button, Menu or keyboard shortcut.
+- `Sidebar`, app navigation in a `<nav>` landmark (`aria-label` or `aria-labelledby` is required by the
+  types). It is expanded, collapsed to an icon rail, or a `Drawer` (`placement="start"`) below `drawerBelow`
+  (default `lg`, `false` to disable), so the drawer gets the focus trap, scroll lock and focus return of the
+  other overlays and closes when a link is followed. `collapsed` and `mobileOpen` are controllable, and the
+  opt-in `persistKey` remembers the collapsed state in `localStorage` (read after mount, errors ignored). Its
+  parts are `SidebarHeader`, `SidebarFooter`, `SidebarSection` (a real heading that names its list) and
+  `SidebarItem`, which sets `aria-current="page"`, takes `icon`, `badge` and `disabled`, and renders your
+  router's link through `as` or `render`. `SidebarGroup` is a disclosure button over `Collapse`; in the rail
+  it expands the sidebar and opens the group. Rail items keep their names and show labels in a tooltip on
+  hover and focus, mirrored in RTL. `SidebarToggle` sets `aria-expanded` and `aria-controls` and names the
+  action; with `SidebarProvider` and `useSidebar()` it can live outside the sidebar, for example in a
+  `Navbar`. Widths come from `--os-sidebar-width` and `--os-sidebar-rail-width`, animated with the motion
+  tokens.
+- `Tooltip` `describe={false}`: a visual-only tooltip for a trigger whose accessible name already says the
+  same text. It adds no `aria-describedby` and is hidden from assistive tech. The default is unchanged.
 
 ### Deprecated
 

@@ -19,10 +19,11 @@ export default tseslint.config(
         'error',
         { tags: [], roles: ['tabpanel', 'region'], allowExpressionValues: true },
       ],
-      // <table role="grid"> with gridcells (APG Date Picker Dialog); <fieldset role="radiogroup">.
+      // <table role="grid"> with gridcells (APG Date Picker Dialog); <fieldset role="radiogroup">;
+      // <ul role="tree"> with <li role="treeitem"> (APG Tree View).
       'jsx-a11y/no-noninteractive-element-to-interactive-role': [
         'error',
-        { table: ['grid'], td: ['gridcell'], fieldset: ['radiogroup'] },
+        { table: ['grid'], td: ['gridcell'], fieldset: ['radiogroup'], ul: ['tree'], li: ['treeitem'] },
       ],
       // Still flags the DOM autoFocus attribute; a component prop named autoFocus is not that attribute.
       'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],

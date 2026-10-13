@@ -47,6 +47,9 @@ import {
   Combobox,
   CommandPalette,
   Container,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
   DatePicker,
   Dialog,
   Drawer,
@@ -92,6 +95,13 @@ import {
   Range,
   ScrollSpy,
   Select,
+  Sidebar,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSection,
+  SidebarToggle,
   Skeleton,
   SkipLink,
   SortableList,
@@ -121,6 +131,7 @@ import {
   Tooltip,
   TooltipProvider,
   Transition,
+  TreeView,
   Video,
   VisuallyHidden,
 } from '../src';
@@ -267,6 +278,28 @@ const cases: Record<string, () => ReactElement> = {
     <Field label="Planet">
       <Combobox options={options} defaultValue="mars" />
     </Field>
+  ),
+  ContextMenu: () => (
+    <ContextMenu defaultOpen>
+      <ContextMenuTrigger>
+        <button type="button">Cargo manifest</button>
+      </ContextMenuTrigger>
+      <ContextMenuContent aria-label="Manifest actions">
+        <MenuItem shortcut="Ctrl+C">Copy</MenuItem>
+        <MenuItem disabled>Jettison</MenuItem>
+        <MenuDivider />
+        <MenuCheckboxItem checked onCheckedChange={() => {}}>
+          Pinned
+        </MenuCheckboxItem>
+        <MenuRadioGroup label="Sort by" value="mass" onValueChange={() => {}}>
+          <MenuRadioItem value="mass">Mass</MenuRadioItem>
+          <MenuRadioItem value="name">Name</MenuRadioItem>
+        </MenuRadioGroup>
+        <MenuSub label="Share">
+          <MenuItem>Copy link</MenuItem>
+        </MenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
   ),
   DatePicker: () => (
     <>
@@ -463,6 +496,28 @@ const cases: Record<string, () => ReactElement> = {
       <Select placeholder="Choose" options={options} />
     </Field>
   ),
+  Sidebar: () => (
+    <Sidebar aria-label="App" defaultCollapsed>
+      <SidebarHeader>
+        <SidebarToggle />
+      </SidebarHeader>
+      <SidebarSection heading="Workspace">
+        <SidebarItem href="/" icon={<InfoIcon />} active badge="2">
+          Overview
+        </SidebarItem>
+        <SidebarGroup label="Search" icon={<SearchIcon />}>
+          <SidebarItem href="/search/saved">Saved</SidebarItem>
+        </SidebarGroup>
+      </SidebarSection>
+      <SidebarFooter>
+        <SidebarSection>
+          <SidebarItem href="/help" disabled>
+            Help
+          </SidebarItem>
+        </SidebarSection>
+      </SidebarFooter>
+    </Sidebar>
+  ),
   Skeleton: () => (
     <div role="group" aria-busy="true" aria-label="Loading profile">
       <Skeleton shape="circle" />
@@ -638,6 +693,35 @@ const cases: Record<string, () => ReactElement> = {
         },
       ]}
     />
+  ),
+  TreeView: () => (
+    <AnnouncerProvider>
+      <TreeView
+        aria-label="Files"
+        selectionMode="multiple"
+        items={[
+          {
+            id: 'docs',
+            label: 'Documents',
+            icon: <InfoIcon />,
+            children: [
+              { id: 'cv', label: 'CV.pdf' },
+              { id: 'old', label: 'Old.pdf', disabled: true },
+            ],
+          },
+          { id: 'home', label: 'Home', href: '#home' },
+        ]}
+        defaultExpandedKeys={['docs']}
+        defaultSelectedKeys={['cv']}
+      />
+      <TreeView
+        aria-label="Sync"
+        checkboxes
+        items={[{ id: 'a', label: 'Album', children: [{ id: 'a1', label: 'Track 1' }, { id: 'a2', label: 'Track 2' }] }]}
+        defaultExpandedKeys={['a']}
+        defaultCheckedKeys={['a1']}
+      />
+    </AnnouncerProvider>
   ),
   Kbd: () => (
     <p>
