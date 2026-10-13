@@ -14,6 +14,21 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   platform-aware `Mod` key. It ignores text fields, selects, contenteditable and IME composition unless
   `allowInInputs`, and removes its listener on unmount.
 - Hotkey helpers `parseHotkey`, `matchesHotkey`, `formatHotkey`, `isApplePlatform` and `isEditableTarget`.
+- `Sidebar`, app navigation in a `<nav>` landmark (`aria-label` or `aria-labelledby` is required by the
+  types). It is expanded, collapsed to an icon rail, or a `Drawer` (`placement="start"`) below `drawerBelow`
+  (default `lg`, `false` to disable), so the drawer gets the focus trap, scroll lock and focus return of the
+  other overlays and closes when a link is followed. `collapsed` and `mobileOpen` are controllable, and the
+  opt-in `persistKey` remembers the collapsed state in `localStorage` (read after mount, errors ignored). Its
+  parts are `SidebarHeader`, `SidebarFooter`, `SidebarSection` (a real heading that names its list) and
+  `SidebarItem`, which sets `aria-current="page"`, takes `icon`, `badge` and `disabled`, and renders your
+  router's link through `as` or `render`. `SidebarGroup` is a disclosure button over `Collapse`; in the rail
+  it expands the sidebar and opens the group. Rail items keep their names and show labels in a tooltip on
+  hover and focus, mirrored in RTL. `SidebarToggle` sets `aria-expanded` and `aria-controls` and names the
+  action; with `SidebarProvider` and `useSidebar()` it can live outside the sidebar, for example in a
+  `Navbar`. Widths come from `--os-sidebar-width` and `--os-sidebar-rail-width`, animated with the motion
+  tokens.
+- `Tooltip` `describe={false}`: a visual-only tooltip for a trigger whose accessible name already says the
+  same text. It adds no `aria-describedby` and is hidden from assistive tech. The default is unchanged.
 
 ### Deprecated
 

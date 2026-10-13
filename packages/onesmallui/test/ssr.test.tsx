@@ -14,6 +14,12 @@ import {
   TimePicker,
   LiveRegion,
   Portal,
+  Sidebar,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSection,
+  SidebarToggle,
   SkipLink,
   ToastProvider,
   Transition,
@@ -103,5 +109,28 @@ describe('SSR', () => {
     const html = renderToString(<Shortcut />);
     expect(html).toContain('data-platform="other"');
     expect(html).toContain('Control K');
+  });
+  it('renders Sidebar inline (never the drawer) and reads no storage on the server', () => {
+    const html = renderToString(
+      <Sidebar aria-label="App" persistKey="app-sidebar">
+        <SidebarHeader>
+          <SidebarToggle />
+        </SidebarHeader>
+        <SidebarSection heading="Workspace">
+          <SidebarItem href="/" active>
+            Home
+          </SidebarItem>
+          <SidebarGroup label="Settings">
+            <SidebarItem href="/profile">Profile</SidebarItem>
+          </SidebarGroup>
+        </SidebarSection>
+      </Sidebar>,
+    );
+    expect(html).toContain('<nav');
+    expect(html).toContain('data-mode="expanded"');
+    expect(html).toContain('data-drawer-below="lg"');
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain('aria-label="Collapse sidebar"');
+    expect(html).not.toContain('<dialog');
   });
 });

@@ -1,0 +1,295 @@
+@use '../abstracts' as *;
+
+// ---------- Sidebar ----------
+// Widths are custom properties, so an app can set them once on any ancestor:
+//   :root { --os-sidebar-width: 18rem; --os-sidebar-rail-width: 4.5rem; }
+// `data-mode` is expanded | collapsed | drawer. `data-state` follows the shared transition
+// vocabulary for the expansion: `open` is full width, `closing` animates to the rail, `closed` is the rail.
+.#{$prefix}-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  inline-size: var(--#{$prefix}-sidebar-width, 16rem);
+  max-inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  border-inline-end: 1px solid token('border');
+  background: token('surface');
+  color: token('text');
+  overflow: hidden;
+  transition: inline-size dur('base') ease('standard');
+
+  &[data-mode='collapsed'] {
+    inline-size: var(--#{$prefix}-sidebar-rail-width, 4.5rem);
+  }
+
+  // Inside the drawer the panel sets the size.
+  &[data-mode='drawer'] {
+    inline-size: auto;
+    block-size: auto;
+    border: 0;
+    background: transparent;
+    transition: none;
+  }
+}
+
+// Before hydration (and with JS off) the inline sidebar stays hidden below its breakpoint,
+// where the client renders the drawer instead.
+@each $bp in ('sm', 'md', 'lg', 'xl', '2xl', '3xl') {
+  @include down($bp) {
+    .#{$prefix}-sidebar[data-drawer-below='#{$bp}']:not([data-mode='drawer']) {
+      display: none;
+    }
+  }
+}
+
+.#{$prefix}-sidebar__header,
+.#{$prefix}-sidebar__footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 4rem;
+  padding-block: 0.75rem;
+  padding-inline: 0.75rem;
+  overflow: hidden;
+
+  .#{$prefix}-sidebar[data-mode='collapsed'] > & {
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.#{$prefix}-sidebar__header {
+  border-block-end: 1px solid token('border');
+  font-family: var(--#{$prefix}-font-display);
+  font-weight: 700;
+}
+
+.#{$prefix}-sidebar__footer {
+  border-block-start: 1px solid token('border');
+}
+
+.#{$prefix}-sidebar__body {
+  flex: 1;
+  min-block-size: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-block: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.#{$prefix}-sidebar__section {
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+
+  .#{$prefix}-sidebar[data-mode='collapsed'] & + & {
+    margin-block-start: 0.25rem;
+    padding-block-start: 0.5rem;
+    border-block-start: 1px solid token('border');
+  }
+}
+
+.#{$prefix}-sidebar__heading {
+  margin: 0;
+  padding-block: 0.75rem 0.25rem;
+  padding-inline: 0.875rem;
+  color: token('text-muted');
+  font-family: inherit;
+  font-size: token('text-xs');
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity dur('fast') ease('standard');
+
+  .#{$prefix}-sidebar[data-state='closing'] & {
+    opacity: 0;
+  }
+
+  // Rail: still a heading for screen readers; sections are divided by a rule instead.
+  .#{$prefix}-sidebar[data-state='closed'] & {
+    @include visually-hidden;
+  }
+}
+
+.#{$prefix}-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &[data-nested] {
+    padding-block: 0.125rem;
+    padding-inline-start: 1.25rem;
+  }
+}
+
+.#{$prefix}-sidebar__item {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+// The tooltip wrapper must not change the link's box.
+.#{$prefix}-sidebar__tip {
+  display: flex;
+}
+
+.#{$prefix}-sidebar__link {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.75rem;
+  min-inline-size: 0;
+  min-block-size: $target-size;
+  // The same start padding in both modes keeps the icon still while the width animates.
+  padding-inline: 0.875rem 0.75rem;
+  border: 0;
+  border-radius: radius('md');
+  background: transparent;
+  color: token('text-muted');
+  font: inherit;
+  font-size: token('text-sm');
+  font-weight: 600;
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  @include transition(color, background-color);
+  @include focus-ring;
+
+  &:hover:not([data-disabled]) {
+    background: token('surface-2');
+    color: token('text');
+  }
+
+  &[data-active] {
+    color: token('text');
+  }
+
+  // Current page: tinted fill plus a start-edge bar, so it isn't shown by color alone.
+  &[aria-current='page'] {
+    background: token('primary-soft');
+    color: token('primary-text');
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block: 0.5rem;
+      inset-inline-start: 0;
+      inline-size: 3px;
+      border-radius: 3px;
+      background: token('primary');
+    }
+  }
+
+  &[data-disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.#{$prefix}-sidebar__icon,
+.#{$prefix}-sidebar__abbr {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.25rem;
+
+  svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+}
+
+// Letter shown in the rail for items without an icon.
+.#{$prefix}-sidebar__abbr {
+  display: none;
+  font-weight: 700;
+
+  .#{$prefix}-sidebar[data-mode='collapsed'] & {
+    display: inline-flex;
+  }
+}
+
+.#{$prefix}-sidebar__label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity dur('fast') ease('standard');
+
+  .#{$prefix}-sidebar[data-state='closing'] &,
+  .#{$prefix}-sidebar[data-state='closed'] & {
+    opacity: 0;
+  }
+
+  // Rail: the label leaves the layout but keeps the accessible name.
+  .#{$prefix}-sidebar[data-state='closed'] & {
+    @include visually-hidden;
+  }
+}
+
+.#{$prefix}-sidebar__badge {
+  flex-shrink: 0;
+  min-inline-size: 1.5rem;
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background: token('primary');
+  color: token('on-primary');
+  font-size: token('text-xs');
+  font-weight: 700;
+  line-height: 1.5rem;
+  text-align: center;
+
+  // Rail: a dot on the icon's corner; the text stays in the link's name.
+  .#{$prefix}-sidebar[data-state='closed'] & {
+    position: absolute;
+    inset-block-start: 0.4rem;
+    inset-inline-start: 1.8rem;
+    min-inline-size: 0.6rem;
+    block-size: 0.6rem;
+    padding: 0;
+    overflow: hidden;
+    color: transparent;
+    line-height: 0;
+    box-shadow: 0 0 0 2px token('surface');
+  }
+}
+
+.#{$prefix}-sidebar__chevron {
+  flex-shrink: 0;
+  inline-size: 1rem;
+  block-size: 1rem;
+  @include transition(transform);
+
+  [aria-expanded='true'] > & {
+    transform: rotate(180deg);
+  }
+
+  .#{$prefix}-sidebar[data-state='closing'] &,
+  .#{$prefix}-sidebar[data-state='closed'] & {
+    display: none;
+  }
+}
+
+// Drawer below the breakpoint: the sidebar's sections fill the drawer body edge to edge.
+.#{$prefix}-sidebar-drawer .#{$prefix}-drawer__body {
+  padding: 0;
+}
+
+// Toggle: the chevron points to where the sidebar will go, mirrored in RTL.
+.#{$prefix}-sidebar-toggle:not([data-mode='drawer']) svg {
+  scale: var(--#{$prefix}-dir) 1;
+  @include transition(scale);
+}
+
+.#{$prefix}-sidebar-toggle[data-mode='collapsed'] svg {
+  scale: calc(-1 * var(--#{$prefix}-dir)) 1;
+}

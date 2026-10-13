@@ -91,6 +91,13 @@ import {
   Range,
   ScrollSpy,
   Select,
+  Sidebar,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSection,
+  SidebarToggle,
   Skeleton,
   SkipLink,
   SortableList,
@@ -461,6 +468,28 @@ const cases: Record<string, () => ReactElement> = {
     <Field label="Planet">
       <Select placeholder="Choose" options={options} />
     </Field>
+  ),
+  Sidebar: () => (
+    <Sidebar aria-label="App" defaultCollapsed>
+      <SidebarHeader>
+        <SidebarToggle />
+      </SidebarHeader>
+      <SidebarSection heading="Workspace">
+        <SidebarItem href="/" icon={<InfoIcon />} active badge="2">
+          Overview
+        </SidebarItem>
+        <SidebarGroup label="Search" icon={<SearchIcon />}>
+          <SidebarItem href="/search/saved">Saved</SidebarItem>
+        </SidebarGroup>
+      </SidebarSection>
+      <SidebarFooter>
+        <SidebarSection>
+          <SidebarItem href="/help" disabled>
+            Help
+          </SidebarItem>
+        </SidebarSection>
+      </SidebarFooter>
+    </Sidebar>
   ),
   Skeleton: () => (
     <div role="group" aria-busy="true" aria-label="Loading profile">
