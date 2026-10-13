@@ -17,6 +17,8 @@ export * from './CloseButton';
 export * from './CodeBlock';
 export * from './Collapse';
 export * from './Combobox';
+export { DataTable } from './DataTable';
+export type { DataTableColumn, DataTableDensity, DataTableLabels, DataTableProps, SortDirection, SortRule } from './DataTable';
 export * from './DatePicker';
 export * from './Dialog';
 export * from './Drawer';
