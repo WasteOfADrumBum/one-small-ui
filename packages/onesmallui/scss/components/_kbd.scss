@@ -1,0 +1,48 @@
+@use '../abstracts' as *;
+
+// ---------- Kbd ----------
+// The bare `kbd` element is styled in base/_reset.scss; `.os-kbd` adds sizes and combos.
+.#{$prefix}-kbd {
+  --_fs: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  min-inline-size: 1.5em;
+  padding-block: 0.1em;
+  padding-inline: 0.4em;
+  border: 1px solid token('border-strong');
+  border-block-end-width: 2px;
+  border-radius: radius('sm');
+  background: token('surface');
+  color: token('text');
+  font-family: token('font-mono');
+  font-size: var(--_fs);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  vertical-align: baseline;
+  justify-content: center;
+
+  &[data-size='sm'] {
+    --_fs: 0.75rem;
+  }
+
+  &[data-size='lg'] {
+    --_fs: 0.9375rem;
+  }
+}
+
+.#{$prefix}-kbd__keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
+// Nested keys inherit the outer key's box.
+.#{$prefix}-kbd__key {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}

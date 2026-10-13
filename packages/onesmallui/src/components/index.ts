@@ -27,6 +27,7 @@ export * from './Field';
 export * from './Form';
 export * from './Input';
 export * from './InputGroup';
+export * from './Kbd';
 export * from './Layout';
 export * from './ListGroup';
 export * from './Media';
