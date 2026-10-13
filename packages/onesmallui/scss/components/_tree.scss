@@ -1,0 +1,198 @@
+@use '../abstracts' as *;
+
+// ---------- TreeView ----------
+// <ul role="tree"> → <li role="treeitem" class="os-tree__item"> → .os-tree__row + <ul role="group">.
+// The item takes focus, so the focus ring and the selected look are drawn on its own row,
+// not around its whole subtree.
+.#{$prefix}-tree {
+  --_indent: 1.5rem;
+  --_box: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: token('text');
+
+  &[data-size='sm'] {
+    --_indent: 1.25rem;
+    --_box: 1.125rem;
+    font-size: token('text-sm');
+  }
+
+  &[data-size='lg'] {
+    --_indent: 1.75rem;
+    --_box: 1.5rem;
+    font-size: token('text-lg');
+  }
+}
+
+.#{$prefix}-tree__group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.#{$prefix}-tree__item {
+  outline: none;
+}
+
+.#{$prefix}-tree__row {
+  display: flex;
+  align-items: center;
+  min-block-size: $target-size;
+  padding-inline-start: calc((var(--_level, 1) - 1) * var(--_indent));
+  padding-inline-end: 0.75rem;
+  border-radius: radius('md');
+  cursor: pointer;
+  user-select: none;
+  @include transition(background-color, color);
+
+  &:hover {
+    background: token('surface-2');
+  }
+}
+
+.#{$prefix}-tree__item:focus-visible > .#{$prefix}-tree__row {
+  outline: 3px solid token('focus');
+  outline-offset: -3px;
+  box-shadow: 0 0 0 6px token('glow');
+}
+
+.#{$prefix}-tree__item[aria-selected='true'] > .#{$prefix}-tree__row {
+  background: token('primary-soft');
+  color: token('primary-text');
+  font-weight: 600;
+}
+
+.#{$prefix}-tree__item[aria-disabled='true'] > .#{$prefix}-tree__row {
+  color: token('text-muted');
+  cursor: not-allowed;
+
+  .#{$prefix}-tree__label {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+}
+
+// A full 44×44 target for the expand / collapse chevron; leaves keep the space for alignment.
+.#{$prefix}-tree__toggle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  inline-size: $target-size;
+  block-size: $target-size;
+  color: token('text-muted');
+
+  svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    transform: scaleX(var(--#{$prefix}-dir));
+    transition: transform dur('base') ease('standard');
+  }
+}
+
+.#{$prefix}-tree__item[aria-expanded='true'] > .#{$prefix}-tree__row > .#{$prefix}-tree__toggle svg {
+  transform: rotate(90deg);
+}
+
+// Decorative tri-state box; the item itself carries aria-checked.
+.#{$prefix}-tree__check {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  inline-size: var(--_box);
+  block-size: var(--_box);
+  margin-inline-end: 0.5rem;
+  border: 2px solid token('border-strong');
+  border-radius: radius('sm');
+  background: token('surface');
+  color: token('on-primary');
+  transition: background-color dur('base') ease('standard'), border-color dur('base') ease('standard');
+
+  svg {
+    inline-size: calc(var(--_box) * 0.7);
+    block-size: calc(var(--_box) * 0.7);
+  }
+
+  path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    transition: stroke-dashoffset dur('slow') ease('standard');
+  }
+}
+
+.#{$prefix}-tree__item[aria-checked='true'] > .#{$prefix}-tree__row > .#{$prefix}-tree__check,
+.#{$prefix}-tree__item[aria-checked='mixed'] > .#{$prefix}-tree__row > .#{$prefix}-tree__check {
+  // The border uses the text-strength color so the box keeps 3:1 against the surface.
+  border-color: token('primary-text');
+  background: token('primary');
+}
+
+.#{$prefix}-tree__item[aria-checked='true'] > .#{$prefix}-tree__row .#{$prefix}-tree__tick,
+.#{$prefix}-tree__item[aria-checked='mixed'] > .#{$prefix}-tree__row .#{$prefix}-tree__dash {
+  stroke-dashoffset: 0;
+}
+
+.#{$prefix}-tree__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-inline-end: 0.5rem;
+  color: token('text-muted');
+
+  [aria-selected='true'] > .#{$prefix}-tree__row > & {
+    color: inherit;
+  }
+
+  svg {
+    inline-size: 1.125em;
+    block-size: 1.125em;
+  }
+}
+
+.#{$prefix}-tree__label {
+  flex: 1;
+  min-inline-size: 0;
+  padding-block: 0.375rem;
+  overflow-wrap: anywhere;
+}
+
+.#{$prefix}-tree__link {
+  color: inherit;
+  text-decoration: none;
+
+  .#{$prefix}-tree__row:hover & {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+// Loading and error rows under a lazy parent.
+.#{$prefix}-tree__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: $target-size;
+  padding-inline-start: calc((var(--_level, 1) - 1) * var(--_indent) + #{$target-size});
+  padding-inline-end: 0.75rem;
+  color: token('text-muted');
+  font-size: token('text-sm');
+
+  &[data-error] {
+    color: token('danger-text');
+  }
+}
+
+.#{$prefix}-tree__status-icon {
+  flex-shrink: 0;
+}
+
+@media (forced-colors: active) {
+  .#{$prefix}-tree__item[aria-selected='true'] > .#{$prefix}-tree__row,
+  .#{$prefix}-tree__item[aria-checked='true'] > .#{$prefix}-tree__row > .#{$prefix}-tree__check,
+  .#{$prefix}-tree__item[aria-checked='mixed'] > .#{$prefix}-tree__row > .#{$prefix}-tree__check {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
