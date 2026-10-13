@@ -57,13 +57,13 @@ export function App() {
 
 **Actions:** Button, ButtonGroup, ButtonToolbar, ToggleButton, ToggleButtonGroup, CloseButton, Toggler
 
-**Forms:** Field, FieldGroup, FloatingLabel, Form, Input, InputGroup, Textarea, Select, Combobox, Checkbox, Radio / RadioGroup, Switch, Range, DatePicker, Calendar, OtpInput, PasswordStrength, ChipInput, DropZone
+**Forms:** Field, FieldGroup, FloatingLabel, Form, Input, InputGroup, NumberInput, Textarea, Select, Combobox, Checkbox, Radio / RadioGroup, Switch, Range, DatePicker, TimePicker, Calendar, OtpInput, PasswordStrength, TagInput, ChipInput (deprecated: use TagInput), DropZone
 
 **Navigation:** Nav, NavMenu, Navbar, Breadcrumb, Pagination, Tabs, Stepper, ScrollSpy, SkipLink
 
 **Overlays:** Dialog, Drawer, Menu, Popover, Tooltip, Toast (`ToastProvider` / `useToast`), Modal (deprecated: use Dialog or Drawer)
 
-**Content and feedback:** Accordion, Alert, Avatar, Badge, Blockquote, Card, Carousel, Chip, CodeBlock, Collapse, ListGroup, Progress, Skeleton / Placeholder, SortableList, Spinner, Table, VisuallyHidden
+**Content and feedback:** Accordion, Alert, Avatar, Badge, Blockquote, Card, Carousel, Chip, CodeBlock, Collapse, ListGroup, Progress, Skeleton / Placeholder, SortableList, Spinner, Table, DataTable, VisuallyHidden
 
 **Layout and media:** Container, Stack, Grid, AspectRatio, Image, Video
 

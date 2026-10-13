@@ -62,3 +62,26 @@ rules for the accessibility hooks, icons, Transition and motion tokens added in 
   guards this.
 - In SCSS use `dur('fast'|'base'|'slow'|'slower')` and `ease('standard'|'enter'|'exit'|'emphasized')`. In TS,
   use `motion.duration.*`. Never hardcode durations.
+
+## Form controls and data (0.3.0)
+
+- New form controls follow the existing pattern: `useControllableState`, `useFieldControl` for Field wiring,
+  `name` submits through hidden inputs (disabled controls submit nothing), `size?: ExtendedSize`, and
+  `invalid` / `readOnly` / `disabled`. Announce status changes with `useAnnouncer`, never a private live region.
+- Popups anchored to an input (TimePicker, TagInput suggestions) follow Combobox: `role="combobox"` on the
+  input, `aria-activedescendant`, and the list in the top layer via `useFloating` + `showInTopLayer()`, not
+  `Portal`. TagInput reuses the `.os-combobox__*` option styles.
+- Time values are always `"HH:mm"` 24-hour strings, whatever the display. Use the helpers in
+  `TimePicker.tsx` (`parseTime`, `formatTime`, `getTimeOptions`, …) rather than parsing times again. Pass
+  `locale` when server rendering anything locale-formatted, or server and client can disagree.
+- `ChipInput` is deprecated: new work uses `TagInput`. `chipKeyNav` in `Chip.tsx` is internal, so the barrel
+  exports Chip by name.
+- DataTable keeps native `<table>` semantics (not ARIA grid). Its `disabled` / `readOnly` / `invalid` / `name`
+  apply to row selection.
+- Physical sizes in new SCSS and inline styles are logical (`inline-size`, `block-size`,
+  `max-block-size`).
+- Layout that jsdom can't measure goes in `npm run test:layout`: add a fixture to
+  `packages/onesmallui/test/layout/fixtures.tsx` and its checks to `scripts/layout-test.mjs`. It isn't in CI
+  (CI has no Playwright browser), so run it locally with `test:a11y`.
+- The avatar is an exact square (`inline-size` = `block-size` = `--_size`). The image and initials sit in
+  `.os-avatar__frame`, which clips, and the status dot is outside the frame.
