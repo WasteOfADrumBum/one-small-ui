@@ -164,6 +164,25 @@ describe('Avatar and AvatarGroup', () => {
     expect(screen.getByRole('img', { name: '9 more' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Ada Lovelace' })).toHaveAttribute('data-size', '2xl');
   });
+
+  it('clips the image inside a frame and keeps the status dot outside it', () => {
+    render(<Avatar name="Ada Lovelace" src="/ada.png" status="online" shape="square" />);
+    const avatar = screen.getByRole('img', { name: 'Ada Lovelace (online)' });
+    const frame = avatar.querySelector('.os-avatar__frame')!;
+    expect(frame.querySelector('img.os-avatar__img')).toHaveAttribute('alt', '');
+    expect(avatar.querySelector(':scope > .os-avatar__status')).toHaveAttribute('data-status', 'online');
+    expect(frame.querySelector('.os-avatar__status')).toBeNull();
+  });
+
+  it('falls back to initials when the image fails, and retries when src changes', () => {
+    const { rerender, container } = render(<Avatar name="Ada Lovelace" src="/broken.png" />);
+    fireEvent.error(container.querySelector('img')!);
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('.os-avatar__initials')).toHaveTextContent('AL');
+    rerender(<Avatar name="Ada Lovelace" src="/ada.png" />);
+    expect(container.querySelector('img')).toHaveAttribute('src', '/ada.png');
+    expect(container.querySelector('.os-avatar__initials')).toBeNull();
+  });
 });
 
 describe('Badge', () => {

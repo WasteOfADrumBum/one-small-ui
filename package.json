@@ -16,7 +16,8 @@
     "test": "npm run test -w @onesmall/ui",
     "check": "npm run check:contrast && npm run typecheck && npm run lint && npm test",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "test:a11y": "node scripts/a11y-audit.mjs"
+    "test:a11y": "node scripts/a11y-audit.mjs",
+    "test:layout": "node scripts/layout-test.mjs"
   },
   "engines": {
     "node": ">=18.18"

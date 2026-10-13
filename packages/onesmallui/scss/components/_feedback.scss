@@ -554,19 +554,23 @@ $statuses: $theme-colors;
 }
 
 // ---------- Avatar ----------
+// An exact square per size token. The image never takes part in layout (it is absolutely
+// positioned inside the frame), so its intrinsic size can't stretch the avatar into an oval.
 .#{$prefix}-avatar {
   --_size: 2.5rem;
   position: relative;
-  display: inline-grid;
-  place-items: center;
+  display: inline-block;
   flex-shrink: 0;
-  width: var(--_size);
-  height: var(--_size);
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  aspect-ratio: 1;
+  vertical-align: middle;
   border-radius: 50%;
   background: linear-gradient(135deg, token('primary-soft'), token('accent-soft'));
   color: token('text');
   font-weight: 700;
   font-size: calc(var(--_size) * 0.38);
+  line-height: 1;
   box-shadow: 0 0 0 2px token('surface'), 0 0 0 3px token('border');
   @include color-vars;
 
@@ -592,11 +596,24 @@ $statuses: $theme-colors;
   }
 }
 
-.#{$prefix}-avatar__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+// Clips the image or initials to the avatar's shape. The status dot is its sibling, so
+// `overflow: hidden` here never cuts the dot off.
+.#{$prefix}-avatar__frame {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   border-radius: inherit;
+}
+
+.#{$prefix}-avatar__img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  object-fit: cover;
 }
 
 .#{$prefix}-avatar__status {

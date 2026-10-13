@@ -33,7 +33,9 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
   ref,
 ) {
   const group = useContext(AvatarGroupContext);
-  const [failed, setFailed] = useState(false);
+  // Remember which URL failed, so a new `src` gets a fresh chance to load.
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const failed = !!src && failedSrc === src;
   const label = status ? `${name} (${status})` : name;
   return (
     <span
@@ -46,13 +48,16 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
       data-color={color}
       {...rest}
     >
-      {src && !failed ? (
-        <img src={src} alt="" onError={() => setFailed(true)} className={cls('avatar__img')} />
-      ) : (
-        <span className={cls('avatar__initials')} aria-hidden="true">
-          {initials(name)}
-        </span>
-      )}
+      {/* The frame clips the image to the shape; the status dot sits outside it so it is never cut off. */}
+      <span className={cls('avatar__frame')}>
+        {src && !failed ? (
+          <img src={src} alt="" onError={() => setFailedSrc(src)} className={cls('avatar__img')} />
+        ) : (
+          <span className={cls('avatar__initials')} aria-hidden="true">
+            {initials(name)}
+          </span>
+        )}
+      </span>
       {status && <span className={cls('avatar__status')} data-status={status} aria-hidden="true" />}
     </span>
   );
@@ -108,8 +113,10 @@ export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(function
         {shown}
         {hidden > 0 && (
           <span role="img" aria-label={overflowLabel(hidden)} className={cls('avatar')} data-size={size} data-overflow="">
-            <span className={cls('avatar__initials')} aria-hidden="true">
-              {renderOverflow ? renderOverflow(hidden) : `+${hidden}`}
+            <span className={cls('avatar__frame')}>
+              <span className={cls('avatar__initials')} aria-hidden="true">
+                {renderOverflow ? renderOverflow(hidden) : `+${hidden}`}
+              </span>
             </span>
           </span>
         )}
