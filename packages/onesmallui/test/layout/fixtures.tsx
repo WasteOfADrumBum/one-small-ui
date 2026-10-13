@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { Avatar, AvatarGroup, type AvatarSize } from '../../src';
+import { Avatar, AvatarGroup, DataTable, type AvatarSize } from '../../src';
 
 // Solid-color SVGs with explicit intrinsic sizes: the aspect ratios that used to stretch avatars.
 const svg = (w: number, h: number) =>
@@ -47,6 +47,34 @@ function AvatarFixture() {
   );
 }
 
+const crew = Array.from({ length: 40 }, (_, i) => ({
+  id: String(i),
+  name: `Crew member ${i + 1}`,
+  role: ['Pilot', 'Engineer', 'Medic', 'Navigator'][i % 4]!,
+  notes: 'A long note that makes the table wider than its scroll region. '.repeat(3),
+}));
+
+function DataTableFixture() {
+  return (
+    <div style={{ padding: 16, inlineSize: 600 }}>
+      <DataTable
+        caption="Crew"
+        data={crew}
+        columns={[
+          { key: 'name', header: 'Name', sortable: true },
+          { key: 'role', header: 'Role' },
+          { key: 'notes', header: 'Notes', cell: (row) => <span style={{ whiteSpace: 'nowrap' }}>{row.notes}</span> },
+        ]}
+        selectable
+        stickyHeader
+        maxHeight="16rem"
+        data-test="data-table"
+      />
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   avatar: AvatarFixture,
+  'data-table': DataTableFixture,
 };

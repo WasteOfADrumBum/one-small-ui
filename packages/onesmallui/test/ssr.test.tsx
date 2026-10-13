@@ -5,7 +5,12 @@ import { renderToString } from 'react-dom/server';
 import {
   AnnouncerProvider,
   Collapse,
+  DataTable,
   Dialog,
+  Field,
+  NumberInput,
+  TagInput,
+  TimePicker,
   LiveRegion,
   Portal,
   SkipLink,
@@ -60,5 +65,32 @@ describe('SSR', () => {
     expect(html).toContain('data-state="open"');
     expect(html).not.toContain('portalled');
     expect(html).toContain('role="img"');
+  });
+
+  it('renders the 0.3 form controls and DataTable on the server', () => {
+    const html = renderToString(
+      <AnnouncerProvider>
+        <NumberInput aria-label="Tip" name="tip" locale="en-US" defaultValue={0.25} formatOptions={{ style: 'percent' }} allowWheel />
+        <Field label="Tags">
+          <TagInput name="tags" defaultValue={['a']} suggestions={['a', 'b']} />
+        </Field>
+        <TimePicker aria-label="Start" locale="en-US" defaultValue="09:30" name="start" />
+        <DataTable
+          caption="Crew"
+          data={[{ id: 'ada', name: 'Ada' }]}
+          columns={[{ key: 'name', header: 'Name', sortable: true, hideable: true, filterable: true }]}
+          selectable
+          searchable
+          pagination
+          stickyHeader
+          maxHeight="20rem"
+        />
+        <DataTable caption="Loading crew" data={[]} columns={[{ key: 'name', header: 'Name' }]} loading />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('25%');
+    expect(html).toContain('9:30 AM');
+    expect(html).toContain('role="spinbutton"');
+    expect(html).toContain('aria-busy="true"');
   });
 });

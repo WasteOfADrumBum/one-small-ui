@@ -86,6 +86,39 @@ for (const a of avatars) {
   if (a.name.startsWith('single')) check(a.dot && !a.clipped, `${a.name}: status dot is clipped or missing`);
 }
 
+// ---------- DataTable: sticky header stays put while the region scrolls both ways ----------
+await open('data-table');
+const table = await page.evaluate(async () => {
+  const table = document.querySelector('table');
+  let region = table.parentElement;
+  while (region && !['auto', 'scroll'].includes(getComputedStyle(region).overflowY)) region = region.parentElement;
+  const th = table.querySelector('thead th');
+  region.scrollTop = 300;
+  region.scrollLeft = 200;
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  // Pinned: the header's top edge sits on the region's top edge (the caption has scrolled away).
+  const pinned = th.getBoundingClientRect().top - region.getBoundingClientRect().top - region.clientTop;
+  // The cell painted where the header sits must be the header, not a body row showing through.
+  const box = th.getBoundingClientRect();
+  const r = region.getBoundingClientRect();
+  const hit = document.elementFromPoint(r.left + r.width / 2, box.top + box.height / 2);
+  return {
+    found: !!region,
+    focusable: region?.tabIndex === 0,
+    scrolledY: region.scrollTop > 0,
+    scrolledX: region.scrollLeft > 0,
+    pinned,
+    widths: [region.scrollWidth, region.clientWidth],
+    onTop: !!hit && !!hit.closest('thead'),
+    bg: getComputedStyle(th).backgroundColor,
+  };
+});
+check(table.found && table.focusable, 'data-table: no keyboard-focusable scroll region');
+check(table.scrolledY && table.scrolledX, `data-table: region does not scroll on both axes (scroll/client width ${table.widths})`);
+check(Math.abs(table.pinned) < 1, `data-table: header is ${table.pinned}px from the top of the scrolled region, not pinned`);
+check(table.onTop, 'data-table: body content paints over the sticky header');
+check(!/rgba\(.*, 0\)|transparent/.test(table.bg), `data-table: sticky header background is transparent (${table.bg})`);
+
 await browser.close();
 server.close();
 await rm(outDir, { recursive: true, force: true });

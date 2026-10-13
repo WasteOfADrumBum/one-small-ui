@@ -100,6 +100,10 @@ import {
   Switch,
   Tab,
   Table,
+  DataTable,
+  TagInput,
+  TimePicker,
+  NumberInput,
   TabList,
   TabPanel,
   Tabs,
@@ -514,6 +518,48 @@ const cases: Record<string, () => ReactElement> = {
       <TabPanel value="a">All nominal.</TabPanel>
       <TabPanel value="b">82%.</TabPanel>
     </Tabs>
+  ),
+  DataTable: () => (
+    <AnnouncerProvider>
+      <DataTable
+        caption="Crew"
+        data={[
+          { id: 'ada', name: 'Ada', role: 'Analyst' },
+          { id: 'grace', name: 'Grace', role: 'Captain' },
+        ]}
+        columns={[
+          { key: 'name', header: 'Name', sortable: true },
+          { key: 'role', header: 'Role', sortable: true, hideable: true, filterable: true },
+        ]}
+        selectable
+        searchable
+        pagination
+        pageSizeOptions={[5, 10]}
+        name="crew"
+        defaultSelectedIds={['ada']}
+        defaultSort={[{ key: 'name', direction: 'ascending' }]}
+        stickyHeader
+        maxHeight="20rem"
+      />
+    </AnnouncerProvider>
+  ),
+  NumberInput: () => (
+    <Field label="Ticket price" description="Before tax." required>
+      <NumberInput name="price" locale="en-US" defaultValue={19.99} min={0} formatOptions={{ style: 'currency', currency: 'USD' }} />
+    </Field>
+  ),
+  TagInput: () => (
+    <>
+      <Field label="Skills" description="Press Enter or comma to add.">
+        <TagInput name="skills" defaultValue={['Design']} suggestions={['Design', 'Research']} />
+      </Field>
+      <TagInput aria-label="Labels" readOnly defaultValue={['Urgent']} />
+    </>
+  ),
+  TimePicker: () => (
+    <Field label="Start time" hint="Every 15 minutes.">
+      <TimePicker locale="en-US" defaultValue="09:30" name="start" isTimeDisabled={(v) => v === '12:00'} />
+    </Field>
   ),
   Textarea: () => (
     <Field label="Notes">
