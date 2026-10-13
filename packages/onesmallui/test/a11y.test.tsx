@@ -45,6 +45,7 @@ import {
   CollapseTrigger,
   Collapsible,
   Combobox,
+  CommandPalette,
   Container,
   DatePicker,
   Dialog,
@@ -621,6 +622,22 @@ const cases: Record<string, () => ReactElement> = {
     <Portal>
       <p>Rendered in body</p>
     </Portal>
+  ),
+  CommandPalette: () => (
+    <CommandPalette
+      defaultOpen
+      defaultQuery="se"
+      groups={[
+        {
+          heading: 'Actions',
+          items: [
+            { id: 'settings', label: 'Open settings', shortcut: 'Mod+,', description: 'Preferences and themes' },
+            { id: 'search', label: 'Search docs', href: '#search' },
+            { id: 'locked', label: 'Reset everything', disabled: true },
+          ],
+        },
+      ]}
+    />
   ),
   Kbd: () => (
     <p>

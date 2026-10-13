@@ -5,6 +5,7 @@ import { renderToString } from 'react-dom/server';
 import {
   AnnouncerProvider,
   Collapse,
+  CommandPalette,
   DataTable,
   Dialog,
   Field,
@@ -95,6 +96,20 @@ describe('SSR', () => {
     expect(html).toContain('role="spinbutton"');
     expect(html).toContain('aria-busy="true"');
   });
+  it('renders CommandPalette on the server, open and closed, with recent and async options', () => {
+    const groups = [{ heading: 'Pages', items: [{ id: 'home', label: 'Home', href: '/', shortcut: 'Mod+H' }] }];
+    const html = renderToString(
+      <AnnouncerProvider>
+        <CommandPalette groups={groups} recent={{ storageKey: 'ssr-recent' }} />
+        <CommandPalette defaultOpen defaultQuery="ho" groups={groups} loadItems={async () => []} />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('role="combobox"');
+    expect(html).toContain('role="listbox"');
+    expect(html).toContain('Control H');
+    expect(html).toContain('<mark');
+  });
+
   it('renders Kbd with the non-Apple labels and runs useHotkeys without a document', () => {
     function Shortcut() {
       useHotkeys('Mod+K', () => {});

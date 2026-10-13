@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { Avatar, AvatarGroup, DataTable, type AvatarSize } from '../../src';
+import { Avatar, AvatarGroup, CommandPalette, DataTable, type AvatarSize, type CommandItem } from '../../src';
 
 // Solid-color SVGs with explicit intrinsic sizes: the aspect ratios that used to stretch avatars.
 const svg = (w: number, h: number) =>
@@ -74,7 +74,26 @@ function DataTableFixture() {
   );
 }
 
+// Enough items to scroll, with descriptions, shortcuts and a label long enough to wrap.
+const commands: CommandItem[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `cmd-${i}`,
+  label: i === 3 ? 'A deliberately long command label that has to wrap on a narrow phone screen' : `Command number ${i + 1}`,
+  description: i % 3 === 0 ? 'Runs a thing, with a description underneath the label' : undefined,
+  shortcut: i % 4 === 0 ? 'Mod+Shift+K' : undefined,
+  group: ['Actions', 'Navigation', 'Settings'][i % 3],
+}));
+
+function CommandPaletteFixture() {
+  return (
+    <div style={{ padding: 16 }}>
+      <p>Page content behind the palette.</p>
+      <CommandPalette defaultOpen items={commands} hotkey={false} data-test="command-palette" />
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   avatar: AvatarFixture,
+  'command-palette': CommandPaletteFixture,
   'data-table': DataTableFixture,
 };
