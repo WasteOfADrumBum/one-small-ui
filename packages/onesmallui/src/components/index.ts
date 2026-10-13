@@ -32,6 +32,8 @@ export * from './Menu';
 export * from './Modal';
 export * from './Nav';
 export * from './Navbar';
+export { NumberInput } from './NumberInput';
+export type { NumberInputProps } from './NumberInput';
 export * from './OtpInput';
 export * from './Pagination';
 export * from './PasswordStrength';
