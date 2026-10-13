@@ -1,5 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Drawer, SkipLink, ThemeToggle } from '@onesmall/ui';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Button,
+  CommandPalette,
+  Drawer,
+  Kbd,
+  SearchIcon,
+  SkipLink,
+  ThemeToggle,
+  useHotkeyPlatform,
+  type CommandGroup,
+  type CommandItem,
+} from '@onesmall/ui';
 import { componentDocs, groups } from './site/componentDocs';
 import { useHashRoute } from './site/router';
 import { Home } from './pages/Home';
@@ -18,6 +29,58 @@ const guides = [
 
 const isRoute = (p: string) =>
   p === 'home' || guides.some((g) => g.path === p) || componentDocs.some((d) => `components/${d.slug}` === p);
+
+// The hash router reads the hash. (Options with href="#…" would work too, but axe's skip-link
+// rule flags in-page hash links whose target id doesn't exist once they scroll out of view.)
+const go = (item: CommandItem) => {
+  window.location.hash = item.id;
+};
+
+/** Every docs page, grouped like the sidebar, for the Mod+K search palette. */
+function useDocsSearchGroups(): CommandGroup[] {
+  return useMemo(
+    () => [
+      { heading: 'Guides', items: guides.map((g) => ({ id: g.path, label: g.label, onSelect: go })) },
+      ...groups.map((group) => ({
+        heading: group,
+        items: componentDocs
+          .filter((d) => d.group === group)
+          .map((d) => ({ id: `components/${d.slug}`, label: d.name, keywords: [d.slug, d.group], onSelect: go })),
+      })),
+    ],
+    [],
+  );
+}
+
+function DocsSearch() {
+  const [open, setOpen] = useState(false);
+  const searchGroups = useDocsSearchGroups();
+  const platform = useHotkeyPlatform();
+  return (
+    <>
+      <Button
+        className="docs-search-btn"
+        variant="outline"
+        color="neutral"
+        aria-keyshortcuts={platform === 'mac' ? 'Meta+K' : 'Control+K'}
+        leftIcon={<SearchIcon />}
+        rightIcon={<Kbd combo="Mod+K" size="sm" className="docs-search-btn__kbd" />}
+        onClick={() => setOpen(true)}
+      >
+        <span className="docs-search-btn__label">Search docs</span>
+      </Button>
+      <CommandPalette
+        open={open}
+        onOpenChange={setOpen}
+        groups={searchGroups}
+        label="Search the documentation"
+        inputLabel="Search docs pages"
+        placeholder="Search components, hooks and guides…"
+        recent={{ storageKey: 'onesmallui-docs-recent', max: 5, label: 'Recently visited' }}
+      />
+    </>
+  );
+}
 
 function Nav({ route, onNavigate }: { route: string; onNavigate?: () => void }) {
   const link = (path: string, label: string) => (
@@ -116,6 +179,7 @@ export function App() {
         </Button>
         <Logo />
         <div className="docs-header__actions">
+          <DocsSearch />
           <a className="docs-header__link" href="#getting-started">
             Docs
           </a>

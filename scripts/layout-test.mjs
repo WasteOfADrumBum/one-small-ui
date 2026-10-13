@@ -127,6 +127,55 @@ check(Math.abs(table.pinned) < 1, `data-table: header is ${table.pinned}px from 
 check(table.onTop, 'data-table: body content paints over the sticky header');
 check(!/rgba\(.*, 0\)|transparent/.test(table.bg), `data-table: sticky header background is transparent (${table.bg})`);
 
+// ---------- CommandPalette: fits the viewport on phones, tablets and desktop ----------
+await page.emulateMedia({ reducedMotion: 'reduce' });
+for (const [width, height] of [
+  [360, 740],
+  [768, 1024],
+  [1280, 900],
+]) {
+  await page.setViewportSize({ width, height });
+  await open('command-palette');
+  await page.waitForTimeout(300);
+  const tag = `command-palette @${width}px`;
+  const m = await page.evaluate(() => {
+    const dialog = document.querySelector('dialog.os-command-palette');
+    const panel = dialog?.querySelector('.os-dialog__panel');
+    const results = dialog?.querySelector('[role="listbox"]');
+    const input = dialog?.querySelector('input[role="combobox"]');
+    if (!dialog?.open || !panel || !results || !input) return null;
+    const box = (el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+    };
+    const options = Array.from(dialog.querySelectorAll('[role="option"]')).map(box);
+    return {
+      vw: document.documentElement.clientWidth,
+      vh: window.innerHeight,
+      pageScrollWidth: document.documentElement.scrollWidth,
+      panel: box(panel),
+      panelOverflowX: panel.scrollWidth - panel.clientWidth,
+      results: box(results),
+      resultsScrolls: results.scrollHeight > results.clientHeight,
+      input: box(input),
+      focused: document.activeElement === input,
+      options,
+    };
+  });
+  check(!!m, `${tag}: palette did not open`);
+  if (!m) continue;
+  const { panel, vw, vh } = m;
+  check(panel.left >= -0.5 && panel.top >= -0.5 && panel.right <= vw + 0.5 && panel.bottom <= vh + 0.5, `${tag}: panel ${JSON.stringify(panel)} leaves the ${vw}×${vh} viewport`);
+  check(m.pageScrollWidth <= vw, `${tag}: page scrolls sideways (${m.pageScrollWidth} > ${vw})`);
+  check(m.panelOverflowX <= 0, `${tag}: panel content overflows sideways by ${m.panelOverflowX}px`);
+  check(m.results.bottom <= panel.bottom + 0.5 && m.resultsScrolls, `${tag}: results don't scroll inside the panel`);
+  check(m.input.width >= 150 && m.input.right <= panel.right, `${tag}: search input is ${m.input.width}px wide or clipped`);
+  check(m.focused, `${tag}: focus is not on the search input`);
+  check(m.options.length === 30 && m.options.every((o) => o.height >= 44 && o.right <= panel.right + 0.5), `${tag}: options are under 44px tall or overflow the panel`);
+  if (width < 576) check(Math.abs(panel.width - vw) < 1 && Math.abs(panel.height - vh) < 1, `${tag}: not full screen below sm (${panel.width}×${panel.height})`);
+  else check(panel.width <= 640.5 && panel.top > 0, `${tag}: panel should be a centered 40rem card (${panel.width}px wide, top ${panel.top})`);
+}
+
 // ---------- ContextMenu: opened at every corner and edge, it stays inside the viewport ----------
 const menuBox = () =>
   page.evaluate(async () => {

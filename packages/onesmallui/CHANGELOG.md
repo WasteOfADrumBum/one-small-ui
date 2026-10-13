@@ -14,6 +14,20 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   platform-aware `Mod` key. It ignores text fields, selects, contenteditable and IME composition unless
   `allowInInputs`, and removes its listener on unmount.
 - Hotkey helpers `parseHotkey`, `matchesHotkey`, `formatHotkey`, `isApplePlatform` and `isEditableTarget`.
+- `CommandPalette`, a search-first command menu on `Dialog`, opened with `Mod+K` (configurable through
+  `hotkey`, `false` turns it off). It is an ARIA 1.2 combobox with a grouped listbox and
+  `aria-activedescendant`. Built-in fuzzy search matches labels and `keywords` and highlights matches in
+  `<mark>` without splitting the option's accessible name. Item shortcuts show with `Kbd`. Items with
+  `children` open nested pages with a breadcrumb; Backspace on an empty input or Escape goes back. It also has
+  opt-in `recent` items in localStorage, `loadItems` async results with a debounce, `aria-busy` and aborted
+  stale requests, and an empty state. Result counts are announced through `useAnnouncer` once typing settles.
+  Open state and query can be controlled or uncontrolled, and link items take `href` plus `as` or `render`
+  for router links such as Next.js `Link`. It goes full screen below `sm`. The docs site now uses it to search
+  every page from the header.
+- `fuzzyMatch(query, text)` and `fuzzyFilter(items, query, { getText, getKeywords })`, the dependency-free
+  scorer behind CommandPalette. Word starts and consecutive runs score higher, and it returns the matched
+  indices for highlighting.
+- `npm run test:layout` checks that CommandPalette fits the viewport at 360px, 768px and desktop widths.
 - `TreeView`, a hierarchical list on the WAI-ARIA tree view pattern (`ul role="tree"` → `li role="treeitem"` →
   `ul role="group"` with `aria-level`, `aria-setsize` and `aria-posinset`). It has roving focus, arrow keys
   (swapped in RTL), Home/End, `*` to open siblings and a 600ms typeahead. Selection is `none`, `single` or
