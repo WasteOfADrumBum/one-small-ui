@@ -85,3 +85,30 @@ rules for the accessibility hooks, icons, Transition and motion tokens added in 
   `test:a11y` as the `Playwright (layout)` and `Playwright (a11y)` jobs; a failure uploads `playwright-report/`.
 - The avatar is an exact square (`inline-size` = `block-size` = `--_size`). The image and initials sit in
   `.os-avatar__frame`, which clips, and the status dot is outside the frame.
+
+## Navigation (0.4.0)
+
+- Shortcuts go through `utils/hotkeys.ts` (`parseHotkey`, `matchesHotkey`, `formatHotkey`, `isApplePlatform`,
+  `isEditableTarget`); don't parse key combos again. `Mod` is ⌘ on Apple platforms and Ctrl elsewhere.
+  Global shortcuts use `useHotkeys`, which skips text fields and IME composition unless `allowInInputs`.
+- Show shortcuts with `<Kbd combo="Mod+K" />`. It renders the non-Apple form on the server and corrects it
+  after hydration (`useHotkeyPlatform`, `useSyncExternalStore`), and spells the combo out for screen readers.
+  Menu `shortcut` stays a `ReactNode` rendered `aria-hidden`, so a Kbd or a string both work there.
+- Items that navigate (SidebarItem, CommandPalette items, TreeView nodes) take `href` plus `as` (an element
+  type such as Next.js `Link`) or `render`. New navigating items follow the same shape.
+- `Sidebar` renders through `Drawer` below `drawerBelow`, so it gets the overlay hooks for free; don't add a
+  second focus trap. `SidebarProvider` / `useSidebar()` let a `SidebarToggle` live outside the sidebar.
+  `Tooltip describe={false}` is for triggers whose accessible name already says the tooltip text (rail items).
+- `CommandPalette` runs on `Dialog` and follows the Combobox pattern (`role="combobox"`,
+  `aria-activedescendant`, grouped listbox). Search goes through `utils/fuzzy.ts` (`fuzzyMatch`,
+  `fuzzyFilter`). Highlights are `<mark>`, and the option's name comes from `aria-label` so it is read as one
+  word. The docs header dogfoods it (`apps/docs/src/App.tsx`, Mod+K).
+- `Menu` and `ContextMenu` share their state machine through `components/MenuBase.tsx` (`useMenuRoot`,
+  `MenuContext`), which is internal and not exported from the barrel. ContextMenu anchors to a virtual rect
+  with `useFloating`'s `setAnchor` and reuses Menu's items; never add a parallel item family.
+- `TreeView` keeps native list semantics with ARIA tree roles (`ul role="tree"`, `li role="treeitem"`,
+  `ul role="group"`); `eslint.config.js` allows those roles on `ul`/`li`. Rows are memoized and subscribe to
+  their own state, so a focus move re-renders two rows. Don't virtualize it (that breaks `aria-setsize` and
+  reading order). With `checkboxes`, leaf keys are the source of truth and parents derive `mixed`.
+- Docs pages can set `callout` (`apps/docs/src/site/docTypes.ts`) for a warning the page leads with, as
+  ContextMenu does for "always provide another path".
