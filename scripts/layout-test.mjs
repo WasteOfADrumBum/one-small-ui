@@ -127,6 +127,79 @@ check(Math.abs(table.pinned) < 1, `data-table: header is ${table.pinned}px from 
 check(table.onTop, 'data-table: body content paints over the sticky header');
 check(!/rgba\(.*, 0\)|transparent/.test(table.bg), `data-table: sticky header background is transparent (${table.bg})`);
 
+// ---------- ContextMenu: opened at every corner and edge, it stays inside the viewport ----------
+const menuBox = () =>
+  page.evaluate(async () => {
+    const el = document.querySelector('[data-test="context-menu"]');
+    if (!el || !el.hasAttribute('data-side')) return null;
+    await Promise.all(el.getAnimations().map((a) => a.finished));
+    const r = el.getBoundingClientRect();
+    return {
+      left: r.left,
+      top: r.top,
+      right: r.right,
+      bottom: r.bottom,
+      scrolls: el.scrollHeight > el.clientHeight,
+      focus: document.activeElement?.getAttribute('role'),
+    };
+  });
+const waitForMenu = () => page.waitForSelector('[data-test="context-menu"][data-side]', { timeout: 2000 }).catch(() => null);
+
+for (const viewport of [
+  { width: 1280, height: 900 },
+  { width: 375, height: 667 },
+  { width: 640, height: 320 },
+]) {
+  await page.setViewportSize(viewport);
+  await open('context-menu');
+  const { width: w, height: h } = viewport;
+  const points = {
+    'top-left': [2, 2],
+    top: [w / 2, 2],
+    'top-right': [w - 2, 2],
+    right: [w - 2, h / 2],
+    'bottom-right': [w - 2, h - 2],
+    bottom: [w / 2, h - 2],
+    'bottom-left': [2, h - 2],
+    left: [2, h / 2],
+    center: [w / 2, h / 2],
+  };
+  for (const [name, [x, y]] of Object.entries(points)) {
+    const label = `context-menu ${w}×${h} ${name}`;
+    await page.mouse.click(x, y, { button: 'right' });
+    await waitForMenu();
+    const box = await menuBox();
+    check(!!box, `${label}: menu did not open on right-click`);
+    if (box) {
+      const inside = box.left >= 0 && box.top >= 0 && box.right <= w && box.bottom <= h;
+      check(inside, `${label}: menu ${JSON.stringify(box)} leaves the ${w}×${h} viewport`);
+      check(box.focus === 'menuitem', `${label}: focus is on ${box.focus}, not the first item`);
+      // At the pointer: its top or bottom edge on the pointer, and the pointer within its width
+      // (narrow viewports shift the menu sideways to fit).
+      if (name === 'center') {
+        const nearY = Math.min(Math.abs(box.top - y), Math.abs(box.bottom - y)) < 4;
+        const spansX = box.left - 4 <= x && x <= box.right + 4;
+        check(nearY && spansX, `${label}: menu ${JSON.stringify(box)} is not at the pointer (${x}, ${y})`);
+      }
+    }
+    await page.keyboard.press('Escape');
+    const back = await page.evaluate(() => ({
+      open: !!document.querySelector('[data-test="context-menu"]'),
+      focus: document.activeElement?.getAttribute('data-test'),
+    }));
+    check(!back.open && back.focus === 'context-target', `${label}: Escape left ${JSON.stringify(back)}`);
+  }
+
+  // Keyboard: Shift+F10 on the focused full-viewport target anchors inside it, not below the viewport.
+  await page.focus('[data-test="context-target"]');
+  await page.keyboard.press('Shift+F10');
+  await waitForMenu();
+  const kb = await menuBox();
+  check(!!kb, `context-menu ${w}×${h} Shift+F10: menu did not open`);
+  if (kb) check(kb.left >= 0 && kb.top >= 0 && kb.right <= w && kb.bottom <= h, `context-menu ${w}×${h} Shift+F10: menu ${JSON.stringify(kb)} leaves the viewport`);
+  await page.keyboard.press('Escape');
+}
+
 // ---------- Sidebar: expanded width, rail width, drawer below lg, RTL mirror ----------
 const sidebarAt = async (query, width) => {
   current = `sidebar ${query || 'expanded'} @${width}`;

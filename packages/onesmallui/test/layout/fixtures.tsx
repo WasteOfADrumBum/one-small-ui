@@ -2,7 +2,16 @@ import type { ComponentType } from 'react';
 import {
   Avatar,
   AvatarGroup,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
   DataTable,
+  MenuCheckboxItem,
+  MenuDivider,
+  MenuItem,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuSub,
   Sidebar,
   SidebarGroup,
   SidebarHeader,
@@ -87,6 +96,36 @@ function DataTableFixture() {
   );
 }
 
+// A target that fills the viewport, so the runner can right-click at every corner and edge.
+function ContextMenuFixture() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div role="region" tabIndex={0} aria-label="Canvas" data-test="context-target" style={{ position: 'fixed', inset: 0 }}>
+          Right-click anywhere
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent aria-label="Canvas actions" data-test="context-menu">
+        <MenuItem shortcut="Ctrl+X">Cut</MenuItem>
+        <MenuItem shortcut="Ctrl+C">Copy</MenuItem>
+        <MenuItem shortcut="Ctrl+V">Paste</MenuItem>
+        <MenuItem disabled>Paste as plain text</MenuItem>
+        <MenuDivider />
+        <MenuCheckboxItem defaultChecked>Snap to grid</MenuCheckboxItem>
+        <MenuRadioGroup label="Zoom" defaultValue="100">
+          <MenuRadioItem value="50">50%</MenuRadioItem>
+          <MenuRadioItem value="100">100%</MenuRadioItem>
+          <MenuRadioItem value="200">200%</MenuRadioItem>
+        </MenuRadioGroup>
+        <MenuSub label="Arrange">
+          <MenuItem>Bring to front</MenuItem>
+          <MenuItem>Send to back</MenuItem>
+        </MenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
 // App shell: `?collapsed=1` starts as a rail, `?dir=rtl` mirrors it. Below lg it is a drawer.
 function SidebarFixture() {
   const params = new URLSearchParams(location.search);
@@ -120,6 +159,7 @@ function SidebarFixture() {
 }
 
 export const fixtures: Record<string, ComponentType> = {
+  'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'data-table': DataTableFixture,
   sidebar: SidebarFixture,
