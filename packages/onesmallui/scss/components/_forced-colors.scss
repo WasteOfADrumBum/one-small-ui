@@ -17,6 +17,7 @@
   .#{$prefix}-list-group__item[data-active],
   .#{$prefix}-menu__item[data-active],
   .#{$prefix}-menu__item[aria-current],
+  .#{$prefix}-sidebar__link[aria-current='page'],
   [aria-checked='true'] > .#{$prefix}-menu__indicator,
   .#{$prefix}-calendar__day[data-selected],
   [data-range-start] > .#{$prefix}-calendar__day,

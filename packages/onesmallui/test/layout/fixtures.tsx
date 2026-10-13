@@ -12,8 +12,16 @@ import {
   MenuRadioGroup,
   MenuRadioItem,
   MenuSub,
+  Sidebar,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarItem,
+  SidebarProvider,
+  SidebarSection,
+  SidebarToggle,
   type AvatarSize,
 } from '../../src';
+import { HomeIcon, SettingsIcon, UserIcon } from '../../src/icons';
 
 // Solid-color SVGs with explicit intrinsic sizes: the aspect ratios that used to stretch avatars.
 const svg = (w: number, h: number) =>
@@ -118,8 +126,41 @@ function ContextMenuFixture() {
   );
 }
 
+// App shell: `?collapsed=1` starts as a rail, `?dir=rtl` mirrors it. Below lg it is a drawer.
+function SidebarFixture() {
+  const params = new URLSearchParams(location.search);
+  return (
+    <div dir={params.get('dir') ?? 'ltr'} style={{ display: 'flex', blockSize: '100vh' }}>
+      <SidebarProvider defaultCollapsed={params.get('collapsed') === '1'}>
+        <Sidebar aria-label="App">
+          <SidebarHeader>
+            <span className="os-sidebar__label">Starlight</span>
+            <SidebarToggle data-test="inner-toggle" />
+          </SidebarHeader>
+          <SidebarSection heading="Workspace">
+            <SidebarItem href="#home" icon={<HomeIcon />} active data-test="first-item">
+              Dashboard
+            </SidebarItem>
+            <SidebarItem href="#crew" icon={<UserIcon />} badge="3">
+              Crew
+            </SidebarItem>
+            <SidebarGroup label="Settings" icon={<SettingsIcon />}>
+              <SidebarItem href="#profile">Profile</SidebarItem>
+            </SidebarGroup>
+          </SidebarSection>
+        </Sidebar>
+        <div style={{ flex: 1, padding: 16 }}>
+          <SidebarToggle data-test="outer-toggle" />
+          <p>Content</p>
+        </div>
+      </SidebarProvider>
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'data-table': DataTableFixture,
+  sidebar: SidebarFixture,
 };

@@ -48,6 +48,7 @@ export * from './Radio';
 export * from './Range';
 export * from './ScrollSpy';
 export * from './Select';
+export * from './Sidebar';
 export * from './Skeleton';
 export * from './SortableList';
 export * from './Spinner';
