@@ -27,7 +27,7 @@ const doc: ComponentDoc = {
     {
       name: 'tree-view-lazy',
       title: 'Lazy children',
-      description: 'Nodes with hasChildren load on first expand. While loading, the item is aria-busy; a failed load shows an error row with Retry.',
+      description: 'Nodes with hasChildren load on first expand. While loading, the item is aria-busy; a failed load shows an error row, and Enter on the item (or the Retry button) tries again.',
     },
     {
       name: 'tree-view-navigation',
@@ -64,7 +64,7 @@ const doc: ComponentDoc = {
         {
           name: 'labels',
           type: 'Partial<TreeViewLabels>',
-          description: 'Text for translation: loading, loaded(label, count), loadError(label), retry, selected(count). Keep the object stable.',
+          description: 'Text for translation: loading, loaded(label, count), loadError(label), retry, retryHint, selected(count). Keep the object stable.',
         },
       ],
     },
@@ -92,7 +92,7 @@ const doc: ComponentDoc = {
     { keys: 'Home / End', action: 'First or last visible node.' },
     { keys: '*', action: 'Opens every sibling of the focused node.' },
     { keys: 'Type characters', action: 'Moves to the next visible node whose text starts with them (600ms buffer). Repeating one letter cycles through matches.' },
-    { keys: 'Enter', action: 'Selects (single), toggles (multiple) or toggles the checkbox; follows the link of an href node; in selectionMode none calls onAction and opens or closes a parent.' },
+    { keys: 'Enter', action: 'Failed lazy parent: retries (and opens it if closed). Otherwise selects (single), toggles (multiple) or toggles the checkbox; follows the link of an href node; in selectionMode none calls onAction and opens or closes a parent.' },
     { keys: 'Space', action: 'Selects, toggles selection or toggles the checkbox; in selectionMode none, same as Enter.' },
     { keys: 'Shift + ArrowDown / ArrowUp', action: 'Multiple: moves focus and extends the selection range.' },
     { keys: 'Shift + Space / Shift + click', action: 'Multiple: selects from the last toggled node to this one.' },
@@ -103,7 +103,7 @@ const doc: ComponentDoc = {
     'Each item is a treeitem with aria-level, aria-setsize and aria-posinset, so NVDA, JAWS and VoiceOver read "Letters, collapsed, 2 of 2, level 2". aria-expanded is set only on parents.',
     'Items are named by their label only (aria-labelledby), not by the text of their subtree. Icons and the chevron are hidden.',
     'Selection uses aria-selected (with aria-multiselectable in multiple mode); checkboxes use aria-checked, with "mixed" for a partly checked parent. Never both.',
-    'Lazy loading: the item and its group are aria-busy and show "Loading"; "Loading", then "Remote: 3 items", are announced politely. A failed load is announced assertively ("Couldn’t load Remote") and the error row has a Retry button.',
+    'Lazy loading: the item and its group are aria-busy and show "Loading"; "Loading", then "Remote: 3 items", are announced politely. A failed load is announced assertively ("Couldn’t load Remote. Press Enter to retry"), and Enter or ArrowRight on the item retries. The error row\'s Retry button is for mouse and touch and is not a tab stop (tabIndex -1), so the tree stays one tab stop.',
     'Range and select-all changes announce the count ("4 items selected") through the shared announcer.',
   ],
   dos: [
