@@ -47,6 +47,7 @@ export * from './Portal';
 export * from './Progress';
 export * from './Radio';
 export * from './Range';
+export * from './Rating';
 export * from './ScrollSpy';
 export * from './Select';
 export * from './Sidebar';

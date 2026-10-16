@@ -1,0 +1,161 @@
+@use '../abstracts' as *;
+@use 'form-mixins' as fm;
+
+// ---------- Rating ----------
+// Each item holds a glyph (outline icon + filled copy clipped by a logical box) and one or
+// two transparent native radios laid over it as the hit areas: the half-step radio covers
+// the inline-start half, the whole-step radio the rest.
+.#{$prefix}-rating {
+  --_c: #{token('warning')};
+  --_text: #{token('warning-text')};
+  --_icon: 1.5rem;
+  // Hit area per item: 44px, or 48px with half steps so each half is at least 24px wide.
+  --_hit: #{$target-size};
+  @include color-vars;
+
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &[data-size='xs'] {
+    --_icon: 1rem;
+  }
+
+  &[data-size='sm'] {
+    --_icon: 1.25rem;
+  }
+
+  &[data-size='lg'] {
+    --_icon: 2rem;
+  }
+
+  &[data-precision='half'] {
+    --_hit: 3rem;
+  }
+
+  &[data-disabled] {
+    opacity: 0.6;
+  }
+
+  // A display: icons sit close together, no hit areas.
+  &[data-readonly] {
+    display: inline-flex;
+    gap: 0.125rem;
+    vertical-align: middle;
+  }
+
+  > legend {
+    margin-block-end: 0.25rem;
+  }
+}
+
+.#{$prefix}-rating__items {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.#{$prefix}-rating__item {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: max(var(--_hit), var(--_icon));
+  block-size: max(var(--_hit), var(--_icon));
+
+  [data-readonly] > & {
+    inline-size: var(--_icon);
+    block-size: var(--_icon);
+  }
+}
+
+.#{$prefix}-rating__glyph {
+  position: relative;
+  display: block;
+  inline-size: var(--_icon);
+  block-size: var(--_icon);
+  border-radius: radius('sm');
+  transition: transform dur('fast') ease('standard');
+
+  [data-hovered] > & {
+    transform: scale(1.15);
+  }
+
+  // Focus shows on the glyph, since the radio itself is transparent.
+  .#{$prefix}-rating__item:has(> .#{$prefix}-rating__input:focus-visible) > & {
+    outline: 3px solid token('focus');
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px token('glow');
+  }
+}
+
+.#{$prefix}-rating__icon {
+  display: block;
+  inline-size: var(--_icon);
+  block-size: var(--_icon);
+  max-inline-size: none;
+  // Empty: an outline in a 3:1 boundary color.
+  stroke: token('border-strong');
+}
+
+.#{$prefix}-rating__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 0;
+  overflow: hidden;
+
+  // Filled: solid shape with a text-strength outline, so it keeps 3:1 even for light colors
+  // and differs from an empty step by shape, not only by color.
+  .#{$prefix}-rating__icon {
+    fill: var(--_c);
+    stroke: var(--_text);
+  }
+
+  [data-fill='half'] > & {
+    inline-size: 50%;
+  }
+
+  [data-fill='full'] > & {
+    inline-size: 100%;
+  }
+}
+
+.#{$prefix}-rating__input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+
+  &[data-half] {
+    inset-inline-end: auto;
+    inline-size: 50%;
+    z-index: 2;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// Invalid: the empty outlines turn the error color (the message says why).
+.#{$prefix}-rating[data-invalid] .#{$prefix}-rating__glyph > .#{$prefix}-rating__icon,
+.#{$prefix}-form[data-validated] .#{$prefix}-rating:has(.#{$prefix}-rating__input:invalid) .#{$prefix}-rating__glyph > .#{$prefix}-rating__icon {
+  stroke: fm.$invalid-color;
+}
+
+@media (forced-colors: active) {
+  .#{$prefix}-rating__icon {
+    stroke: CanvasText;
+  }
+
+  .#{$prefix}-rating__fill .#{$prefix}-rating__icon {
+    fill: Highlight;
+    stroke: Highlight;
+  }
+}

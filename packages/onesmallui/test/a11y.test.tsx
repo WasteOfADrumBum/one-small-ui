@@ -93,6 +93,7 @@ import {
   Radio,
   RadioGroup,
   Range,
+  Rating,
   ScrollSpy,
   Select,
   Sidebar,
@@ -474,6 +475,15 @@ const cases: Record<string, () => ReactElement> = {
     <Field label="Thrust">
       <Range defaultValue={40} showValue showMinMax ticks={[0, 50, 100]} />
     </Field>
+  ),
+  Rating: () => (
+    <AnnouncerProvider>
+      <Field label="Service" hint="1 is poor, 5 is excellent." required>
+        <Rating name="service" precision={0.5} defaultValue={3.5} allowClear />
+      </Field>
+      <Rating label="Quality" defaultValue={2} />
+      <Rating readOnly value={4.5} precision={0.5} />
+    </AnnouncerProvider>
   ),
   ScrollSpy: () => (
     <>
