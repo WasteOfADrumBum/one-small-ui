@@ -13,6 +13,7 @@ import {
   MenuRadioGroup,
   MenuRadioItem,
   MenuSub,
+  Rating,
   Sidebar,
   SidebarGroup,
   SidebarHeader,
@@ -178,10 +179,26 @@ function SidebarFixture() {
   );
 }
 
+// Half-step ratings in both directions: the half fill and the half hit area sit at the inline start.
+function RatingFixture() {
+  return (
+    <div style={{ display: 'grid', gap: 24, padding: 16 }}>
+      {(['ltr', 'rtl'] as const).map((dir) => (
+        <div key={dir} dir={dir} style={{ display: 'grid', gap: 12 }}>
+          <Rating label={`Half steps ${dir}`} precision={0.5} defaultValue={2.5} data-test={`rating-${dir}`} />
+          <Rating label={`Whole steps ${dir}`} size="sm" defaultValue={3} data-test={`rating-whole-${dir}`} />
+          <Rating readOnly value={2.5} precision={0.5} size="lg" data-test={`rating-readonly-${dir}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'command-palette': CommandPaletteFixture,
   'data-table': DataTableFixture,
+  rating: RatingFixture,
   sidebar: SidebarFixture,
 };

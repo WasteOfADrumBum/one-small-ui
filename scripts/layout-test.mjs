@@ -334,6 +334,87 @@ for (const dir of ['ltr', 'rtl']) {
 }
 await page.setViewportSize({ width: 1280, height: 900 });
 
+// ---------- Rating: half fill and half hit area at the inline start, in LTR and RTL ----------
+await open('rating');
+for (const dir of ['ltr', 'rtl']) {
+  const r = await page.evaluate((dir) => {
+    const box = (el) => {
+      const b = el.getBoundingClientRect();
+      return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, height: b.height };
+    };
+    const measure = (root) => {
+      const items = Array.from(root.querySelectorAll('.os-rating__item'));
+      return items.map((item) => {
+        const glyph = item.querySelector('.os-rating__glyph');
+        const [outline, filled] = glyph.querySelectorAll('svg');
+        const fill = glyph.querySelector('.os-rating__fill');
+        return {
+          state: glyph.dataset.fill,
+          item: box(item),
+          glyph: box(glyph),
+          outline: box(outline),
+          filled: box(filled),
+          fill: box(fill),
+          inputs: Array.from(item.querySelectorAll('input')).map((i) => ({ value: i.value, ...box(i) })),
+        };
+      });
+    };
+    const half = document.querySelector(`[data-test="rating-${dir}"]`);
+    const whole = document.querySelector(`[data-test="rating-whole-${dir}"]`);
+    const ro = document.querySelector(`[data-test="rating-readonly-${dir}"]`);
+    const third = half.querySelectorAll('.os-rating__item')[2].getBoundingClientRect();
+    const y = third.top + third.height / 2;
+    const startX = dir === 'rtl' ? third.right - third.width / 4 : third.left + third.width / 4;
+    const endX = dir === 'rtl' ? third.left + third.width / 4 : third.right - third.width / 4;
+    return {
+      half: measure(half),
+      whole: measure(whole),
+      readonly: measure(ro),
+      hitStart: document.elementFromPoint(startX, y)?.value,
+      hitEnd: document.elementFromPoint(endX, y)?.value,
+      hoverPoint: [startX + (dir === 'rtl' ? -1 : 1) * third.width, y],
+    };
+  }, dir);
+  const tag = `rating ${dir}`;
+  const isStartHalf = (inner, outer) =>
+    dir === 'ltr'
+      ? near(inner.left, outer.left) && near(inner.right, outer.left + outer.width / 2)
+      : near(inner.right, outer.right) && near(inner.left, outer.right - outer.width / 2);
+  const third = r.half[2];
+  check(third.state === 'half', `${tag}: third star is ${third.state}, expected half`);
+  check(isStartHalf(third.fill, third.glyph), `${tag}: half fill ${JSON.stringify(third.fill)} is not the inline-start half of ${JSON.stringify(third.glyph)}`);
+  for (const [i, s] of r.half.entries()) {
+    check(near(s.filled.left, s.outline.left, 0.5) && near(s.filled.top, s.outline.top, 0.5) && near(s.filled.width, s.outline.width, 0.5), `${tag}: star ${i + 1} filled copy is offset from its outline`);
+    check(s.item.width >= 48 - 0.5 && s.item.height >= 44 - 0.5, `${tag}: half-step item ${i + 1} is ${s.item.width}×${s.item.height}, below 48×44`);
+    const [h, f] = s.inputs;
+    check(h && f && isStartHalf(h, s.item), `${tag}: star ${i + 1} half-step radio is not on the inline-start half`);
+    check(h && h.width >= 24 - 0.5 && h.height >= 44 - 0.5, `${tag}: star ${i + 1} half-step target is ${h?.width}×${h?.height}, below 24×44`);
+  }
+  check(r.half[0].state === 'full' && r.half[1].state === 'full' && r.half[3].state === 'empty', `${tag}: fills ${r.half.map((s) => s.state)}`);
+  check(r.hitStart === '2.5' && r.hitEnd === '3', `${tag}: inline-start/end of star 3 hit ${r.hitStart}/${r.hitEnd}, expected 2.5/3`);
+  // Stars follow the reading order: star 1 at the inline start.
+  check(dir === 'ltr' ? r.half[0].item.left < r.half[4].item.left : r.half[0].item.left > r.half[4].item.left, `${tag}: stars are not in reading order`);
+  check(r.whole.every((s) => s.item.width >= 44 - 0.5 && s.item.height >= 44 - 0.5 && s.inputs.length === 1), `${tag}: whole-step targets under 44×44`);
+  check(r.whole.map((s) => s.state).join() === 'full,full,full,empty,empty', `${tag}: whole-step fills ${r.whole.map((s) => s.state)}`);
+  const ro = r.readonly[2];
+  check(ro.state === 'half' && isStartHalf(ro.fill, ro.glyph) && ro.inputs.length === 0, `${tag}: read-only half star is wrong (${ro.state}, ${JSON.stringify(ro.fill)})`);
+
+  // Hover over the inline-start half of star 4 previews 3.5 and leaves the value alone.
+  await page.mouse.move(...r.hoverPoint);
+  const hover = await page.evaluate((dir) => {
+    const root = document.querySelector(`[data-test="rating-${dir}"]`);
+    return {
+      fills: Array.from(root.querySelectorAll('.os-rating__glyph')).map((g) => g.dataset.fill).join(),
+      preview: root.hasAttribute('data-preview'),
+      checked: root.querySelector('input:checked')?.value,
+    };
+  }, dir);
+  check(hover.fills === 'full,full,full,half,empty' && hover.preview && hover.checked === '2.5', `${tag}: hover preview ${JSON.stringify(hover)}`);
+  await page.mouse.move(1, 1);
+  const left = await page.evaluate((dir) => document.querySelector(`[data-test="rating-${dir}"]`).hasAttribute('data-preview'), dir);
+  check(!left, `${tag}: preview stays after the pointer leaves`);
+}
+
 if (failures.length) {
   const items = [{ title: 'Failed checks', details: failures }];
   for (const [fixture, shot] of shots) items.push({ title: `Fixture: ${fixture}`, screenshot: await shot });

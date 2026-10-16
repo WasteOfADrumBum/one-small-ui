@@ -15,6 +15,7 @@ import {
   Kbd,
   MenuItem,
   NumberInput,
+  Rating,
   TagInput,
   TimePicker,
   LiveRegion,
@@ -185,5 +186,20 @@ describe('SSR', () => {
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('aria-label="Collapse sidebar"');
     expect(html).not.toContain('<dialog');
+  });
+
+  it('renders Rating, interactive and read-only, on the server', () => {
+    const html = renderToString(
+      <AnnouncerProvider>
+        <Field label="Service">
+          <Rating name="service" precision={0.5} defaultValue={3.5} allowClear />
+        </Field>
+        <Rating readOnly value={4.5} precision={0.5} />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('role="radiogroup"');
+    expect(html).toContain('aria-label="3.5 stars"');
+    expect(html).toContain('data-fill="half"');
+    expect(html).toContain('aria-label="4.5 out of 5 stars"');
   });
 });

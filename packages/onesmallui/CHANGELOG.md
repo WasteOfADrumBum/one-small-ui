@@ -5,6 +5,19 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- `Rating`, a star rating on visually hidden native radios in a `<fieldset>` (`role="radiogroup"`), so arrow
+  keys, `Field`, `Form`, required validation and native submission work as they do for radios. `precision` is
+  `1` or `0.5`, `max` defaults to 5, and each option is named "3 stars" / "3.5 stars" (`getLabel` to
+  translate). Hovering or focusing an option previews it (`data-preview`) without changing the value.
+  `allowClear` clears the rating when the current value is chosen again (click, or Space on the checked
+  option) and announces "Rating cleared" through `useAnnouncer`. `readOnly` renders one `role="img"` named
+  "4.5 out of 5 stars" (`getValueText`) with no inputs. It takes an `icon` (default `StarIcon`), `size` and
+  `color`; chosen steps are filled and empty ones outlined, so the value never relies on color, and half fills
+  use a logical clip that mirrors in RTL. `npm run test:layout` checks the half fill and hit areas in LTR and
+  RTL.
+
 ## [0.4.1] - 2026-10-16
 
 ### Changed
