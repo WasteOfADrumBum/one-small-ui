@@ -8,6 +8,7 @@ export * from './useFloating';
 export * from './useFocusTrap';
 export * from './useFocusReturn';
 export * from './useScrollLock';
+export * from './useSwipe';
 export * from './useReducedMotion';
 export { AnnouncerProvider, LiveRegion, useAnnouncer } from './useAnnouncer';
 export type { Announce, AnnounceOptions, LiveRegionProps, Politeness } from './useAnnouncer';
