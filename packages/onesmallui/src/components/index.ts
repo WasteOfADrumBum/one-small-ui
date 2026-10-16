@@ -31,6 +31,7 @@ export * from './Input';
 export * from './InputGroup';
 export * from './Kbd';
 export * from './Layout';
+export * from './Lightbox';
 export * from './ListGroup';
 export * from './Media';
 export * from './Menu';

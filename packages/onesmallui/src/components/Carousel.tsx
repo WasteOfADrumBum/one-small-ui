@@ -17,6 +17,7 @@ import {
 } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { usePrefersReducedMotion } from '../hooks/useMediaQuery';
+import { useSwipe } from '../hooks/useSwipe';
 import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
 import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
@@ -287,8 +288,8 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
     }
   };
 
-  // Simple swipe for the fade transition (the slide track scrolls natively).
-  const swipe = useRef<number | null>(null);
+  // Swipe for the fade transition (the slide track scrolls natively). Mouse drags count too.
+  useSwipe(trackRef, { enabled: fade, mouse: true, onSwipe: (dir) => (dir === 'start' ? next() : prev()) });
 
   const peekValue = peek === true ? '10%' : peek || undefined;
   const vars = {
@@ -389,18 +390,6 @@ export const Carousel = forwardRef<HTMLElement, CarouselProps>(function Carousel
           tabIndex={fade ? undefined : 0}
           onScroll={fade ? undefined : onScroll}
           onKeyDown={onKeyDown}
-          onPointerDown={fade ? (e) => (swipe.current = e.clientX) : undefined}
-          onPointerUp={
-            fade
-              ? (e) => {
-                  if (swipe.current === null) return;
-                  const dx = (e.clientX - swipe.current) * (isRtl(e.currentTarget) ? -1 : 1);
-                  swipe.current = null;
-                  if (dx < -40) next();
-                  else if (dx > 40) prev();
-                }
-              : undefined
-          }
         >
           {slides.map((slide, i) => (
             <SlideContext.Provider

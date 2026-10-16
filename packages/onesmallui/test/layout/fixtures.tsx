@@ -7,6 +7,7 @@ import {
   ContextMenuContent,
   ContextMenuTrigger,
   DataTable,
+  Lightbox,
   MenuCheckboxItem,
   MenuDivider,
   MenuItem,
@@ -26,6 +27,7 @@ import {
   TimelineItem,
   type AvatarSize,
   type CommandItem,
+  type LightboxImage,
 } from '../../src';
 import { HomeIcon, SettingsIcon, UserIcon } from '../../src/icons';
 
@@ -260,6 +262,30 @@ function TimelineFixture() {
   );
 }
 
+// Striped SVG "photos" with intrinsic sizes (landscape and portrait), opened at the middle image.
+// `?dir=rtl` mirrors it. The last image never loads, for the broken state.
+const photo = (w: number, h: number, hue: number) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="hsl(${hue} 60% 40%)"/><path d="M0 0L${w} ${h}M${w} 0L0 ${h}" stroke="white" stroke-width="8"/></svg>`,
+  )}`;
+const lightboxImages: LightboxImage[] = [
+  { src: photo(1200, 800, 10), alt: 'Red landscape', width: 1200, height: 800, caption: 'A caption long enough to wrap onto a second line on a narrow phone screen.' },
+  { src: photo(800, 1200, 90), alt: 'Green portrait', width: 800, height: 1200 },
+  { src: photo(1600, 900, 200), alt: 'Blue panorama', width: 1600, height: 900, caption: 'The middle image.', download: true },
+  { src: photo(1000, 1000, 280), alt: 'Purple square', width: 1000, height: 1000 },
+  { src: '/does-not-exist.jpg', alt: 'A photo that never loads' },
+];
+
+function LightboxFixture() {
+  const params = new URLSearchParams(location.search);
+  return (
+    <div dir={params.get('dir') ?? 'ltr'}>
+      <p>Page content behind the viewer.</p>
+      <Lightbox images={lightboxImages} defaultOpen defaultIndex={2} thumbnails data-test="lightbox" />
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
@@ -267,6 +293,7 @@ export const fixtures: Record<string, ComponentType> = {
   'data-table': DataTableFixture,
   rating: RatingFixture,
   popconfirm: PopconfirmFixture,
+  lightbox: LightboxFixture,
   sidebar: SidebarFixture,
   timeline: TimelineFixture,
 };

@@ -43,6 +43,25 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 - `Popover` takes `role` (`'dialog'` by default, or `'alertdialog'`), `aria-describedby`, `initialFocus` (a ref
   focused when it opens) and `returnFocusOnDismiss` (default `false`), which also returns focus to the trigger
   after an outside click on something that cannot take focus. Without them it renders and behaves as before.
+- `Lightbox`, a full-screen image viewer on `Dialog` (named "Image viewer" by default and described by its
+  counter). It has previous/next buttons, Left/Right arrows (swapped in RTL), Home/End and Escape, swipe to
+  navigate, pinch zoom, double tap to toggle 2×, `+` / `-` / `0` to zoom and reset, and drag or arrow keys to pan
+  while zoomed (the arrows navigate only when not zoomed). Zoom clamps to 1×–`maxZoom` (default 4) and panning
+  stops at the image edges. `alt` is required on every `LightboxImage` by the types (an empty one warns once in
+  development), and an optional `caption` is a `<figcaption>` linked with `aria-describedby`. The "3 of 12"
+  counter is visible and announced through `useAnnouncer` when it changes, as are zoom changes. It preloads the
+  neighboring images, passes `srcSet` and `sizes` through, shows a `Spinner` while loading and an `ImageOffIcon`
+  with the alt text when an image fails, and has an optional `thumbnails` strip (`aria-current`) and a per-image
+  `download` link. `open` and `index` can be controlled or uncontrolled, and `loop` wraps past the ends.
+- `LightboxGallery`, a responsive grid of thumbnail buttons ("Open <alt>") wired to a Lightbox; closing returns
+  focus to the thumbnail that opened it.
+- `useSwipe(ref, { onSwipe, threshold, enabled, axis, mouse })`, pointer-event swipes reported in logical
+  directions (`'start' | 'end' | 'up' | 'down'`, RTL-aware). It ignores multi-touch (pinch), and mouse drags
+  unless `mouse`. Carousel's fade-mode swipe now runs on it.
+- Icons: `ZoomInIcon`, `ZoomOutIcon` and `ImageOffIcon`.
+- `npm run test:layout` checks the Lightbox at 360px and desktop widths, in LTR and RTL, with Chromium touch
+  emulation: it fits the screen with 44px controls, and swipe, pinch, double tap, drag and keyboard zoom and pan
+  all work.
 
 ## [0.4.1] - 2026-10-16
 

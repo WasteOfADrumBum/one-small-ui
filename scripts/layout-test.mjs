@@ -41,12 +41,14 @@ const failures = [];
 const shots = new Map();
 let passed = 0;
 let current = '';
+// The page a failure screenshot comes from, when a section uses its own context.
+let shotPage = null;
 const check = (ok, message) => {
   if (ok) passed++;
   else {
     failures.push(message);
     // One screenshot per failing fixture, taken while the page still shows it.
-    if (!shots.has(current)) shots.set(current, page.screenshot({ fullPage: true }));
+    if (!shots.has(current)) shots.set(current, (shotPage ?? page).screenshot({ fullPage: true }));
   }
 };
 const open = async (fixture) => {
@@ -555,6 +557,196 @@ for (const dir of ['ltr', 'rtl']) {
   });
 }
 await page.setViewportSize({ width: 1280, height: 900 });
+
+// ---------- Lightbox: fits phones and desktop; swipe, pinch, double tap, keyboard zoom and pan ----------
+// Its own touch context (Chromium touch emulation); gestures go through CDP Input.dispatchTouchEvent.
+const measureLightbox = (tp) =>
+  tp.evaluate(async () => {
+    // Let React commit and the (reduced-motion, 0.01ms) transform transition settle: wait until
+    // the image's transform reads the same for three frames in a row (a busy machine can lag).
+    const frame = () => new Promise((r) => requestAnimationFrame(r));
+    const read = () => {
+      const el = document.querySelector('dialog.os-lightbox .os-lightbox__image');
+      return `${el ? getComputedStyle(el).transform : ''}|${document.querySelector('.os-lightbox__counter')?.textContent}`;
+    };
+    await new Promise((r) => setTimeout(r, 30));
+    for (let last = read(), same = 0, i = 0; same < 3 && i < 60; i++) {
+      await frame();
+      const now = read();
+      same = now === last ? same + 1 : 0;
+      last = now;
+    }
+    const box = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+    };
+    const dialog = document.querySelector('dialog.os-lightbox');
+    const stage = dialog?.querySelector('.os-lightbox__stage');
+    const img = dialog?.querySelector('.os-lightbox__image');
+    const controls = dialog?.querySelectorAll('.os-lightbox__toolbar :is(button, a), .os-lightbox__nav, .os-lightbox__thumb') ?? [];
+    return {
+      open: !!dialog?.open,
+      vw: document.documentElement.clientWidth,
+      vh: window.innerHeight,
+      pageScrollWidth: document.documentElement.scrollWidth,
+      panel: box(dialog?.querySelector('.os-dialog__panel')),
+      stage: box(stage),
+      img: box(img),
+      transform: img ? getComputedStyle(img).transform : null,
+      counter: dialog?.querySelector('.os-lightbox__counter')?.textContent,
+      status: stage?.getAttribute('data-status'),
+      zoomed: !!dialog?.querySelector('[data-zoomed]'),
+      controls: Array.from(controls).map((el) => ({ name: el.getAttribute('aria-label'), thumb: el.classList.contains('os-lightbox__thumb'), ...box(el) })),
+      thumbs: box(dialog?.querySelector('.os-lightbox__thumbnails')),
+      caption: box(dialog?.querySelector('.os-lightbox__caption')),
+      error: box(dialog?.querySelector('.os-lightbox__error')),
+    };
+  });
+// Scale and translation of a computed `matrix(a, b, c, d, tx, ty)` (identity for none).
+const scaleOf = (t) => (t && t !== 'none' ? Math.hypot(...t.slice(7, -1).split(', ').slice(0, 2).map(Number)) : 1);
+const translateOf = (t) => (t && t !== 'none' ? t.slice(7, -1).split(', ').slice(4).map(Number) : [0, 0]);
+const within = (a, b, tol = 0.5) => !!a && a.left >= b.left - tol && a.top >= b.top - tol && a.right <= b.right + tol && a.bottom <= b.bottom + tol;
+
+for (const [width, height] of [
+  [360, 740],
+  [1280, 900],
+]) {
+  for (const dir of ['ltr', 'rtl']) {
+    const tag = `lightbox ${dir} @${width}px`;
+    current = tag;
+    const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 576, reducedMotion: 'reduce' });
+    const tp = await context.newPage();
+    shotPage = tp;
+    const cdp = await context.newCDPSession(tp);
+    const touch = (type, points) =>
+      cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points.map(([x, y], id) => ({ x, y, id, radiusX: 1, radiusY: 1, force: 1 })) });
+    const gesture = async (from, to, steps = 8) => {
+      await touch('touchStart', from);
+      for (let i = 1; i <= steps; i++) {
+        await touch('touchMove', from.map(([x, y], k) => [x + ((to[k][0] - x) * i) / steps, y + ((to[k][1] - y) * i) / steps]));
+      }
+      await touch('touchEnd', []);
+      await tp.waitForTimeout(60);
+    };
+    const doubleTap = async (x, y) => {
+      await tp.waitForTimeout(350);
+      for (let i = 0; i < 2; i++) {
+        await touch('touchStart', [[x, y]]);
+        await touch('touchEnd', []);
+        await tp.waitForTimeout(60);
+      }
+      await tp.waitForTimeout(60);
+    };
+    await tp.goto(`${base}?fixture=lightbox${dir === 'rtl' ? '&dir=rtl' : ''}`, { waitUntil: 'networkidle' });
+    await tp.waitForSelector('.os-lightbox__stage[data-status="loaded"]', { timeout: 3000 }).catch(() => null);
+
+    let m = await measureLightbox(tp);
+    check(m.open && m.status === 'loaded' && !!m.img, `${tag}: viewer did not open with a loaded image (${m.status})`);
+    if (!m.open || !m.img) {
+      if (shots.has(tag)) shots.set(tag, await shots.get(tag));
+      await context.close();
+      shotPage = null;
+      continue;
+    }
+    const screen = { left: 0, top: 0, right: m.vw, bottom: m.vh };
+    // Full screen, nothing sideways, the image inside the stage, every control on screen and at least 44px.
+    check(Math.abs(m.panel.width - m.vw) < 1 && Math.abs(m.panel.height - m.vh) < 1, `${tag}: panel ${m.panel.width}×${m.panel.height} is not full screen`);
+    check(m.pageScrollWidth <= m.vw, `${tag}: page scrolls sideways (${m.pageScrollWidth} > ${m.vw})`);
+    check(within(m.img, m.stage) && m.img.width > 100 && m.img.height > 100, `${tag}: image ${JSON.stringify(m.img)} doesn't fit the stage ${JSON.stringify(m.stage)}`);
+    for (const c of m.controls) {
+      check(c.width >= 44 && c.height >= 44, `${tag}: ${c.name} is ${c.width}×${c.height}, below 44px`);
+      // Thumbnails may scroll inside their strip; everything else must be on screen.
+      if (!c.thumb) check(within(c, screen), `${tag}: ${c.name} is off screen ${JSON.stringify(c)}`);
+    }
+    check(within(m.thumbs, screen), `${tag}: thumbnail strip leaves the viewport`);
+    check(!!m.caption && m.caption.top >= m.stage.bottom - 0.5 && m.caption.bottom <= m.thumbs.top + 0.5, `${tag}: caption is not between the stage and the strip`);
+    const prevBtn = m.controls.find((c) => c.name === 'Previous image');
+    const nextBtn = m.controls.find((c) => c.name === 'Next image');
+    check(!!prevBtn && !!nextBtn && (dir === 'ltr' ? prevBtn.left < nextBtn.left : prevBtn.left > nextBtn.left), `${tag}: previous is not on the inline-start side`);
+
+    // Swipe: toward the inline start shows the next image (finger to the left in LTR, to the right in RTL).
+    const cx = m.stage.left + m.stage.width / 2;
+    const cy = m.stage.top + m.stage.height / 2;
+    const span = Math.min(120, m.stage.width / 3);
+    await gesture([[cx + span, cy]], [[cx - span, cy]]);
+    m = await measureLightbox(tp);
+    check(m.counter === (dir === 'ltr' ? '4 of 5' : '2 of 5'), `${tag}: swiping left shows "${m.counter}"`);
+    await gesture([[cx - span, cy]], [[cx + span, cy]]);
+    m = await measureLightbox(tp);
+    check(m.counter === '3 of 5', `${tag}: swiping back right shows "${m.counter}"`);
+    await gesture([[cx + 15, cy]], [[cx - 15, cy]]);
+    m = await measureLightbox(tp);
+    check(m.counter === '3 of 5', `${tag}: a 30px drag counted as a swipe ("${m.counter}")`);
+
+    // Pinch: spreading two fingers zooms about 3×, and doesn't navigate.
+    await tp.waitForTimeout(350);
+    await gesture(
+      [
+        [cx - 30, cy],
+        [cx + 30, cy],
+      ],
+      [
+        [cx - 90, cy],
+        [cx + 90, cy],
+      ],
+    );
+    m = await measureLightbox(tp);
+    const pinched = scaleOf(m.transform);
+    check(pinched > 2.5 && pinched <= 4.01 && m.zoomed, `${tag}: pinch zoomed to ${pinched.toFixed(2)}×, expected about 3×`);
+    check(m.counter === '3 of 5', `${tag}: pinch changed the image to "${m.counter}"`);
+
+    // Pan while zoomed: a one-finger drag moves the image and no longer swipes.
+    const before = translateOf(m.transform);
+    await gesture([[cx, cy]], [[cx - 80, cy - 40]]);
+    m = await measureLightbox(tp);
+    const after = translateOf(m.transform);
+    check(after[0] < before[0] - 20, `${tag}: dragging while zoomed did not pan (${before} → ${after})`);
+    check(m.counter === '3 of 5', `${tag}: dragging while zoomed changed the image to "${m.counter}"`);
+    // Clamped: however far you drag, the zoomed image still reaches the stage's edge.
+    await gesture([[cx, cy]], [[cx - 2000, cy]], 12);
+    m = await measureLightbox(tp);
+    check(m.img.right >= m.stage.right - 1, `${tag}: panned past the image edge (image right ${m.img.right}, stage right ${m.stage.right})`);
+
+    // Double tap: resets when zoomed, then zooms to 2×.
+    await doubleTap(cx, cy);
+    m = await measureLightbox(tp);
+    check(scaleOf(m.transform) === 1 && !m.zoomed, `${tag}: double tap did not reset the zoom (${m.transform})`);
+    await doubleTap(cx, cy);
+    m = await measureLightbox(tp);
+    check(Math.abs(scaleOf(m.transform) - 2) < 0.01, `${tag}: double tap zoomed to ${scaleOf(m.transform)}×, expected 2×`);
+
+    // Keyboard: 0 resets, + zooms, the arrows pan while zoomed and navigate when not.
+    await tp.keyboard.press('0');
+    await tp.keyboard.press('+');
+    await tp.keyboard.press('+');
+    m = await measureLightbox(tp);
+    check(Math.abs(scaleOf(m.transform) - 2) < 0.01, `${tag}: + + zoomed to ${scaleOf(m.transform)}×, expected 2×`);
+    const k0 = translateOf(m.transform);
+    await tp.keyboard.press('ArrowLeft');
+    m = await measureLightbox(tp);
+    const k1 = translateOf(m.transform);
+    check(k1[0] > k0[0] && m.counter === '3 of 5', `${tag}: ArrowLeft while zoomed did not pan (${k0} → ${k1}, ${m.counter})`);
+    await tp.keyboard.press('0');
+    await tp.keyboard.press('ArrowRight');
+    m = await measureLightbox(tp);
+    check(m.counter === (dir === 'ltr' ? '4 of 5' : '2 of 5') && !m.zoomed, `${tag}: ArrowRight after a reset shows "${m.counter}"`);
+
+    // Broken image: the error state sits centered in the stage.
+    await tp.keyboard.press('End');
+    await tp.waitForSelector('.os-lightbox__stage[data-status="error"]', { timeout: 3000 }).catch(() => null);
+    m = await measureLightbox(tp);
+    check(m.status === 'error' && within(m.error, m.stage), `${tag}: broken image state missing or outside the stage`);
+    if (m.error) {
+      const off = Math.abs((m.error.left + m.error.right) / 2 - (m.stage.left + m.stage.right) / 2);
+      check(off < 2, `${tag}: broken image state is ${off}px off center`);
+    }
+    // Finish any failure screenshot before the context goes away.
+    if (shots.has(tag)) shots.set(tag, await shots.get(tag));
+    await context.close();
+    shotPage = null;
+  }
+}
 
 if (failures.length) {
   const items = [{ title: 'Failed checks', details: failures }];
