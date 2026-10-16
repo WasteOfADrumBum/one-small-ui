@@ -415,6 +415,73 @@ for (const dir of ['ltr', 'rtl']) {
   check(!left, `${tag}: preview stays after the pointer leaves`);
 }
 
+// ---------- Timeline: horizontal scrolls inside itself at 360px; alternating mirrors in RTL ----------
+const timelineAt = async (query, width) => {
+  current = `timeline ${query} @${width}`;
+  await page.setViewportSize({ width, height: 800 });
+  await page.goto(`${base}?fixture=timeline&${query}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(50);
+};
+
+await timelineAt('layout=horizontal', 360);
+const horizontal = await page.evaluate(async () => {
+  const viewport = document.querySelector('[data-test="timeline"] .os-timeline__viewport');
+  const items = Array.from(viewport.querySelectorAll('li')).map((li) => li.getBoundingClientRect());
+  const scrollable = viewport.scrollWidth > viewport.clientWidth;
+  viewport.scrollLeft = 200;
+  await new Promise((r) => requestAnimationFrame(r));
+  return {
+    vw: document.documentElement.clientWidth,
+    pageScrollWidth: document.documentElement.scrollWidth,
+    viewportRight: viewport.getBoundingClientRect().right,
+    scrollable,
+    scrolled: viewport.scrollLeft > 0,
+    region: viewport.getAttribute('role') === 'region' && viewport.tabIndex === 0 && viewport.getAttribute('aria-label') === 'Mission',
+    sameRow: items.every((r) => Math.abs(r.top - items[0].top) < 1),
+    minWidth: Math.min(...items.map((r) => r.width)),
+  };
+});
+check(horizontal.pageScrollWidth <= horizontal.vw, `timeline horizontal @360: page scrolls sideways (${horizontal.pageScrollWidth} > ${horizontal.vw})`);
+check(horizontal.viewportRight <= horizontal.vw, `timeline horizontal @360: scroll region ends at ${horizontal.viewportRight}px, past the viewport`);
+check(horizontal.scrollable && horizontal.scrolled, 'timeline horizontal @360: the timeline does not scroll inside its region');
+check(horizontal.region, 'timeline horizontal @360: the overflowing timeline is not a focusable region named "Mission"');
+check(horizontal.sameRow && horizontal.minWidth >= 150, `timeline horizontal @360: items are not one row of readable width (${horizontal.minWidth}px)`);
+
+const timelineSides = () =>
+  page.evaluate(() =>
+    Array.from(document.querySelectorAll('[data-test="timeline"] li')).map((li) => {
+      const m = li.querySelector('.os-timeline__marker').getBoundingClientRect();
+      const b = li.querySelector('.os-timeline__body').getBoundingClientRect();
+      const list = li.parentElement.getBoundingClientRect();
+      return {
+        side: b.right <= m.left ? 'left' : b.left >= m.right ? 'right' : 'overlap',
+        centered: Math.abs(m.left + m.width / 2 - (list.left + list.width / 2)) < 2,
+        page: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      };
+    }),
+  );
+for (const dir of ['ltr', 'rtl']) {
+  // Wide: odd items on the inline-start side of a centered line (left in LTR, right in RTL).
+  await timelineAt(`layout=alternating&dir=${dir}`, 1280);
+  const start = dir === 'ltr' ? 'left' : 'right';
+  const end = dir === 'ltr' ? 'right' : 'left';
+  const wide = await timelineSides();
+  check(wide.length === 6, `timeline alternating ${dir}: expected 6 items, found ${wide.length}`);
+  wide.forEach((it, i) => {
+    const want = i % 2 === 0 ? start : end;
+    check(it.side === want, `timeline alternating ${dir} @1280: item ${i + 1} is on the ${it.side}, expected ${want}`);
+    check(it.centered, `timeline alternating ${dir} @1280: item ${i + 1}'s marker is not on the centered line`);
+  });
+  // Narrow: one side, content after the marker (inline end), and no page overflow.
+  await timelineAt(`layout=alternating&dir=${dir}`, 360);
+  const narrow = await timelineSides();
+  narrow.forEach((it, i) => {
+    check(it.side === end, `timeline alternating ${dir} @360: item ${i + 1} is on the ${it.side}, expected ${end} (single column)`);
+    check(it.page, `timeline alternating ${dir} @360: page scrolls sideways`);
+  });
+}
+await page.setViewportSize({ width: 1280, height: 900 });
+
 if (failures.length) {
   const items = [{ title: 'Failed checks', details: failures }];
   for (const [fixture, shot] of shots) items.push({ title: `Fixture: ${fixture}`, screenshot: await shot });

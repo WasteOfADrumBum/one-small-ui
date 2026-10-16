@@ -17,6 +17,19 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   `color`; chosen steps are filled and empty ones outlined, so the value never relies on color, and half fills
   use a logical clip that mirrors in RTL. `npm run test:layout` checks the half fill and hit areas in LTR and
   RTL.
+- `Timeline` and `TimelineItem`, events in order on an `<ol>`. Each item has a marker (status icon, any
+  icon or an `Avatar`), title, `<time dateTime>` (from a `Date` or ISO string; date-only strings stay on
+  their calendar day in every time zone), description, extra content and actions. `status` (`success`,
+  `warning`, `danger`, `info`, `pending`) shows its own icon plus a visually hidden prefix ("Success:"), so
+  color is never the only cue; `statusLabels` translates it. Layouts are `vertical`, `alternating` (both
+  sides of a centered line from a 36rem container width, mirrored in RTL) and `horizontal` (scrolls inline
+  and becomes a focusable, named region when it overflows). `pageSize` adds "Show more", which reveals the
+  next batch, focuses its first event and announces "5 more events shown" through `useAnnouncer`; the
+  visible count can be controlled. `variant="feed"` is for activity logs: avatar, actor, action and an
+  `Intl.RelativeTimeFormat` time with the full date in a `Tooltip`. The server renders absolute dates and the
+  relative text switches in after hydration (or right away with `now`), kept current by one shared clock.
+- `npm run test:layout` checks that a horizontal Timeline scrolls inside itself at 360px without page
+  overflow, and that the alternating layout mirrors in RTL and falls back to one side when narrow.
 
 ## [0.4.1] - 2026-10-16
 

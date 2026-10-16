@@ -21,6 +21,8 @@ import {
   SidebarProvider,
   SidebarSection,
   SidebarToggle,
+  Timeline,
+  TimelineItem,
   type AvatarSize,
   type CommandItem,
 } from '../../src';
@@ -194,6 +196,27 @@ function RatingFixture() {
   );
 }
 
+// `?layout=horizontal|alternating` and `?dir=rtl`. Long enough to scroll sideways at 360px.
+function TimelineFixture() {
+  const params = new URLSearchParams(location.search);
+  const layout = (params.get('layout') ?? 'vertical') as 'vertical' | 'alternating' | 'horizontal';
+  return (
+    <div dir={params.get('dir') ?? 'ltr'} style={{ padding: 16 }}>
+      <Timeline layout={layout} aria-label="Mission" locale="en-US" timeZone="UTC" data-test="timeline">
+        {['Launch', 'Orbit insertion', 'Docking', 'Crew transfer', 'Undocking', 'Splashdown'].map((title, i) => (
+          <TimelineItem
+            key={title}
+            title={title}
+            status={i < 3 ? 'success' : i === 3 ? 'pending' : 'default'}
+            time={`2026-10-0${i + 1}T06:40:00Z`}
+            description="A description long enough to wrap onto a second line in a narrow column."
+          />
+        ))}
+      </Timeline>
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
@@ -201,4 +224,5 @@ export const fixtures: Record<string, ComponentType> = {
   'data-table': DataTableFixture,
   rating: RatingFixture,
   sidebar: SidebarFixture,
+  timeline: TimelineFixture,
 };

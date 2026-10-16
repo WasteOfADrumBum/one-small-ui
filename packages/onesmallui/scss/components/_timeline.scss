@@ -1,0 +1,289 @@
+@use '../abstracts' as *;
+
+// Public custom properties: --os-timeline-gap, --os-timeline-marker-size, --os-timeline-item-min.
+.#{$prefix}-timeline {
+  --_marker: var(--#{$prefix}-timeline-marker-size, 2rem);
+  --_gap: var(--#{$prefix}-timeline-gap, 1.5rem);
+  --_line: 2px;
+  --_space: 0.75rem;
+  min-inline-size: 0;
+
+  &[data-variant='feed'] {
+    --_marker: var(--#{$prefix}-timeline-marker-size, 2.5rem);
+  }
+
+  // Alternating needs to know its own width to fall back to one side when narrow.
+  &[data-layout='alternating'] {
+    container: os-timeline / inline-size;
+  }
+}
+
+.#{$prefix}-timeline__viewport {
+  min-inline-size: 0;
+  border-radius: radius('md');
+  @include focus-ring;
+
+  [data-layout='horizontal'] > & {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    // Room for the focus ring of items and the scrollbar.
+    padding: 0.25rem;
+  }
+}
+
+.#{$prefix}-timeline__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  [data-layout='horizontal'] & {
+    flex-direction: row;
+  }
+}
+
+.#{$prefix}-timeline__item {
+  --_c: #{token('primary')};
+  --_text: #{token('primary-text')};
+  --_soft: #{token('primary-soft')};
+  position: relative;
+  display: flex;
+  gap: var(--_space);
+  min-inline-size: 0;
+  padding-block-end: var(--_gap);
+  border-radius: radius('md');
+  @include focus-ring;
+
+  @each $c in (success, warning, danger, info) {
+    &[data-status='#{$c}'] {
+      --_c: #{token($c)};
+      --_text: #{token('#{$c}-text')};
+      --_soft: #{token('#{$c}-soft')};
+    }
+  }
+
+  &[data-status='pending'] {
+    --_c: #{token('border-strong')};
+    --_text: #{token('text-muted')};
+    --_soft: #{token('surface')};
+  }
+
+  &:last-child {
+    padding-block-end: 0;
+  }
+
+  // The line to the next item.
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    inset-block: calc(var(--_marker) + 0.25rem) 0.25rem;
+    inset-inline-start: calc(var(--_marker) / 2 - var(--_line) / 2);
+    inline-size: var(--_line);
+    border-radius: radius('full');
+    background: token('border-strong');
+  }
+}
+
+.#{$prefix}-timeline__marker {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  inline-size: var(--_marker);
+  block-size: var(--_marker);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: var(--_soft);
+  color: var(--_text);
+
+  svg {
+    inline-size: calc(var(--_marker) * 0.55);
+    block-size: calc(var(--_marker) * 0.55);
+  }
+
+  [data-status='pending'] > & {
+    border-style: dashed;
+  }
+
+  // Default status: a plain dot.
+  &:empty::after {
+    content: '';
+    inline-size: calc(var(--_marker) * 0.3);
+    block-size: calc(var(--_marker) * 0.3);
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  // An avatar (feed, or a custom marker) fills the marker instead of sitting in a ring.
+  &:has(> .#{$prefix}-avatar) {
+    border: 0;
+    background: none;
+
+    > .#{$prefix}-avatar {
+      --_size: var(--_marker);
+    }
+  }
+}
+
+// Feed: the status icon on the avatar's corner.
+.#{$prefix}-timeline__badge {
+  position: absolute;
+  inset-block-end: -0.25rem;
+  inset-inline-end: -0.25rem;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: 50%;
+  background: token('surface');
+  box-shadow: 0 0 0 2px token('surface');
+  color: var(--_text);
+
+  .#{$prefix}-timeline__marker & svg {
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+  }
+}
+
+.#{$prefix}-timeline__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  // Centers the first line of text on the marker.
+  padding-block-start: max(0px, calc((var(--_marker) - 1.5em) / 2));
+}
+
+.#{$prefix}-timeline__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  row-gap: 0.125rem;
+}
+
+.#{$prefix}-timeline__title {
+  color: token('text');
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+
+  [data-variant='feed'] & {
+    font-weight: 400;
+  }
+}
+
+.#{$prefix}-timeline__actor {
+  font-weight: 600;
+}
+
+.#{$prefix}-timeline__time {
+  color: token('text-muted');
+  font-size: token('text-sm');
+  font-variant-numeric: tabular-nums;
+  border-radius: radius('sm');
+  @include focus-ring;
+
+  // A relative time is a tooltip trigger: hint that there is more to it.
+  &[tabindex] {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+    cursor: help;
+  }
+}
+
+.#{$prefix}-timeline__description,
+.#{$prefix}-timeline__content {
+  color: token('text-muted');
+  font-size: token('text-sm');
+  overflow-wrap: anywhere;
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+}
+
+.#{$prefix}-timeline__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 0.25rem;
+}
+
+.#{$prefix}-timeline__more {
+  display: flex;
+  margin-block-start: var(--_gap);
+  padding-inline-start: calc(var(--_marker) + var(--_space));
+
+  [data-layout='horizontal'] > & {
+    padding-inline-start: 0;
+  }
+}
+
+// ---------- Horizontal: a row that scrolls sideways when it doesn't fit ----------
+.#{$prefix}-timeline[data-layout='horizontal'] {
+  .#{$prefix}-timeline__item {
+    flex: 1 0 var(--#{$prefix}-timeline-item-min, 12rem);
+    flex-direction: column;
+    padding-block-end: 0;
+    padding-inline-end: var(--_gap);
+
+    &:last-child {
+      padding-inline-end: 0;
+    }
+
+    &:not(:last-child)::before {
+      inset-block: calc(var(--_marker) / 2 - var(--_line) / 2) auto;
+      inset-inline: calc(var(--_marker) + 0.5rem) 0.5rem;
+      inline-size: auto;
+      block-size: var(--_line);
+    }
+  }
+
+  .#{$prefix}-timeline__body {
+    padding-block-start: 0;
+  }
+}
+
+// ---------- Alternating: items on both sides of a centered line, when there is room ----------
+@container os-timeline (min-width: 36rem) {
+  .#{$prefix}-timeline[data-layout='alternating'] {
+    .#{$prefix}-timeline__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--_marker) minmax(0, 1fr);
+      column-gap: var(--_space);
+
+      &::before {
+        inset-inline-start: calc(50% - var(--_line) / 2);
+      }
+    }
+
+    .#{$prefix}-timeline__marker {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .#{$prefix}-timeline__body {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    // Odd items sit on the inline-start side, aligned against the line.
+    .#{$prefix}-timeline__item:nth-child(odd) .#{$prefix}-timeline__body {
+      grid-column: 1;
+      align-items: flex-end;
+      text-align: end;
+    }
+
+    .#{$prefix}-timeline__item:nth-child(odd) :is(.#{$prefix}-timeline__header, .#{$prefix}-timeline__actions) {
+      justify-content: flex-end;
+    }
+
+    .#{$prefix}-timeline__more {
+      justify-content: center;
+      padding-inline-start: 0;
+    }
+  }
+}

@@ -17,6 +17,8 @@ import {
   NumberInput,
   Rating,
   TagInput,
+  Timeline,
+  TimelineItem,
   TimePicker,
   LiveRegion,
   Portal,
@@ -201,5 +203,20 @@ describe('SSR', () => {
     expect(html).toContain('aria-label="3.5 stars"');
     expect(html).toContain('data-fill="half"');
     expect(html).toContain('aria-label="4.5 out of 5 stars"');
+  });
+  it('renders Timeline with absolute dates on the server unless now is passed', () => {
+    const feed = (now?: Date) => (
+      <Timeline variant="feed" pageSize={1} locale="en-US" timeZone="UTC" now={now}>
+        <TimelineItem actor="Ada Lovelace" action="commented" time="2026-10-16T11:55:00Z" />
+        <TimelineItem actor="Grace Hopper" action="approved" time="2026-10-16T11:00:00Z" />
+      </Timeline>
+    );
+    const html = renderToString(feed());
+    expect(html).toContain('<ol');
+    expect(html).toMatch(/datetime="2026-10-16T11:55:00Z"/i);
+    expect(html).toContain('Friday, October 16, 2026 at 11:55 AM');
+    expect(html).not.toContain('ago');
+    expect(html).toContain('Show more');
+    expect(renderToString(feed(new Date('2026-10-16T12:00:00Z')))).toContain('5 minutes ago');
   });
 });

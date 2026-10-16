@@ -115,6 +115,8 @@ import {
   Table,
   DataTable,
   TagInput,
+  Timeline,
+  TimelineItem,
   TimePicker,
   NumberInput,
   TabList,
@@ -622,6 +624,18 @@ const cases: Record<string, () => ReactElement> = {
       </Field>
       <TagInput aria-label="Labels" readOnly defaultValue={['Urgent']} />
     </>
+  ),
+  Timeline: () => (
+    <AnnouncerProvider>
+      <Timeline aria-label="Mission" pageSize={2} locale="en-US" timeZone="UTC">
+        <TimelineItem title="Launch" status="success" time="2026-10-01T06:40:00Z" description="Pad 39A" actions={<Button size="sm">Details</Button>} />
+        <TimelineItem title="Orbit" status="pending" time="2026-10-01" />
+        <TimelineItem title="Docking" time="2026-10-02" />
+      </Timeline>
+      <Timeline variant="feed" aria-label="Activity" now={new Date('2026-10-16T12:00:00Z')} locale="en-US" timeZone="UTC">
+        <TimelineItem actor="Ada Lovelace" action="commented" status="info" time="2026-10-16T11:55:00Z" />
+      </Timeline>
+    </AnnouncerProvider>
   ),
   TimePicker: () => (
     <Field label="Start time" hint="Every 15 minutes.">
