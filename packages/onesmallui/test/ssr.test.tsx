@@ -16,6 +16,7 @@ import {
   MenuItem,
   NumberInput,
   Rating,
+  Popconfirm,
   TagInput,
   Timeline,
   TimelineItem,
@@ -218,5 +219,16 @@ describe('SSR', () => {
     expect(html).not.toContain('ago');
     expect(html).toContain('Show more');
     expect(renderToString(feed(new Date('2026-10-16T12:00:00Z')))).toContain('5 minutes ago');
+  });
+
+  it('renders an open Popconfirm as an alertdialog without touching the DOM', () => {
+    const html = renderToString(
+      <Popconfirm defaultOpen variant="danger" title="Archive this log?" message="It moves to the archive." confirmLabel="Archive">
+        <button type="button">Archive</button>
+      </Popconfirm>,
+    );
+    expect(html).toContain('role="alertdialog"');
+    expect(html).toContain('aria-describedby="os-popconfirm-');
+    expect(html).toContain('os-popconfirm__actions');
   });
 });

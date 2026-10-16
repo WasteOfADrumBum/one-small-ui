@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import {
   Avatar,
   AvatarGroup,
@@ -14,6 +14,7 @@ import {
   MenuRadioItem,
   MenuSub,
   Rating,
+  Popconfirm,
   Sidebar,
   SidebarGroup,
   SidebarHeader,
@@ -149,6 +150,48 @@ function ContextMenuFixture() {
   );
 }
 
+// One trigger pinned to each corner and edge (and the center), so the runner can open each and
+// check the panel flips and shifts to stay inside the viewport.
+const edgeSpots: Record<string, CSSProperties> = {
+  'top-left': { insetBlockStart: 4, insetInlineStart: 4 },
+  top: { insetBlockStart: 4, insetInlineStart: '50%', transform: 'translateX(-50%)' },
+  'top-right': { insetBlockStart: 4, insetInlineEnd: 4 },
+  right: { insetBlockStart: '50%', insetInlineEnd: 4, transform: 'translateY(-50%)' },
+  'bottom-right': { insetBlockEnd: 4, insetInlineEnd: 4 },
+  bottom: { insetBlockEnd: 4, insetInlineStart: '50%', transform: 'translateX(-50%)' },
+  'bottom-left': { insetBlockEnd: 4, insetInlineStart: 4 },
+  left: { insetBlockStart: '50%', insetInlineStart: 4, transform: 'translateY(-50%)' },
+  center: { insetBlockStart: '50%', insetInlineStart: '50%', transform: 'translate(-50%, -50%)' },
+};
+
+function PopconfirmFixture() {
+  return (
+    <>
+      <p data-test="popconfirm-outside" style={{ position: 'fixed', insetBlockStart: '30%', insetInlineStart: 16, margin: 0 }}>
+        Plain text
+      </p>
+      <button type="button" data-test="popconfirm-other" style={{ position: 'fixed', insetBlockStart: '70%', insetInlineStart: 16 }}>
+        Other control
+      </button>
+      {Object.entries(edgeSpots).map(([name, spot], i) => (
+        <span key={name} style={{ position: 'fixed', ...spot }}>
+          <Popconfirm
+            title="Remove this crew member from the mission?"
+            message="They lose access to the mission board and its files. You can invite them again later."
+            variant={i % 2 ? 'danger' : 'default'}
+            confirmLabel="Remove"
+            className={`layout-popconfirm-${name}`}
+          >
+            <button type="button" data-test={`popconfirm-${name}`}>
+              {name}
+            </button>
+          </Popconfirm>
+        </span>
+      ))}
+    </>
+  );
+}
+
 // App shell: `?collapsed=1` starts as a rail, `?dir=rtl` mirrors it. Below lg it is a drawer.
 function SidebarFixture() {
   const params = new URLSearchParams(location.search);
@@ -223,6 +266,7 @@ export const fixtures: Record<string, ComponentType> = {
   'command-palette': CommandPaletteFixture,
   'data-table': DataTableFixture,
   rating: RatingFixture,
+  popconfirm: PopconfirmFixture,
   sidebar: SidebarFixture,
   timeline: TimelineFixture,
 };
