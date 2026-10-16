@@ -54,6 +54,7 @@ import {
   Dialog,
   Drawer,
   DropZone,
+  EmptyState,
   Field,
   FieldGroup,
   FloatingLabel,
@@ -330,6 +331,13 @@ const cases: Record<string, () => ReactElement> = {
     </Drawer>
   ),
   DropZone: () => <DropZone accept="image/*" maxFiles={3} />,
+  EmptyState: () => (
+    <>
+      <EmptyState preset="first-use" actions={<Button>Create project</Button>} secondaryActions={<a href="#docs">Read the guide</a>} />
+      <EmptyState preset="no-results" size="compact" headingLevel={3} onClearFilters={() => {}} />
+      <EmptyState preset="error" headingLevel={3} onRetry={() => {}} />
+    </>
+  ),
   Field: () => (
     <FieldGroup legend="Contact" description="How we reach you.">
       <Field label="Email" hint="Never shared." error="Enter an email" required>

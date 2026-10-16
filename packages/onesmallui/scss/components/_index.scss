@@ -1,6 +1,7 @@
 // Icons load first so component rules that size the SVGs inside them win ties.
 @use 'icon';
 @use 'rating';
+@use 'empty-state';
 @use 'kbd';
 @use 'button';
 @use 'feedback';

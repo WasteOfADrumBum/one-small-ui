@@ -11,6 +11,7 @@ import {
   ContextMenuTrigger,
   DataTable,
   Dialog,
+  EmptyState,
   Field,
   Kbd,
   Lightbox,
@@ -173,6 +174,18 @@ describe('SSR', () => {
     expect(html).toContain('aria-selected="true"');
     expect(html).toContain('aria-checked="true"');
     expect(html).toContain('href="/cv"');
+  });
+
+  it('renders EmptyState presets on the server', () => {
+    const html = renderToString(
+      <>
+        <EmptyState preset="no-results" onClearFilters={() => {}} headingLevel={3} />
+        <EmptyState preset="error" size="compact" onRetry={() => {}} />
+      </>,
+    );
+    expect(html).toContain('<h3 class="os-empty-state__title">No results found</h3>');
+    expect(html).toContain('data-size="compact"');
+    expect(html).toContain('Try again');
   });
 
   it('renders an open ContextMenu without touching the DOM', () => {

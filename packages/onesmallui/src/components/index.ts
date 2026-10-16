@@ -25,6 +25,7 @@ export * from './DatePicker';
 export * from './Dialog';
 export * from './Drawer';
 export * from './DropZone';
+export * from './EmptyState';
 export * from './Field';
 export * from './Form';
 export * from './Input';
