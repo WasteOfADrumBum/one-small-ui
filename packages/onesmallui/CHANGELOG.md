@@ -5,6 +5,8 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-16
+
 ### Added
 
 - `Rating`, a star rating on visually hidden native radios in a `<fieldset>` (`role="radiogroup"`), so arrow
