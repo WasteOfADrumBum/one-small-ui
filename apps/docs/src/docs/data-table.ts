@@ -59,7 +59,7 @@ const doc: ComponentDoc = {
         { name: 'stickyHeader', type: 'boolean', description: 'Header rows stick to the scroll region. Pair with maxHeight.' },
         { name: 'maxHeight', type: 'CSS length', description: 'Caps the region height and scrolls it vertically.' },
         { name: 'loading / loadingRows', type: 'boolean · number', default: 'false · 5', description: 'Skeleton rows, aria-busy on the table and a polite "Loading" announcement.' },
-        { name: 'emptyState', type: 'ReactNode', default: "'No results'", description: 'Shown across all columns when there are no rows.' },
+        { name: 'emptyState', type: 'ReactNode', default: "'No results'", description: 'Shown across all columns when there are no rows. A string becomes the heading (h3) of a compact EmptyState; pass an <EmptyState> for a preset, actions or another heading level.' },
         { name: 'manual / rowCount', type: 'boolean · number', description: 'Server-side mode: no client sorting, filtering or paging. rowCount is the total on the server.' },
         { name: 'toolbar', type: 'ReactNode', description: 'Extra toolbar content, such as bulk actions.' },
         { name: 'tableProps', type: 'TableProps', description: 'Passed to the inner Table: striped, hover, bordered, variant, color.' },

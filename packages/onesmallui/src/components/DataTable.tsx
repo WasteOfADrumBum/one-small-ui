@@ -25,6 +25,7 @@ import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { Button } from './Button';
 import { Checkbox } from './Checkbox';
+import { EmptyState } from './EmptyState';
 import { Input } from './Input';
 import { Menu, MenuCheckboxItem, MenuContent, MenuTrigger } from './Menu';
 import { Pagination } from './Pagination';
@@ -184,7 +185,7 @@ export interface DataTableProps<Row>
   loading?: boolean;
   /** Skeleton rows shown while loading. */
   loadingRows?: number;
-  /** Shown when there are no rows. */
+  /** Shown when there are no rows. A string becomes the heading of a compact EmptyState; other nodes render as they are. */
   emptyState?: ReactNode;
 
   // Server mode
@@ -518,7 +519,11 @@ function DataTableInner<Row>(
     body = (
       <tr data-empty="">
         <td colSpan={colCount} className={cls('data-table__empty')}>
-          {emptyState ?? l.empty}
+          {emptyState == null || (typeof emptyState === 'string' && emptyState) ? (
+            <EmptyState size="compact" headingLevel={3} title={emptyState ?? l.empty} className={cls('data-table__empty-state')} />
+          ) : (
+            emptyState
+          )}
         </td>
       </tr>
     );

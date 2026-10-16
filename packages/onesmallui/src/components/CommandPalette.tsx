@@ -28,6 +28,7 @@ import { Breadcrumb, BreadcrumbItem } from './Breadcrumb';
 import { CloseButton } from './CloseButton';
 import { Dialog, type DialogAnimation } from './Dialog';
 import type { OverlayAppearance } from './DialogBase';
+import { EmptyState } from './EmptyState';
 import { Kbd } from './Kbd';
 import { Spinner } from './Spinner';
 
@@ -98,6 +99,8 @@ export interface CommandPaletteLabels {
   loading: string;
   /** Shown and announced when `loadItems` rejects. */
   error: string;
+  /** The button that runs `loadItems` again after it rejects. Default `'Retry'`. */
+  retry?: string;
   /** Announced after filtering. */
   results: (count: number) => string;
 }
@@ -109,6 +112,7 @@ const defaultLabels: CommandPaletteLabels = {
   close: 'Close command palette',
   loading: 'Loading results',
   error: 'Results could not be loaded.',
+  retry: 'Retry',
   results: (n) => (n === 0 ? 'No results' : n === 1 ? '1 result' : `${n} results`),
 };
 
@@ -147,7 +151,7 @@ export interface CommandPaletteProps
   label?: string;
   /** Accessible name of the search input. */
   inputLabel?: string;
-  /** Shown when nothing matches. */
+  /** Shown when nothing matches. A string becomes the heading of a compact EmptyState; other nodes render as they are. */
   emptyState?: ReactNode | ((query: string) => ReactNode);
   /** Opt in to a "Recent" group, stored in localStorage. */
   recent?: CommandPaletteRecent;
@@ -297,6 +301,8 @@ export const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(
   const [loaded, setLoaded] = useState<CommandGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  // Bumped by Retry to run `loadItems` again for the same query.
+  const [attempt, setAttempt] = useState(0);
   const [recentIds, setRecentIds] = useState<string[]>([]);
   // A chosen item closes the dialog at once, so focus can follow wherever the action goes.
   const [instant, setInstant] = useState(false);
@@ -385,7 +391,7 @@ export const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(
       clearTimeout(timer);
       controller.abort();
     };
-  }, [open, hasLoader, atRoot, q, debounce, loadRef]);
+  }, [open, hasLoader, atRoot, q, debounce, loadRef, attempt]);
 
   // ---------- Results ----------
   const sections = useMemo<Section[]>(() => {
@@ -699,7 +705,27 @@ export const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(
           </div>
         )}
         {open && !loading && entries.length === 0 && (
-          <div className={cls('command-palette__empty')}>{error ? labels.error : empty}</div>
+          <div className={cls('command-palette__empty')}>
+            {error ? (
+              <EmptyState
+                preset="error"
+                size="compact"
+                title={labels.error}
+                description={null}
+                onRetry={() => {
+                  // The button goes away while loading, so focus goes back to the search.
+                  setAttempt((n) => n + 1);
+                  inputRef.current?.focus();
+                }}
+                labels={{ retry: labels.retry }}
+                className={cls('command-palette__empty-state')}
+              />
+            ) : typeof empty === 'string' && empty ? (
+              <EmptyState size="compact" title={empty} className={cls('command-palette__empty-state')} />
+            ) : (
+              empty
+            )}
+          </div>
         )}
       </div>
     </Dialog>

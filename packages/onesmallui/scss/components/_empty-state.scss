@@ -1,0 +1,132 @@
+@use '../abstracts' as *;
+
+// ---------- EmptyState ----------
+// .os-empty-state[data-size][data-preset] > .os-empty-state__media + __title + __description + __actions.
+// A centered column; `compact` tightens it for tables, menus and lists. Hosts (DataTable,
+// CommandPalette, TreeView) reset it further so their empty cells keep their 0.4.0 look.
+.#{$prefix}-empty-state {
+  --_media: 4rem;
+  --_icon: 2rem;
+  --_illustration: 12rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 3rem;
+  padding-inline: 1.5rem;
+  color: token('text');
+  text-align: center;
+
+  &[data-size='compact'] {
+    --_media: 2.5rem;
+    --_icon: 1.25rem;
+    --_illustration: 6rem;
+    gap: 0.25rem;
+    padding-block: 1.5rem;
+    padding-inline: 1rem;
+  }
+}
+
+.#{$prefix}-empty-state__media {
+  display: inline-grid;
+  place-items: center;
+  margin-block-end: 0.5rem;
+  color: token('text-muted');
+
+  &[data-kind='icon'] {
+    inline-size: var(--_media);
+    block-size: var(--_media);
+    border-radius: 50%;
+    background: token('surface-2');
+
+    svg {
+      inline-size: var(--_icon);
+      block-size: var(--_icon);
+    }
+  }
+
+  &[data-kind='illustration'] {
+    max-inline-size: min(100%, var(--_illustration));
+
+    > :is(img, svg) {
+      display: block;
+      max-inline-size: 100%;
+      block-size: auto;
+    }
+  }
+
+  // The icon shape and the heading say "error"; the color only reinforces it.
+  .#{$prefix}-empty-state[data-preset='error'] > & {
+    color: token('danger-text');
+  }
+
+  .#{$prefix}-empty-state[data-size='compact'] > & {
+    margin-block-end: 0.25rem;
+  }
+}
+
+.#{$prefix}-empty-state__title {
+  margin: 0;
+  font-size: token('text-xl');
+  font-weight: 600;
+  line-height: $line-height-tight;
+  color: token('text');
+
+  .#{$prefix}-empty-state[data-size='compact'] > & {
+    font-size: token('text-base');
+  }
+}
+
+.#{$prefix}-empty-state__description {
+  max-inline-size: 42ch;
+  margin: 0;
+  color: token('text-muted');
+
+  .#{$prefix}-empty-state[data-size='compact'] > & {
+    font-size: token('text-sm');
+  }
+}
+
+.#{$prefix}-empty-state__actions,
+.#{$prefix}-empty-state__primary,
+.#{$prefix}-empty-state__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.#{$prefix}-empty-state__actions {
+  flex-direction: column;
+  margin-block-start: 1rem;
+
+  .#{$prefix}-empty-state[data-size='compact'] > & {
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+}
+
+// ---------- Inside DataTable, CommandPalette and TreeView ----------
+// A string empty state in these components is a compact EmptyState whose heading keeps the plain,
+// muted text they showed before 0.5.0. The table cell and the palette box keep their own padding.
+.#{$prefix}-empty-state:is(
+    .#{$prefix}-data-table__empty-state,
+    .#{$prefix}-command-palette__empty-state,
+    .#{$prefix}-tree__empty-state
+  ) {
+  > .#{$prefix}-empty-state__title {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+}
+
+.#{$prefix}-empty-state:is(.#{$prefix}-data-table__empty-state, .#{$prefix}-command-palette__empty-state) {
+  padding: 0;
+  color: inherit;
+}
+
+.#{$prefix}-empty-state.#{$prefix}-tree__empty-state {
+  color: token('text-muted');
+}

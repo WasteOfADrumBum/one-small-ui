@@ -28,6 +28,7 @@ import { ErrorIcon } from '../icons/ErrorIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { Button } from './Button';
+import { EmptyState } from './EmptyState';
 import { Spinner } from './Spinner';
 import type { Size } from './types';
 
@@ -100,6 +101,11 @@ const defaultLabels: TreeViewLabels = {
 export interface TreeViewProps
   extends Omit<HTMLAttributes<HTMLUListElement>, 'children' | 'defaultValue' | 'onChange' | 'onSelect'> {
   items: TreeNode[];
+  /**
+   * Shown when `items` is empty. A string becomes the heading of a compact EmptyState; other nodes
+   * render as they are. The empty tree stays in the DOM (hidden) as the ref target.
+   */
+  emptyState?: ReactNode;
   /** `single` (default) or `multiple` selection with `aria-selected`; `none` for navigation-only trees. Ignored with `checkboxes`. */
   selectionMode?: TreeSelectionMode;
   selectedKeys?: string[];
@@ -242,6 +248,7 @@ function enabledLeaves(nodes: TreeNode[], lazy: LazyState, out: string[] = []) {
 export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function TreeView(
   {
     items,
+    emptyState,
     selectionMode = 'single',
     selectedKeys,
     defaultSelectedKeys = EMPTY,
@@ -260,6 +267,7 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
     size,
     labels: labelsProp,
     className,
+    hidden,
     onKeyDown,
     onFocus,
     onClick,
@@ -268,6 +276,7 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
   },
   ref,
 ) {
+  const showEmpty = items.length === 0 && emptyState != null && emptyState !== false && emptyState !== '';
   const labels = useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
   const { announce } = useAnnouncer();
   const [selected, setSelected] = useControllableState(selectedKeys, defaultSelectedKeys, onSelectedKeysChange);
@@ -613,10 +622,18 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
         onFocus={handleFocus}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
+        // An empty tree is hidden so it isn't exposed as a tree with no items.
+        hidden={showEmpty || hidden}
         {...rest}
       >
         <TreeChildren nodes={items} level={1} />
       </ul>
+      {showEmpty &&
+        (typeof emptyState === 'string' ? (
+          <EmptyState size="compact" headingLevel={3} title={emptyState} className={cls('tree__empty-state')} />
+        ) : (
+          emptyState
+        ))}
     </TreeContext.Provider>
   );
 });

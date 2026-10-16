@@ -25,6 +25,7 @@ import {
   SidebarToggle,
   Timeline,
   TimelineItem,
+  TreeView,
   type AvatarSize,
   type CommandItem,
   type LightboxImage,
@@ -119,6 +120,45 @@ function CommandPaletteFixture() {
       <p>Page content behind the palette.</p>
       <CommandPalette defaultOpen items={commands} hotkey={false} data-test="command-palette" />
     </div>
+  );
+}
+
+// Empty states. A fragment renders as it is, which is exactly the 0.4.0 markup (bare text in the
+// cell), so the runner compares the EmptyState versions against it: same size, spacing, color, alignment.
+const emptyColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+];
+
+function EmptyStatesFixture() {
+  return (
+    <div style={{ padding: 16, inlineSize: 600, display: 'grid', gap: 24 }}>
+      <DataTable caption="Default" data={[]} columns={emptyColumns} data-test="dt-default" />
+      <DataTable caption="Reference" data={[]} columns={emptyColumns} emptyState={<>No results</>} data-test="dt-reference" />
+      <DataTable caption="String" data={[]} columns={emptyColumns} emptyState="No crew yet" data-test="dt-string" />
+      <DataTable caption="String reference" data={[]} columns={emptyColumns} emptyState={<>No crew yet</>} data-test="dt-string-reference" />
+      <div style={{ inlineSize: 320 }}>
+        <TreeView aria-label="Files" items={[]} emptyState="No files" data-test="tree" />
+      </div>
+    </div>
+  );
+}
+
+// The palette with nothing to show: `?state=error` makes the loader fail, `?state=reference`
+// renders the 0.4.0 markup (bare text) through a fragment.
+function CommandPaletteEmptyFixture() {
+  const state = new URLSearchParams(location.search).get('state');
+  return (
+    <CommandPalette
+      defaultOpen
+      hotkey={false}
+      items={commands}
+      defaultQuery="zzzz"
+      emptyState={state === 'reference' ? (q) => <>{`No results for “${q}”`}</> : undefined}
+      loadItems={state === 'error' ? () => Promise.reject(new Error('offline')) : undefined}
+      debounce={0}
+      data-test="command-palette"
+    />
   );
 }
 
@@ -290,10 +330,12 @@ export const fixtures: Record<string, ComponentType> = {
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'command-palette': CommandPaletteFixture,
+  'command-palette-empty': CommandPaletteEmptyFixture,
   'data-table': DataTableFixture,
   rating: RatingFixture,
   popconfirm: PopconfirmFixture,
   lightbox: LightboxFixture,
+  'empty-states': EmptyStatesFixture,
   sidebar: SidebarFixture,
   timeline: TimelineFixture,
 };
