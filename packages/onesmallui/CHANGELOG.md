@@ -5,6 +5,10 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Fixed
+
+- `@types/node` is now a declared devDependency and in the test tsconfig `types`, so `prepublishOnly` typechecks `test/tokens.test.tsx` on installs that omit optional peers.
+
 ## [0.5.0] - 2026-10-16
 
 ### Added
