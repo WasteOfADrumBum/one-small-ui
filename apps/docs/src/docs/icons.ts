@@ -6,7 +6,7 @@ const doc: ComponentDoc = {
   name: 'Icons',
   group: 'Content',
   summary:
-    '41 stroked icons on a 24×24 grid that take the text color, so they follow themes and forced colors. Decorative by default; give one a label when it carries meaning on its own. Each icon is its own module, so you ship only the ones you import.',
+    '44 stroked icons on a 24×24 grid that take the text color, so they follow themes and forced colors. Decorative by default; give one a label when it carries meaning on its own. Each icon is its own module, so you ship only the ones you import.',
   importLine: "import { ChevronDownIcon, Icon, createIcon } from '@onesmall/ui/icons'; // also exported from '@onesmall/ui'",
   examples: [
     {
