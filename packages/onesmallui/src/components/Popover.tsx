@@ -12,6 +12,7 @@ import {
   type ReactElement,
   type ReactNode,
   type Ref,
+  type RefObject,
 } from 'react';
 import { useMergedRefs } from '../hooks/useMergedRefs';
 import { useControllableState } from '../hooks/useControllableState';
@@ -25,6 +26,7 @@ import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
 import { CloseButton } from './CloseButton';
 import { appearanceProps, type OverlayAppearance } from './DialogBase';
+import { PopoverContext, type PopoverControls } from './PopoverContext';
 import type { Placement } from './types';
 
 export type PopoverTrigger = 'click' | 'hover' | 'focus';
@@ -52,6 +54,17 @@ export interface PopoverProps {
   closeButton?: boolean;
   /** Accessible name when there is no `title`. */
   'aria-label'?: string;
+  /** Id(s) of the element(s) that describe the panel, such as its message. */
+  'aria-describedby'?: string;
+  /** `'alertdialog'` for a panel that asks for a response, such as a confirmation (default `'dialog'`). */
+  role?: 'dialog' | 'alertdialog';
+  /** Moves focus to this element when the panel opens. Without it, focus stays on the trigger. */
+  initialFocus?: RefObject<HTMLElement | null>;
+  /**
+   * Return focus to the trigger after an outside click too (default `false`: focus stays where the
+   * user clicked). A click on another focusable control always keeps focus there.
+   */
+  returnFocusOnDismiss?: boolean;
   /** Class for the floating panel. */
   className?: string;
   style?: CSSProperties;
@@ -77,6 +90,10 @@ export function Popover({
   appearance = 'default',
   closeButton,
   'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy,
+  role = 'dialog',
+  initialFocus,
+  returnFocusOnDismiss = false,
   className,
   style,
 }: PopoverProps) {
@@ -94,6 +111,15 @@ export function Popover({
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // Escape and the close button send focus back to the trigger; light dismiss leaves it where the user clicked.
   const { restore: returnFocus } = useFocusReturn({ active: isOpen, target: anchorRef, restoreOnDeactivate: false });
+  // Set by the close path; focus moves back once the panel has actually closed (a controlled parent may refuse).
+  const returnOnClose = useRef(false);
+  useEffect(() => {
+    if (isOpen || !returnOnClose.current) return;
+    returnOnClose.current = false;
+    returnFocus();
+  }, [isOpen, returnFocus]);
+  const refocus = useRef<() => void>(undefined);
+  useEffect(() => () => refocus.current?.(), []);
 
   const show = (wait = 0) => {
     clearTimeout(timer.current);
@@ -114,19 +140,50 @@ export function Popover({
     return () => hideFromTopLayer(el);
   }, [mounted, floatingRef]);
 
+  useLayoutEffect(() => {
+    if (isOpen) initialFocus?.current?.focus({ preventScroll: true });
+  }, [isOpen, initialFocus]);
+
   // Light dismiss: a click outside the trigger and panel, or Escape anywhere.
   useEffect(() => {
     if (!isOpen) return;
     const inside = (t: EventTarget | null) =>
       t instanceof Node && (!!floatingRef.current?.contains(t) || !!anchorRef.current?.contains(t));
     const onDown = (e: PointerEvent) => {
-      if (!inside(e.target)) setOpen(false);
+      if (inside(e.target)) return;
+      returnOnClose.current = false;
+      if (returnFocusOnDismiss) refocusAfterClick();
+      setOpen(false);
+    };
+    // The browser moves focus after pointerdown (on mousedown, or after the tap for touch). Once it
+    // has, refocus the trigger only if focus was lost (a click on another control keeps it there).
+    // Checked right after this event and again on the click that follows.
+    const refocusAfterClick = () => {
+      refocus.current?.();
+      const panel = floatingRef.current;
+      const run = () => {
+        const a = document.activeElement;
+        if (!a || a === document.body || !!panel?.contains(a)) returnFocus();
+      };
+      const timer = setTimeout(run, 0);
+      const onClick = () => {
+        stop();
+        run();
+      };
+      const stop = () => {
+        clearTimeout(timer);
+        document.removeEventListener('click', onClick, true);
+        document.removeEventListener('pointerdown', stop, true);
+        refocus.current = undefined;
+      };
+      document.addEventListener('click', onClick, true);
+      document.addEventListener('pointerdown', stop, true);
+      refocus.current = stop;
     };
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      const hadFocus = inside(document.activeElement);
+      returnOnClose.current = inside(document.activeElement);
       setOpen(false);
-      if (hadFocus) returnFocus();
     };
     document.addEventListener('pointerdown', onDown, true);
     document.addEventListener('keydown', onKey);
@@ -134,7 +191,7 @@ export function Popover({
       document.removeEventListener('pointerdown', onDown, true);
       document.removeEventListener('keydown', onKey);
     };
-  }, [isOpen, setOpen, floatingRef, anchorRef, returnFocus]);
+  }, [isOpen, setOpen, floatingRef, anchorRef, returnFocus, returnFocusOnDismiss]);
 
   const childRef = isValidElement(children) ? (children.props as { ref?: Ref<HTMLElement> }).ref : undefined;
   const triggerRef = useMergedRefs(anchorRef, childRef);
@@ -188,6 +245,12 @@ export function Popover({
   );
 
   const withClose = closeButton ?? clickable;
+  const controls: PopoverControls = {
+    close: (refocusTrigger = true) => {
+      returnOnClose.current = refocusTrigger;
+      setOpen(false);
+    },
+  };
 
   return (
     <>
@@ -196,12 +259,13 @@ export function Popover({
         <div
           ref={floatingRef}
           id={panelId}
-          role="dialog"
+          role={role}
           data-state={state === 'closing' ? 'closing' : 'open'}
           // Leaving: hidden from assistive tech while it fades out.
           aria-hidden={state === 'closing' || undefined}
           aria-labelledby={title ? titleId : undefined}
           aria-label={title ? undefined : ariaLabel}
+          aria-describedby={ariaDescribedBy}
           className={cx(cls('floating'), cls('popover'), className)}
           style={style}
           data-arrow={arrow || undefined}
@@ -234,17 +298,13 @@ export function Popover({
                 </p>
               )}
               {withClose && (
-                <CloseButton
-                  label="Close"
-                  onClick={() => {
-                    setOpen(false);
-                    returnFocus();
-                  }}
-                />
+                <CloseButton label="Close" onClick={() => controls.close(true)} />
               )}
             </div>
           )}
-          <div className={cls('popover__body')}>{content}</div>
+          <div className={cls('popover__body')}>
+            <PopoverContext.Provider value={controls}>{content}</PopoverContext.Provider>
+          </div>
         </div>
       )}
     </>
