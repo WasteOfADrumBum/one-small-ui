@@ -122,3 +122,28 @@ Standing rules from the maintainer for every session:
   reading order). With `checkboxes`, leaf keys are the source of truth and parents derive `mixed`.
 - Docs pages can set `callout` (`apps/docs/src/site/docTypes.ts`) for a warning the page leads with, as
   ContextMenu does for "always provide another path".
+
+## Feedback and display (0.5.0)
+
+- Swipes go through `useSwipe(ref, { onSwipe, threshold, axis, mouse })`. It reports logical directions
+  (`start | end | up | down`, already flipped in RTL) and ignores multi-touch, so pinch handlers can coexist.
+  Carousel's fade mode and Lightbox use it; don't hand-roll pointer swipe math again.
+- `Lightbox` runs on `Dialog` (fullscreen, dark appearance) and `LightboxGallery` wires thumbnail buttons to it,
+  passing the clicked thumbnail as `returnFocus`. `alt` is a required `string` on `LightboxImage`. Arrow keys
+  navigate only at 1× zoom and pan while zoomed. Position and zoom changes are announced with `useAnnouncer`.
+- `Rating` is visually hidden native radios in a `<fieldset role="radiogroup">`, so arrow keys, `Field`, `Form`
+  and native submission come from the browser. Read-only renders one `role="img"` with "4.5 out of 5 stars".
+  Half-step targets are 24×44px (AA, not AAA); the docs say so.
+- `Popover` takes `role="alertdialog"`, `aria-describedby`, `initialFocus` and `returnFocusOnDismiss`; defaults keep
+  the old output. `Popconfirm` is built on them through the internal `PopoverContext` (not exported). It returns
+  focus to the trigger on dismiss unless the outside click landed on another focusable control. Irreversible
+  actions use `Dialog`, not Popconfirm.
+- Empty states use `EmptyState` (`preset`, `headingLevel` 2–6, `size="compact"` inside tables, menus and lists).
+  DataTable, CommandPalette and TreeView render string or default empty content through a compact EmptyState
+  inside their existing `__empty` hooks; host-scoped CSS in `_empty-state.scss` keeps their 0.4.0 look, guarded
+  by side-by-side checks in `test:layout`. A ReactNode `emptyState` still renders as-is.
+- `Timeline` is an `<ol>` of `TimelineItem`s with `<time dateTime>`. Status is an icon plus visually hidden text,
+  never color alone. The feed variant renders absolute dates on the server and switches to relative text after
+  hydration unless `now` is passed, so SSR and hydration match.
+- Known gap: `computePosition` doesn't clamp the main axis when neither side fits, so floating panels can
+  overflow very short viewports (about 320px tall). Fix it there, for every floating component, not per component.
