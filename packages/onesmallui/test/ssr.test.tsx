@@ -13,6 +13,8 @@ import {
   Dialog,
   Field,
   Kbd,
+  Lightbox,
+  LightboxGallery,
   MenuItem,
   NumberInput,
   Rating,
@@ -39,6 +41,7 @@ import {
   useHotkeys,
   useReducedMotion,
   useScrollLock,
+  useSwipe,
   useTransition,
 } from '../src';
 import { CheckIcon } from '../src/icons';
@@ -48,6 +51,7 @@ function Hooks() {
   useFocusTrap(ref);
   useFocusReturn({ active: true });
   useScrollLock(true);
+  useSwipe(ref, { onSwipe: () => {} });
   const reduced = useReducedMotion();
   const { state } = useTransition(true);
   useAnnouncer();
@@ -123,6 +127,25 @@ describe('SSR', () => {
     expect(html).toContain('role="listbox"');
     expect(html).toContain('Control H');
     expect(html).toContain('<mark');
+  });
+
+  it('renders Lightbox and LightboxGallery on the server, open and closed', () => {
+    const photos = [
+      { src: '/a.jpg', alt: 'Harbor', caption: 'Dawn', srcSet: '/a-640.jpg 640w', sizes: '100vw', download: true },
+      { src: '/b.jpg', alt: 'Dunes', thumbnail: '/b-thumb.jpg' },
+    ];
+    const html = renderToString(
+      <AnnouncerProvider>
+        <LightboxGallery images={photos} aria-label="Photos" />
+        <Lightbox images={photos} defaultOpen thumbnails />
+      </AnnouncerProvider>,
+    );
+    expect(html).toContain('aria-label="Open Harbor"');
+    expect(html).toContain('aria-label="Image viewer"');
+    expect(html).toContain('1 of 2');
+    expect(html).toContain('srcSet="/a-640.jpg 640w"');
+    expect(html).toContain('aria-current="true"');
+    expect(html).toContain('<figcaption');
   });
 
   it('renders Kbd with the non-Apple labels and runs useHotkeys without a document', () => {

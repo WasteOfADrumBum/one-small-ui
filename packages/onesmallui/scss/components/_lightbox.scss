@@ -1,0 +1,280 @@
+@use '../abstracts' as *;
+
+// ---------- Lightbox ----------
+// Built on a full-screen Dialog: the <dialog> carries `.os-lightbox`, and the content is a
+// grid of toolbar, figure (the stage plus its caption) and the optional thumbnail strip.
+// The figure takes every touch gesture itself (`touch-action: none`): swipe, pinch, pan. That
+// also keeps a sideways swipe from turning into the browser's back gesture.
+dialog.#{$prefix}-lightbox {
+  > .#{$prefix}-dialog__panel {
+    background: token('bg');
+  }
+
+  .#{$prefix}-dialog__body {
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+.#{$prefix}-lightbox__content {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.#{$prefix}-lightbox__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+  padding-inline: 1rem 0.25rem;
+}
+
+.#{$prefix}-lightbox__counter {
+  margin: 0;
+  color: token('text');
+  font-size: token('text-sm');
+  font-variant-numeric: tabular-nums;
+}
+
+.#{$prefix}-lightbox__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.#{$prefix}-lightbox__figure {
+  display: grid;
+  touch-action: none;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-block-size: 0;
+  margin: 0;
+}
+
+.#{$prefix}-lightbox__stage {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  min-block-size: 0;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: zoom-in;
+
+  @include up(md) {
+    padding-inline: 4.5rem;
+  }
+
+  [data-zoomed] & {
+    cursor: grab;
+  }
+
+  &[data-gesture] {
+    cursor: grabbing;
+  }
+
+  &[data-status='error'] {
+    cursor: default;
+  }
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.#{$prefix}-lightbox__image {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  inline-size: auto;
+  block-size: auto;
+  object-fit: contain;
+  transform-origin: center;
+  transition: transform dur('fast') ease('standard'), opacity dur('base') ease('standard');
+
+  [data-status='loading'] > & {
+    opacity: 0;
+  }
+
+  // Follow the fingers exactly while a gesture is in progress.
+  [data-gesture] > & {
+    transition: none;
+  }
+}
+
+.#{$prefix}-lightbox__spinner {
+  color: token('text');
+}
+
+.#{$prefix}-lightbox__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-inline-size: 28rem;
+  padding: 1.5rem;
+  color: token('text');
+  text-align: center;
+
+  > svg {
+    inline-size: 3rem;
+    block-size: 3rem;
+  }
+}
+
+.#{$prefix}-lightbox__error-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.#{$prefix}-lightbox__error-alt {
+  margin: 0;
+  color: token('text-muted');
+  font-size: token('text-sm');
+}
+
+// Previous / next sit over the stage's inline edges, mirrored in RTL.
+.#{$prefix}-lightbox__nav {
+  grid-area: 1 / 1;
+  z-index: 1;
+  align-self: center;
+  margin-inline: 0.5rem;
+  background: token('surface');
+  box-shadow: var(--#{$prefix}-shadow-md);
+
+  &[data-dir='prev'] {
+    justify-self: start;
+  }
+
+  &[data-dir='next'] {
+    justify-self: end;
+  }
+
+  svg[data-dir] {
+    transform: scaleX(var(--#{$prefix}-dir));
+  }
+
+  // Zoomed in, the image owns the stage: the buttons stay in the tab order but step back.
+  [data-zoomed] & {
+    opacity: 0.6;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+}
+
+.#{$prefix}-lightbox__caption {
+  grid-row: 2;
+  justify-self: center;
+  max-inline-size: 48rem;
+  padding-block: 0.5rem 0.75rem;
+  padding-inline: 1rem;
+  color: token('text');
+  text-align: center;
+}
+
+.#{$prefix}-lightbox__thumbnails {
+  display: flex;
+  justify-content: safe center;
+  gap: 0.5rem;
+  padding-block: 0.5rem 0.75rem;
+  padding-inline: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+// The current thumbnail has a thick frame and full opacity, so it isn't shown by color alone.
+.#{$prefix}-lightbox__thumb {
+  flex: none;
+  inline-size: 4rem;
+  block-size: 3rem;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: radius('md');
+  background: token('surface-2');
+  overflow: hidden;
+  opacity: 0.65;
+  cursor: pointer;
+  @include transition(opacity, border-color);
+  @include focus-ring;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &[aria-current='true'] {
+    border-color: token('text');
+    opacity: 1;
+  }
+
+  display: grid;
+  place-items: center;
+  color: token('text-muted');
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+// ---------- LightboxGallery ----------
+.#{$prefix}-lightbox-gallery {
+  --_min: 10rem;
+  --_gap: 0.5rem;
+  --_ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--_min), 100%), 1fr));
+  gap: var(--_gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.#{$prefix}-lightbox-gallery__item {
+  min-inline-size: 0;
+}
+
+.#{$prefix}-lightbox-gallery__button {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  aspect-ratio: var(--_ratio);
+  padding: 0;
+  border: 1px solid token('border');
+  border-radius: radius('md');
+  background: token('surface-2');
+  color: token('text-muted');
+  overflow: hidden;
+  cursor: zoom-in;
+  @include focus-ring;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform dur('base') ease('standard');
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+@media (forced-colors: active) {
+  .#{$prefix}-lightbox__thumb[aria-current='true'] {
+    border-color: Highlight;
+  }
+}

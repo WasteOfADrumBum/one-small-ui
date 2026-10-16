@@ -64,6 +64,8 @@ import {
   InputGroup,
   InputGroupText,
   Kbd,
+  Lightbox,
+  LightboxGallery,
   ListGroup,
   LiveRegion,
   ListGroupItem,
@@ -369,6 +371,29 @@ const cases: Record<string, () => ReactElement> = {
         </Grid>
       </Stack>
     </Container>
+  ),
+  Lightbox: () => (
+    <AnnouncerProvider>
+      <Lightbox
+        defaultOpen
+        thumbnails
+        defaultIndex={1}
+        images={[
+          { src: '/harbor.jpg', alt: 'Harbor at dawn', caption: 'Fishing boats leave at first light.' },
+          { src: '/dunes.jpg', alt: 'Wind-carved dunes', download: true },
+          { src: '/glacier.jpg', alt: 'Glacier tongue' },
+        ]}
+      />
+    </AnnouncerProvider>
+  ),
+  LightboxGallery: () => (
+    <LightboxGallery
+      aria-label="Travel photos"
+      images={[
+        { src: '/harbor.jpg', alt: 'Harbor at dawn' },
+        { src: '/dunes.jpg', alt: 'Wind-carved dunes' },
+      ]}
+    />
   ),
   ListGroup: () => (
     <ListGroup aria-label="Decks">

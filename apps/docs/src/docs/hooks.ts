@@ -24,6 +24,7 @@ const doc: ComponentDoc = {
         { name: 'useScrollLock(active)', type: 'void', description: 'Lock page scroll without layout shift. See Scroll lock.' },
         { name: 'useAnnouncer()', type: '{ announce }', description: 'Read a message to screen readers. See Announcer.' },
         { name: 'useTransition(show, options?)', type: '{ state, mounted, duration }', description: 'Enter/exit phases. See Transition.' },
+        { name: 'useSwipe(ref, options)', type: 'void', description: "Swipes in logical directions ('start' | 'end' | 'up' | 'down'), RTL-aware; ignores pinch. See Lightbox." },
       ],
     },
   ],
