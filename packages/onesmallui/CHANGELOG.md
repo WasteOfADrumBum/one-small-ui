@@ -66,7 +66,11 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   `title` rendered as an h2 to h6 (`headingLevel`, default 2), a `description`, and `actions` and
   `secondaryActions` slots, in a `default` and a `compact` size. Presets `no-data`, `no-results`, `error` and
   `first-use` fill in the icon and copy; `onClearFilters` and `onRetry` add the no-results and error presets'
-  buttons, and the error preset pairs `ErrorIcon` with its heading so it never relies on color.
+  buttons, and the error preset pairs `ErrorIcon` with its heading so it never relies on color. DataTable and
+  CommandPalette now render a string (or default) `emptyState` as the heading of a compact EmptyState with the
+  same text, cell and look; other nodes render as before. A failed CommandPalette `loadItems` shows the error
+  preset with a Retry button (`labels.retry`). TreeView gets an opt-in `emptyState`, shown when `items` is empty,
+  with the empty tree kept as the hidden ref target.
 - Icons `InboxIcon`, `RefreshIcon` and `SparklesIcon`.
 
 ## [0.4.1] - 2026-10-16

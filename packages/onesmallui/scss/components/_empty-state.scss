@@ -106,3 +106,27 @@
     margin-block-start: 0.5rem;
   }
 }
+
+// ---------- Inside DataTable, CommandPalette and TreeView ----------
+// A string empty state in these components is a compact EmptyState whose heading keeps the plain,
+// muted text they showed before 0.5.0. The table cell and the palette box keep their own padding.
+.#{$prefix}-empty-state:is(
+    .#{$prefix}-data-table__empty-state,
+    .#{$prefix}-command-palette__empty-state,
+    .#{$prefix}-tree__empty-state
+  ) {
+  > .#{$prefix}-empty-state__title {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+}
+
+.#{$prefix}-empty-state:is(.#{$prefix}-data-table__empty-state, .#{$prefix}-command-palette__empty-state) {
+  padding: 0;
+  color: inherit;
+}
+
+.#{$prefix}-empty-state.#{$prefix}-tree__empty-state {
+  color: token('text-muted');
+}

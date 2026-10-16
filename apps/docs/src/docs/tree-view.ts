@@ -40,6 +40,7 @@ const doc: ComponentDoc = {
       title: 'TreeView',
       props: [
         { name: 'items', type: 'TreeNode[]', description: 'The top-level nodes. Keep the array stable (state or useMemo) in large trees.' },
+        { name: 'emptyState', type: 'ReactNode', description: 'Shown when items is empty. A string becomes the heading (h3) of a compact EmptyState. The empty tree stays in the DOM, hidden, as the ref target.' },
         { name: 'aria-label / aria-labelledby', type: 'string', description: 'Required. Names the tree.' },
         {
           name: 'selectionMode',

@@ -20,6 +20,12 @@ const doc: ComponentDoc = {
       description:
         '`no-data`, `no-results`, `error` and `first-use` fill in the icon and copy. `onClearFilters` and `onRetry` add the preset’s button. Every text can be overridden.',
     },
+    {
+      name: 'empty-state-in-components',
+      title: 'In tables and trees',
+      description:
+        'DataTable, CommandPalette and TreeView take a string `emptyState` and render it as a compact EmptyState that keeps their quiet look. Pass a whole EmptyState for a preset or an action.',
+    },
   ],
   props: [
     {
@@ -38,6 +44,27 @@ const doc: ComponentDoc = {
         { name: 'onRetry', type: '() => void', description: 'With preset="error", adds a Try again button.' },
         { name: 'labels', type: 'Partial<{ clearFilters: string; retry: string }>', description: 'Texts of the preset buttons, for translation.' },
         { name: 'children', type: 'ReactNode', description: 'Extra content between the description and the actions.' },
+      ],
+    },
+    {
+      title: 'Inside other components',
+      props: [
+        {
+          name: 'DataTable emptyState',
+          type: 'ReactNode',
+          default: "labels.empty ('No results')",
+          description: 'A string becomes the heading (h3) of a compact EmptyState in the empty cell. Pass an <EmptyState> for a preset or another heading level.',
+        },
+        {
+          name: 'CommandPalette emptyState',
+          type: 'ReactNode | ((query) => ReactNode)',
+          description: 'Same rule. A failed loadItems shows the error preset with labels.error and a Retry button.',
+        },
+        {
+          name: 'TreeView emptyState',
+          type: 'ReactNode',
+          description: 'Shown when items is empty (opt-in). The empty tree stays in the DOM, hidden, as the ref target.',
+        },
       ],
     },
   ],

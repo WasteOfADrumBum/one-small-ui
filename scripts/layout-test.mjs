@@ -178,6 +178,116 @@ for (const [width, height] of [
   else check(panel.width <= 640.5 && panel.top > 0, `${tag}: panel should be a centered 40rem card (${panel.width}px wide, top ${panel.top})`);
 }
 
+// ---------- Empty states: EmptyState inside DataTable, CommandPalette and TreeView ----------
+// Each fixture also renders the 0.4.0 markup (bare text, passed through a fragment), so the refactored
+// empty states are compared with it in the same browser and font: box size and padding, text color,
+// font and alignment must match. Measured on 0.4.0 at 1280px: DataTable cell 52.69px tall, padding
+// 12px 16px; CommandPalette box 91.19px, padding 32px 12px; both centered, text-muted, 17px/27.2px 400.
+const near = (a, b, tol = 1) => Math.abs(a - b) <= tol;
+const measureEmpty = (selector) =>
+  page.evaluate(async (sel) => {
+    const box = document.querySelector(sel);
+    if (!box) return null;
+    await Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {})));
+    const cs = getComputedStyle(box);
+    const r = box.getBoundingClientRect();
+    // The first visible text: the heading's text after the refactor, the bare text before it.
+    const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
+    });
+    const text = walker.nextNode();
+    if (!text) return null;
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const t = range.getBoundingClientRect();
+    const tcs = getComputedStyle(text.parentElement);
+    return {
+      text: text.textContent.trim(),
+      height: r.height,
+      width: r.width,
+      padding: cs.padding,
+      textAlign: cs.textAlign,
+      color: tcs.color,
+      font: `${tcs.fontFamily} ${tcs.fontSize}/${tcs.lineHeight} ${tcs.fontWeight}`,
+      textHeight: t.height,
+      textTop: t.top - r.top,
+      textBottom: r.bottom - t.bottom,
+      textCenter: (t.left + t.right) / 2 - (r.left + r.right) / 2,
+      heading: text.parentElement.closest('h2, h3, h4, h5, h6')?.tagName ?? null,
+      icon: !!box.querySelector('svg'),
+      buttons: Array.from(box.querySelectorAll('button')).map((b) => b.textContent.trim()),
+    };
+  }, selector);
+const sameBox = (tag, m, ref, { geometry = true } = {}) => {
+  check(!!m && !!ref, `${tag}: empty state or its 0.4.0 reference is missing`);
+  if (!m || !ref) return;
+  check(m.padding === ref.padding, `${tag}: padding ${m.padding}, was ${ref.padding}`);
+  check(m.textAlign === ref.textAlign, `${tag}: text-align ${m.textAlign}, was ${ref.textAlign}`);
+  check(m.color === ref.color, `${tag}: text color ${m.color}, was ${ref.color}`);
+  check(m.font === ref.font, `${tag}: font ${m.font}, was ${ref.font}`);
+  check(Math.abs(m.textCenter) < 1, `${tag}: text is ${m.textCenter}px off center`);
+  if (!geometry) return;
+  for (const k of ['height', 'width', 'textHeight', 'textTop', 'textBottom']) {
+    check(near(m[k], ref[k], 0.5), `${tag}: ${k} ${m[k]}px, was ${ref[k]}px`);
+  }
+};
+
+await page.setViewportSize({ width: 1280, height: 900 });
+await open('empty-states');
+const dtRef = await measureEmpty('[data-test="dt-reference"] td.os-data-table__empty');
+for (const [name, refName, text] of [
+  ['dt-default', 'dt-reference', 'No results'],
+  ['dt-string', 'dt-string-reference', 'No crew yet'],
+]) {
+  const m = await measureEmpty(`[data-test="${name}"] td.os-data-table__empty`);
+  const ref = await measureEmpty(`[data-test="${refName}"] td.os-data-table__empty`);
+  sameBox(`data-table ${name}`, m, ref);
+  check(m?.text === text && m?.heading === 'H3', `data-table ${name}: expected "${text}" in an h3, got ${JSON.stringify(m && [m.text, m.heading])}`);
+}
+const tree = await page.evaluate(() => {
+  const ul = document.querySelector('[data-test="tree"]');
+  const es = ul?.nextElementSibling;
+  if (!ul || !es) return null;
+  const cs = getComputedStyle(es);
+  const r = es.getBoundingClientRect();
+  const title = es.querySelector('.os-empty-state__title');
+  const range = document.createRange();
+  range.selectNodeContents(title);
+  const t = range.getBoundingClientRect();
+  return {
+    hidden: ul.hidden && ul.getBoundingClientRect().height === 0,
+    isEmptyState: es.classList.contains('os-empty-state') && es.dataset.size === 'compact',
+    padding: cs.padding,
+    color: getComputedStyle(title).color,
+    textCenter: (t.left + t.right) / 2 - (r.left + r.right) / 2,
+    width: r.width,
+  };
+});
+check(!!tree, 'tree-view: empty state did not render after the tree');
+if (tree) {
+  check(tree.hidden, 'tree-view: the empty tree is not hidden');
+  check(tree.isEmptyState, 'tree-view: the string empty state is not a compact EmptyState');
+  check(tree.padding === '24px 16px', `tree-view: empty state padding ${tree.padding}, expected the compact 24px 16px`);
+  check(tree.color === dtRef?.color, `tree-view: empty text color ${tree.color}, expected text-muted ${dtRef?.color} like the other hosts`);
+  check(Math.abs(tree.textCenter) < 1 && near(tree.width, 320), `tree-view: empty state not centered in its 320px box (${tree.width}px, ${tree.textCenter}px off)`);
+}
+
+const paletteEmpty = async (state) => {
+  current = `command-palette-empty ${state || 'no-results'}`;
+  await page.goto(`${base}?fixture=command-palette-empty${state ? `&state=${state}` : ''}`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.os-command-palette__empty', { timeout: 2000 }).catch(() => null);
+  return measureEmpty('.os-command-palette__empty');
+};
+const cpRef = await paletteEmpty('reference');
+const cpEmpty = await paletteEmpty('');
+sameBox('command-palette no results', cpEmpty, cpRef);
+check(cpEmpty?.text === 'No results for “zzzz”' && cpEmpty?.heading === 'H2', `command-palette no results: got ${JSON.stringify(cpEmpty && [cpEmpty.text, cpEmpty.heading])}`);
+// The error grows by its icon and Retry button (the error preset look) but keeps the box, text and alignment.
+const cpError = await paletteEmpty('error');
+sameBox('command-palette error', cpError, cpRef, { geometry: false });
+check(cpError?.text === 'Results could not be loaded.' && cpError.icon, `command-palette error: expected the error text with its icon, got ${JSON.stringify(cpError)}`);
+check(cpError?.buttons.length === 1 && cpError.buttons[0] === 'Retry', `command-palette error: expected one Retry button, got ${JSON.stringify(cpError?.buttons)}`);
+
 // ---------- ContextMenu: opened at every corner and edge, it stays inside the viewport ----------
 const menuBox = () =>
   page.evaluate(async () => {
@@ -361,8 +471,6 @@ const tooltipBox = async () => {
     return { open: tip.dataset.state === 'open' && t.width > 0, linkLeft: l.left, linkRight: l.right, tipLeft: t.left, tipRight: t.right };
   });
 };
-const near = (a, b, tol = 1) => Math.abs(a - b) <= tol;
-
 for (const dir of ['ltr', 'rtl']) {
   const q = dir === 'rtl' ? 'dir=rtl' : '';
   // Expanded at 1280px: 16rem wide, against the inline-start edge.
