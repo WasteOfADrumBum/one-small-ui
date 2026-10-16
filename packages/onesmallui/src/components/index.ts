@@ -42,6 +42,7 @@ export type { NumberInputProps } from './NumberInput';
 export * from './OtpInput';
 export * from './Pagination';
 export * from './PasswordStrength';
+export * from './Popconfirm';
 export * from './Popover';
 export * from './Portal';
 export * from './Progress';

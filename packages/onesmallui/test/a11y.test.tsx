@@ -86,6 +86,7 @@ import {
   Pagination,
   PasswordStrength,
   Placeholder,
+  Popconfirm,
   Popover,
   Portal,
   Progress,
@@ -448,6 +449,11 @@ const cases: Record<string, () => ReactElement> = {
   ),
   Pagination: () => <Pagination count={20} defaultPage={6} showFirstLast aria-label="Log pages" />,
   PasswordStrength: () => <PasswordStrength value="Orbit-2026!" showRules />,
+  Popconfirm: () => (
+    <Popconfirm defaultOpen variant="danger" title="Delete this draft?" message="You can restore it from the trash for 30 days." confirmLabel="Delete">
+      <Button color="danger">Delete draft</Button>
+    </Popconfirm>
+  ),
   Popover: () => (
     <Popover defaultOpen title="Docking bay 7" content="Clear for landing.">
       <Button>Bay status</Button>

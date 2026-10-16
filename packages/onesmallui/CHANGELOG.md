@@ -30,6 +30,19 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   relative text switches in after hydration (or right away with `now`), kept current by one shared clock.
 - `npm run test:layout` checks that a horizontal Timeline scrolls inside itself at 360px without page
   overflow, and that the alternating layout mirrors in RTL and falls back to one side when narrow.
+- `Popconfirm`, a small confirmation anchored to its trigger, built on `Popover` (so `useFloating`, the top
+  layer and the shared transition come with it). It is a `role="alertdialog"` labelled by `title` and described
+  by `message`, with Cancel and Confirm buttons (`cancelLabel`, `confirmLabel`) and focus on Cancel when it
+  opens (`initialFocus="confirm"` to change that). Escape, Cancel and an outside click call `onCancel` and return
+  focus to the trigger, except when the click lands on another control, which keeps focus. `onConfirm` may
+  return a promise: Confirm shows `loading` and the popover stays open until it settles, and a rejection shows
+  the error inline (`role="alert"`, the error's message or `errorText`) for a retry. `variant="danger"` makes
+  Confirm red and adds a `WarningIcon`, so danger is not shown by color alone. `open` can be controlled. The docs
+  say to use a `Dialog` for irreversible or high-impact actions, and `npm run test:layout` checks it stays inside
+  the viewport at every edge and corner, at 360px and on desktop.
+- `Popover` takes `role` (`'dialog'` by default, or `'alertdialog'`), `aria-describedby`, `initialFocus` (a ref
+  focused when it opens) and `returnFocusOnDismiss` (default `false`), which also returns focus to the trigger
+  after an outside click on something that cannot take focus. Without them it renders and behaves as before.
 
 ## [0.4.1] - 2026-10-16
 

@@ -249,6 +249,80 @@ for (const viewport of [
   await page.keyboard.press('Escape');
 }
 
+// ---------- Popconfirm: opened at every corner and edge, it stays inside the viewport ----------
+const popconfirmSpots = ['top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left', 'center'];
+const popconfirmBox = (name) =>
+  page.evaluate(async (name) => {
+    const el = document.querySelector(`.layout-popconfirm-${name}`);
+    if (!el || !el.hasAttribute('data-side')) return null;
+    await Promise.all(el.getAnimations().map((a) => a.finished));
+    const box = (r) => ({ left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+    const t = document.querySelector(`[data-test="popconfirm-${name}"]`).getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return {
+      ...box(r),
+      trigger: box(t),
+      // The panel must sit beside the trigger, not on top of it.
+      overlaps: r.left < t.right && t.left < r.right && r.top < t.bottom && t.top < r.bottom,
+      overflowX: el.scrollWidth - el.clientWidth,
+      pageScrollWidth: document.documentElement.scrollWidth,
+      role: el.getAttribute('role'),
+      focus: document.activeElement?.textContent,
+      buttons: Array.from(el.querySelectorAll('button')).map((b) => b.getBoundingClientRect().height),
+    };
+  }, name);
+const popconfirmClosed = (name) =>
+  page
+    .waitForFunction((name) => !document.querySelector(`.layout-popconfirm-${name}`), name, { timeout: 2000 })
+    .then(() => true)
+    .catch(() => false);
+const focusedTest = () => page.evaluate(() => document.activeElement?.getAttribute('data-test'));
+
+for (const viewport of [
+  { width: 1280, height: 900 },
+  { width: 360, height: 740 },
+  { width: 360, height: 640 },
+]) {
+  await page.setViewportSize(viewport);
+  await open('popconfirm');
+  const { width: w, height: h } = viewport;
+  for (const name of popconfirmSpots) {
+    const label = `popconfirm ${w}×${h} ${name}`;
+    await page.click(`[data-test="popconfirm-${name}"]`);
+    await page.waitForSelector(`.layout-popconfirm-${name}[data-side]`, { timeout: 2000 }).catch(() => null);
+    const box = await popconfirmBox(name);
+    check(!!box, `${label}: popconfirm did not open`);
+    if (box) {
+      const { trigger, overlaps, overflowX, pageScrollWidth, role, focus, buttons, ...panel } = box;
+      check(panel.left >= 0 && panel.top >= 0 && panel.right <= w && panel.bottom <= h, `${label}: panel ${JSON.stringify(panel)} leaves the ${w}×${h} viewport`);
+      check(!overlaps, `${label}: panel ${JSON.stringify(panel)} covers its trigger ${JSON.stringify(trigger)}`);
+      check(overflowX <= 0, `${label}: panel content overflows sideways by ${overflowX}px`);
+      check(pageScrollWidth <= w, `${label}: page scrolls sideways (${pageScrollWidth} > ${w})`);
+      check(role === 'alertdialog' && focus === 'Cancel', `${label}: role ${role}, focus on "${focus}" (expected alertdialog, Cancel)`);
+      check(buttons.length === 2 && buttons.every((b) => b >= 32), `${label}: buttons are ${buttons} px tall`);
+    }
+    await page.keyboard.press('Escape');
+    check(await popconfirmClosed(name), `${label}: Escape did not close it`);
+    check((await focusedTest()) === `popconfirm-${name}`, `${label}: Escape left focus on ${await focusedTest()}, not the trigger`);
+  }
+}
+
+// Outside clicks, with a real browser moving focus: plain text returns focus to the trigger,
+// another control keeps it.
+await page.setViewportSize({ width: 1280, height: 900 });
+await open('popconfirm');
+await page.click('[data-test="popconfirm-center"]');
+await page.waitForSelector('.layout-popconfirm-center[data-side]');
+await page.click('[data-test="popconfirm-outside"]');
+check(await popconfirmClosed('center'), 'popconfirm: an outside click did not close it');
+check((await focusedTest()) === 'popconfirm-center', `popconfirm: an outside click on text left focus on ${await focusedTest()}, not the trigger`);
+await page.click('[data-test="popconfirm-center"]');
+await page.waitForSelector('.layout-popconfirm-center[data-side]');
+await page.click('[data-test="popconfirm-other"]');
+check(await popconfirmClosed('center'), 'popconfirm: a click on another control did not close it');
+await page.waitForTimeout(50);
+check((await focusedTest()) === 'popconfirm-other', `popconfirm: a click on another control moved focus to ${await focusedTest()}`);
+
 // ---------- Sidebar: expanded width, rail width, drawer below lg, RTL mirror ----------
 const sidebarAt = async (query, width) => {
   current = `sidebar ${query || 'expanded'} @${width}`;

@@ -29,17 +29,27 @@ const doc: ComponentDoc = {
         { name: 'appearance', type: "'default' | 'dark' | 'translucent'", default: "'default'", description: 'Panel style.' },
         { name: 'className / style', type: 'string / CSSProperties', description: 'Applied to the floating panel.' },
         { name: 'aria-label', type: 'string', description: 'Accessible name when there is no title.' },
+        { name: 'aria-describedby', type: 'string', description: 'Id(s) of the content that describes the panel, such as its message.' },
+        { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'", description: "'alertdialog' for a panel that asks for a response, such as a confirmation (see Popconfirm)." },
+        { name: 'initialFocus', type: 'RefObject<HTMLElement>', description: 'Moves focus to this element when it opens. Without it, focus stays on the trigger.' },
+        {
+          name: 'returnFocusOnDismiss',
+          type: 'boolean',
+          default: 'false',
+          description: 'Also return focus to the trigger after an outside click on a non-focusable area. A click on another control always keeps focus there.',
+        },
       ],
     },
   ],
   a11y: [
     'The panel is a non-modal role="dialog" labelled by its title; it follows the trigger in the DOM, so Tab moves into it.',
     'Click triggers get aria-haspopup="dialog", aria-expanded and aria-controls. Hover/focus popovers describe the trigger (aria-describedby) instead.',
-    'Escape closes it and returns focus to the trigger if focus was inside. Clicking outside closes it.',
+    'Escape closes it and returns focus to the trigger if focus was inside. Clicking outside closes it and leaves focus where the click put it, unless returnFocusOnDismiss is set and the click landed on something that cannot take focus.',
+    'Focus stays on the trigger when it opens. Pass initialFocus (a ref to a control inside) to move focus into the panel, for example when it asks a question.',
     'Disabled buttons do not fire events: wrap them in <span tabIndex={0}> so keyboard and pointer users still get the explanation.',
     'Hover popovers stay open while the pointer is over them (WCAG 1.4.13).',
   ],
-  classes: `.os-floating.os-popover[role=dialog][data-side][data-placement][data-arrow]
+  classes: `.os-floating.os-popover[role=dialog|alertdialog][data-side][data-placement][data-arrow]
   > .os-floating__arrow
   > .os-popover__header > .os-popover__title
   > .os-popover__body`,
