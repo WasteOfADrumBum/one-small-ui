@@ -80,7 +80,10 @@ export interface TreeViewLabels {
   loaded: (label: string, count: number) => string;
   /** Shown in the error row and announced (assertive) when loading fails. */
   loadError: (label: string) => string;
+  /** Label of the error row's Retry button (mouse and touch; it is not a tab stop). */
   retry: string;
+  /** Appended to the failure announcement, since Enter on the failed item retries. */
+  retryHint: string;
   /** Announced after a range or select-all changes several nodes at once. */
   selected: (count: number) => string;
 }
@@ -90,6 +93,7 @@ const defaultLabels: TreeViewLabels = {
   loaded: (label, count) => (count === 1 ? `${label}: 1 item` : `${label}: ${count} items`),
   loadError: (label) => `Couldn’t load ${label}`,
   retry: 'Retry',
+  retryHint: 'Press Enter to retry',
   selected: (count) => (count === 0 ? 'No items selected' : count === 1 ? '1 item selected' : `${count} items selected`),
 };
 
@@ -377,7 +381,8 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
             if (inflight.current.get(node.id) !== token) return;
             inflight.current.delete(node.id);
             setLazy((p) => ({ ...p, status: { ...p.status, [node.id]: 'error' } }));
-            announceRef.current(labelsRef.current.loadError(textOf(node)), { politeness: 'assertive' });
+            const l = labelsRef.current;
+            announceRef.current(`${l.loadError(textOf(node))}. ${l.retryHint}`, { politeness: 'assertive' });
           },
         );
     },
@@ -514,8 +519,10 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
       if (entry.isParent && expandedSet.has(id)) setOpen([id], false);
       else if (entry.parentId !== null) next = entry.parentId;
     } else if (e.key === 'Enter') {
-      if (status === 'error' && expandedSet.has(id)) retry(id);
-      else activate(id, 'enter');
+      if (status === 'error') {
+        if (!expandedSet.has(id)) setOpen([id], true);
+        retry(id);
+      } else activate(id, 'enter');
     } else if (e.key === ' ') {
       if (multi && e.shiftKey) selectRange(anchor.current?.key ?? id, id);
       else activate(id, 'space');
@@ -734,7 +741,8 @@ const TreeItem = memo(function TreeItem({ node, level, posinset, setsize }: Tree
             <li role="none" className={cls('tree__status')} data-error="" style={{ '--_level': level + 1 } as CSSProperties}>
               <ErrorIcon className={cls('tree__status-icon')} />
               <span>{labels.loadError(textOf(node))}</span>
-              <Button size="sm" variant="outline" color="neutral" onClick={() => load(node)}>
+              {/* Not a tab stop: the tree stays one tab stop, and Enter on the item retries. */}
+              <Button size="sm" variant="outline" color="neutral" tabIndex={-1} onClick={() => load(node)}>
                 {labels.retry}
               </Button>
             </li>

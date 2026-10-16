@@ -591,11 +591,11 @@ describe('TreeView: lazy children', () => {
     expect(focused()).toBe('r1');
   });
 
-  it('shows an error row with Retry, announces assertively, and retries with the button or ArrowRight', async () => {
+  it('shows an error row with Retry, announces assertively, and retries with the button, Enter or ArrowRight', async () => {
     let attempt = 0;
     const loadChildren = vi.fn(async () => {
       attempt += 1;
-      if (attempt < 3) throw new Error('offline');
+      if (attempt < 4) throw new Error('offline');
       return [{ id: 'r1', label: 'Report' }];
     });
     const { user } = setup({ items: lazyItems, loadChildren });
@@ -603,15 +603,24 @@ describe('TreeView: lazy children', () => {
     await user.keyboard('{ArrowRight}');
     const retry = await screen.findByRole('button', { name: 'Retry' });
     expect(screen.getByText('Couldn’t load Remote')).toBeInTheDocument();
-    await waitFor(() => expect(announced('assertive')).toBe('Couldn’t load Remote'));
+    await waitFor(() => expect(announced('assertive')).toBe('Couldn’t load Remote. Press Enter to retry'));
     expect(item('Remote')).not.toHaveAttribute('aria-busy');
+    // One tab stop: Retry is clickable but Tab skips it.
+    expect(retry).toHaveAttribute('tabindex', '-1');
+    expect(document.activeElement).toBe(item('Remote'));
+    await user.tab();
+    expect(document.activeElement).not.toBe(retry);
     await user.click(retry);
     expect(loadChildren).toHaveBeenCalledTimes(2);
     await screen.findByRole('button', { name: 'Retry' });
     item('Remote').focus();
+    await user.keyboard('{Enter}');
+    expect(loadChildren).toHaveBeenCalledTimes(3);
+    await screen.findByRole('button', { name: 'Retry' });
+    item('Remote').focus();
     await user.keyboard('{ArrowRight}');
     expect(await screen.findByRole('treeitem', { name: 'Report' })).toBeInTheDocument();
-    expect(loadChildren).toHaveBeenCalledTimes(3);
+    expect(loadChildren).toHaveBeenCalledTimes(4);
     expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
   });
 

@@ -3,6 +3,16 @@
 Read CONTRIBUTING.md first; it holds the component, SCSS, docs and check conventions. This file adds the
 rules for the accessibility hooks, icons, Transition and motion tokens added in 0.2.0.
 
+## PR workflow
+
+Standing rules from the maintainer for every session:
+
+- Every PR targets `main`. Never open a PR against another feature branch.
+- Create each branch from an up-to-date `main` (`git fetch origin main` first).
+- If a conflict comes up, rebase on `main` yourself. Don't use other tools or bots to resolve conflicts.
+- Delete each feature branch after its PR merges.
+- Never publish to npm; the maintainer publishes manually.
+
 ## Accessibility hooks (`packages/onesmallui/src/hooks`)
 
 - Overlays and anything modal compose these hooks. Don't re-implement them inside a component.

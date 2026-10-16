@@ -5,6 +5,14 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-16
+
+### Changed
+
+- `TreeView`: a failed lazy load no longer adds a tab stop. The error row's Retry button has `tabIndex={-1}` (it
+  stays clickable for mouse and touch), Enter on the failed item retries (opening it first if it was closed), and
+  the assertive failure announcement ends with "Press Enter to retry" (new `retryHint` label).
+
 ## [0.4.0] - 2026-10-13
 
 ### Added
