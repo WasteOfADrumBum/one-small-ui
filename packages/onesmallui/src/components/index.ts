@@ -60,6 +60,7 @@ export * from './Table';
 export * from './Tabs';
 export * from './TagInput';
 export * from './Textarea';
+export * from './Timeline';
 export * from './TimePicker';
 export * from './Toast';
 export * from './Toggler';
