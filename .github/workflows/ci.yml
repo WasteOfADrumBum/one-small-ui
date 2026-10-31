@@ -36,7 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         suite: [layout, a11y]
-    runs-on: ubuntu-latest
+    # Playwright 1.56 cannot install browsers on the ubuntu-latest image (ubuntu26.04); pin a supported one.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
