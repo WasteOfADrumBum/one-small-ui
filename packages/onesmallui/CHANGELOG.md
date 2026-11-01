@@ -17,6 +17,16 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ### Fixed
 
+- Floating panels no longer run off short viewports (mobile landscape, 320px-tall windows, zoom). When neither
+  side has room, `computePosition` keeps the panel inside the viewport, and Menu, Popover (its body scrolls),
+  Combobox, TagInput, TimePicker and DatePicker cap their height to the room on their side and scroll. The fix is
+  in the shared positioning, so the `dom` layer gets it too. `computePosition` also returns `availableHeight` and
+  `availableWidth`, and `autoPosition` / `useFloating` set `--os-floating-available-height` / `-width` on the panel
+  for custom panels. `npm run test:layout` opens every floating component at the top, middle and bottom of
+  640×320, 1280×400 and 320×480 viewports.
+- The TimePicker list was as wide as the viewport (its `100%` minimum resolved against the top layer). It now
+  matches the field's width, like Combobox.
+
 - `@types/node` is now a declared devDependency and in the test tsconfig `types`, so `prepublishOnly` typechecks `test/tokens.test.tsx` on installs that omit optional peers.
 
 ## [0.5.0] - 2026-10-16

@@ -65,8 +65,8 @@
 }
 
 .#{$prefix}-timepicker__popup {
-  min-inline-size: max(10rem, 100%);
-  max-block-size: min(18rem, 60vh);
+  min-inline-size: 10rem; // at least the field's width: useFloating matchWidth
+  max-block-size: max(6rem, min(18rem, 60vh, var(--#{$prefix}-floating-available-height, 100dvh)));
   padding: 0.25rem;
   overflow-y: auto;
   border: 1px solid token('border-strong');

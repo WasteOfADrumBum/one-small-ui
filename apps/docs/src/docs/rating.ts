@@ -35,7 +35,7 @@ const doc: ComponentDoc = {
         { name: 'name', type: 'string', description: 'Submits the checked value. Read-only ratings submit a hidden input; disabled ones submit nothing.' },
         { name: 'required / disabled / invalid', type: 'boolean', description: 'States (Field sets them). required uses native radio validation.' },
         { name: 'icon', type: 'ComponentType<{ className?: string }>', default: 'StarIcon', description: 'The shape for each step, such as HeartIcon. Drawn outlined when empty and filled when chosen.' },
-        { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Icon size. Hit areas stay at least 44px (48px wide with half steps).' },
+        { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Icon size. Hit areas do not shrink with it: whole steps are 44×44px; with half steps each star is 48×44px, split into two 24×44px targets (WCAG 2.5.8 AA, not the 44px AAA size).' },
         { name: 'color', type: status, default: "'warning'", description: 'Fill color. Filled icons also get a dark outline, so light colors keep 3:1.' },
         { name: 'getLabel', type: '(value, max) => string', default: '"3 stars"', description: 'Name of each option, for translation or other units.' },
         { name: 'getValueText', type: '(value | null, max) => string', default: '"4.5 out of 5 stars"', description: 'Name of a read-only rating ("No rating" when null).' },

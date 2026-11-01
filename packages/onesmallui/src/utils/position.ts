@@ -30,6 +30,13 @@ export interface PositionResult {
   side: Side;
   /** Arrow offset along the floating element's edge, in px. */
   arrowOffset?: number;
+  /**
+   * Room the panel has on the side it uses, in px (height for top/bottom, width for left/right), and the
+   * full viewport size less padding on the other axis. `autoPosition` writes these to
+   * `--os-floating-available-height` / `--os-floating-available-width` so panels can cap their size and scroll.
+   */
+  availableHeight: number;
+  availableWidth: number;
 }
 
 const opposite: Record<Side, Side> = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
@@ -73,6 +80,8 @@ export function computePosition(anchor: AnchorLike, floating: HTMLElement, optio
   let x: number;
   let y: number;
   const vertical = side === 'top' || side === 'bottom';
+  const availableHeight = Math.max(0, vertical ? room[side] - offset : vh - 2 * padding);
+  const availableWidth = Math.max(0, vertical ? vw - 2 * padding : room[side] - offset);
   if (vertical) {
     y = side === 'top' ? a.top - fh - offset : a.bottom + offset;
     const startX = rtl ? a.right - fw : a.left;
@@ -84,6 +93,17 @@ export function computePosition(anchor: AnchorLike, floating: HTMLElement, optio
     y = align === 'start' ? a.top : align === 'end' ? a.bottom - fh : a.top + a.height / 2 - fh / 2;
     if (shift) y = clamp(y, padding, vh - fh - padding);
   }
+  // Main axis: when neither side has room (short viewports, zoom), keep the panel on screen instead of
+  // letting it run off the top or bottom. It may then cover part of its anchor, which beats being cut off.
+  // Only while the anchor is visible, so a panel still scrolls away with an anchor that left the screen.
+  // Point anchors (a context menu at the pointer) are left alone: ContextMenu caps its height to the
+  // taller side itself, and pinning it would move the menu off the pointer while that cap applies.
+  const anchorVisible = a.bottom > 0 && a.top < vh && a.right > 0 && a.left < vw;
+  const pointAnchor = a.width === 0 && a.height === 0;
+  if (shift && anchorVisible && !pointAnchor) {
+    if (vertical) y = clamp(y, padding, vh - fh - padding);
+    else x = clamp(x, padding, vw - fw - padding);
+  }
 
   let arrowOffset: number | undefined;
   if (arrow) {
@@ -93,7 +113,15 @@ export function computePosition(anchor: AnchorLike, floating: HTMLElement, optio
   }
 
   const used = (align === 'center' ? side : `${side}-${align}`) as Placement;
-  return { x: Math.round(x), y: Math.round(y), placement: used, side, arrowOffset };
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    placement: used,
+    side,
+    arrowOffset,
+    availableHeight: Math.floor(availableHeight),
+    availableWidth: Math.floor(availableWidth),
+  };
 }
 
 /**
@@ -108,13 +136,21 @@ export function autoPosition(anchor: AnchorLike, floating: HTMLElement, options:
       if (options.matchWidth && anchor instanceof Element) {
         floating.style.minWidth = `${anchor.getBoundingClientRect().width}px`;
       }
-      const r = computePosition(anchor, floating, options);
-      floating.style.left = `${r.x}px`;
-      floating.style.top = `${r.y}px`;
-      floating.dataset.side = r.side;
-      floating.dataset.placement = r.placement;
-      if (options.arrow && r.arrowOffset !== undefined) {
-        floating.style.setProperty('--os-arrow-offset', `${r.arrowOffset}px`);
+      // Two passes at most: when the reported room changes the panel's size (CSS caps it to
+      // --os-floating-available-height), place it again at that size in the same frame.
+      for (let pass = 0; pass < 2; pass++) {
+        const before = floating.offsetHeight;
+        const r = computePosition(anchor, floating, options);
+        floating.style.setProperty('--os-floating-available-height', `${r.availableHeight}px`);
+        floating.style.setProperty('--os-floating-available-width', `${r.availableWidth}px`);
+        floating.style.left = `${r.x}px`;
+        floating.style.top = `${r.y}px`;
+        floating.dataset.side = r.side;
+        floating.dataset.placement = r.placement;
+        if (options.arrow && r.arrowOffset !== undefined) {
+          floating.style.setProperty('--os-arrow-offset', `${r.arrowOffset}px`);
+        }
+        if (floating.offsetHeight === before) break;
       }
     });
   };
