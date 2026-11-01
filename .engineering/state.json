@@ -1,41 +1,136 @@
 {
   "stateVersion": 1,
-  "revision": 0,
-  "checkpointId": "init-0000000",
+  "revision": 1,
+  "checkpointId": "v060-rc-9a13c9e",
   "projectId": "one-small-ui",
   "repository": "https://github.com/WasteOfADrumBum/one-small-ui",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
     "branch": "main",
-    "commit": null,
-    "recordedAt": null
+    "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
+    "recordedAt": "2026-11-01T03:45:00Z"
   },
   "development": {
-    "milestone": null,
-    "activeTask": null,
-    "workingBranch": null,
+    "milestone": "v0.6.0 release candidate (hardening release)",
+    "activeTask": {
+      "id": "v060-rc",
+      "title": "Hand v0.6.0 candidate to the owner for acceptance and publication"
+    },
+    "workingBranch": "claude/project-thread-vlqigd",
     "activePr": null,
-    "lastCompleted": [],
+    "lastCompleted": [
+      "#31 dependency security: Vitest 5 and ESLint 10; critical vitest/tinypool advisories removed; production audit 0",
+      "#32 short-viewport positioning: main-axis clamp, --os-floating-available-height caps, TimePicker width fix",
+      "#33 React 18/19 consumer smoke on the packed tarball (CI Node 18/20/22/24); SSR-safe layout effects",
+      "#34 version 0.6.0, CHANGELOG, compatibility table, docs/RELEASING.md, release notes, revised accessibility claims",
+      "Candidate artifact onesmall-ui-0.6.0.tgz packed at 9a13c9e: sha256 9390f28a27ca211f56ad76eddbec25869b02d29e32a1114b26f674ec0fecc46f, 681 files; consumer smoke 48/48"
+    ],
     "inProgress": [],
-    "nextAction": null
+    "nextAction": "Owner: review docs/releases/0.6.0-release-notes.md and the readiness report, decide on the jsx-a11y moderate advisory, run manual screen-reader and keyboard checks, then follow docs/RELEASING.md to publish 0.6.0 and tag v0.6.0 at 9a13c9e (or a later green main commit)."
   },
   "decisions": {
-    "made": [],
-    "constraints": [],
-    "unresolved": []
+    "made": [
+      {
+        "id": "v060-scope-hardening",
+        "summary": "No page-block spec existed in the repo, project files or hub, so 0.6.0 was frozen as a hardening release (security, short viewports, compatibility, packaging, docs). Page blocks deferred. Documented in docs/releases/0.6.0-scope.md.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-01T02:00:00Z"
+      },
+      {
+        "id": "v060-root-engines",
+        "summary": "Root workspace engines raised to node >=22.13 for dev tooling (ESLint 10, Vitest 5); the published library keeps >=18.18, verified by the Consumer CI matrix.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-01T03:00:00Z"
+      },
+      {
+        "id": "v060-a11y-claims",
+        "summary": "Package description and README claim WCAG 2.2 AA with AAA contrast (automated checks), not blanket AAA; manual assistive-technology verification is listed as pending.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-01T03:20:00Z"
+      }
+    ],
+    "constraints": [
+      "Never publish to npm or create release tags without the owner; release approval belongs to Joshua Small.",
+      "Every PR targets main; npm scripts must stay cross-platform (Windows).",
+      "Do not run npm audit fix --force or disable audit rules or tests."
+    ],
+    "unresolved": [
+      "Page-block (Phase 5) scope needs an owner-written spec before any work.",
+      "Two moderate dev-only advisories (minimatch 3 inside eslint-plugin-jsx-a11y) await owner acceptance or an upstream fix; production audit is clean.",
+      "Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented)."
+    ]
   },
   "verification": {
-    "testsRun": [],
-    "unverifiedChanges": []
+    "testsRun": [
+      {
+        "command": "npm run check (CI, ubuntu + windows)",
+        "result": "pass",
+        "commit": "a787950c80d3b2a68cd046116c0f44d6136e43ab",
+        "at": "2026-11-01T03:30:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/41269059461"
+      },
+      {
+        "command": "npm run test:layout / test:a11y (CI Playwright)",
+        "result": "pass",
+        "commit": "a787950c80d3b2a68cd046116c0f44d6136e43ab",
+        "at": "2026-11-01T03:30:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/41269059461"
+      },
+      {
+        "command": "npm run test:consumer (CI Node 18/20/22/24)",
+        "result": "pass",
+        "commit": "a787950c80d3b2a68cd046116c0f44d6136e43ab",
+        "at": "2026-11-01T03:30:00Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/41269059461"
+      },
+      {
+        "command": "CI on main candidate (all jobs)",
+        "result": "pass",
+        "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
+        "at": "2026-11-01T03:37:34Z",
+        "ciRunUrl": "https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/41269483773"
+      },
+      {
+        "command": "node scripts/consumer-smoke.mjs onesmall-ui-0.6.0.tgz (local, Node 22, 48 checks)",
+        "result": "pass",
+        "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
+        "at": "2026-11-01T03:38:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "npm audit --omit=dev",
+        "result": "pass",
+        "commit": "979381ec13d670dc6e7013cb90bb2b9e43e813fc",
+        "at": "2026-11-01T02:30:00Z",
+        "ciRunUrl": null
+      }
+    ],
+    "unverifiedChanges": [
+      "No human screen-reader (NVDA, JAWS, VoiceOver, TalkBack) or manual keyboard verification of 0.6.0 changes yet.",
+      "Short-viewport behaviour verified in Chromium only (Playwright); Firefox and Safari not exercised."
+    ]
   },
   "handoff": {
-    "lastAgent": null,
-    "checkpointedAt": null,
-    "unfinished": [],
-    "blockers": [],
-    "continuation": null,
-    "uncommittedWorkOutsideCheckpoint": "unknown",
-    "persistedBy": "github-api"
+    "lastAgent": {
+      "tool": "Claude Code",
+      "model": null
+    },
+    "checkpointedAt": "2026-11-01T03:45:00Z",
+    "unfinished": [
+      "npm publish 0.6.0 (owner)",
+      "Tag v0.6.0 and GitHub release (owner)",
+      "Human accessibility verification (owner or delegate)"
+    ],
+    "blockers": [
+      "Publication and tagging need explicit owner authorization.",
+      "Accept or reject the dev-only jsx-a11y moderate advisory (owner)."
+    ],
+    "continuation": "Code for 0.6.0 is merged on main at 9a13c9e with green CI. Nothing is published. Readiness report: docs/releases/0.6.0-readiness.md. Publishing steps: docs/RELEASING.md. Do not re-run the hardening work; pick up from the owner's decisions.",
+    "uncommittedWorkOutsideCheckpoint": "none",
+    "persistedBy": "local-file"
   },
   "provenance": {
     "claims": "agent_reported",
