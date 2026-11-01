@@ -55,9 +55,21 @@ for (const theme of ['dark', 'light']) {
   const context = await browser.newContext({ colorScheme: theme, reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
   await page.addInitScript((t) => localStorage.setItem('onesmallui-theme', t), theme);
+  // Console errors and uncaught exceptions on a docs page count as failures too.
+  let pageErrors = [];
+  // Network failures for remote example images depend on the runner's network, so they are not counted.
+  page.on('console', (m) => m.type() === 'error' && !m.text().startsWith('Failed to load resource') && pageErrors.push(m.text().slice(0, 200)));
+  page.on('pageerror', (e) => pageErrors.push(String(e.message).slice(0, 200)));
   for (const route of routes) {
+    pageErrors = [];
     await page.goto(`${base}#${route}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(150);
+    // In-page links must point at a route or an element that exists.
+    const brokenLinks = await page.evaluate((known) =>
+      Array.from(document.querySelectorAll('a[href^="#"]'))
+        .map((a) => a.getAttribute('href').slice(1).split('?')[0])
+        .filter((h) => h && !known.includes(h) && !known.includes(h.split('/').slice(0, 2).join('/')) && !document.getElementById(h) && !document.getElementById(decodeURIComponent(h))),
+    routes);
     await page.addScriptTag({ content: axeSource });
     const result = await page.evaluate(() =>
       // eslint-disable-next-line no-undef
@@ -77,6 +89,14 @@ for (const theme of ['dark', 'light']) {
       .filter((v) => v.nodes.length > 0);
     total += violations.length;
     const tag = `${theme.padEnd(5)} ${route}`;
+    for (const err of pageErrors) {
+      total++;
+      console.log(`  FAIL ${tag}: console error — ${err}`);
+    }
+    for (const href of [...new Set(brokenLinks)]) {
+      total++;
+      console.log(`  FAIL ${tag}: broken in-page link #${href}`);
+    }
     if (violations.length === 0) console.log(`  ok   ${tag}`);
     for (const v of violations) {
       console.log(`  FAIL ${tag}: [${v.impact}] ${v.id} — ${v.help}`);
@@ -99,5 +119,5 @@ for (const theme of ['dark', 'light']) {
 await browser.close();
 server.close();
 if (total) await writeReport('a11y', reportItems, `${total} violation(s)`);
-console.log(total ? `\n${total} violation(s).` : '\nNo axe violations at WCAG A, AA or AAA.');
+console.log(total ? `\n${total} violation(s).` : '\nNo axe violations at WCAG A, AA or AAA, no console errors, no broken in-page links.');
 process.exit(total ? 1 : 0);

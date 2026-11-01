@@ -110,6 +110,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 @onesmall/ui/tokens.json    Color tokens for both themes, plus motion tokens (durations, easings)
 @onesmall/ui/agent/SKILL.md Usage guide for AI coding agents`,
     },
+    {
+      title: 'Compatibility',
+      language: 'bash',
+      description:
+        'Checked in CI by installing the packed package into clean React 18 and React 19 apps on Node 18, 20, 22 and 24: ESM and CommonJS imports, strict TypeScript (bundler and node16 resolution), server rendering without warnings and hydration without mismatches.',
+      code: `React        18 and 19 (peer: ^18 || ^19)
+Node         18.18+ for your app (SSR, tests, builds)
+TypeScript   5.x, moduleResolution bundler | node16 | nodenext
+Browsers     current Chrome, Edge, Firefox, Safari`,
+    },
+    {
+      title: 'Upgrade, roll back, uninstall',
+      language: 'bash',
+      description:
+        'Read the changelog before upgrading; deprecated APIs warn once in development and are removed only in a major release. To uninstall, also remove the CSS or SCSS import, themeInitScript() and the provider wrappers. Only the theme choice (and, if you opt in, CommandPalette recents and Sidebar collapsed state) is kept in localStorage.',
+      code: `npm install @onesmall/ui@latest               # upgrade
+npm install @onesmall/ui@0.5.0 --save-exact   # roll back to a known version
+npm uninstall @onesmall/ui                    # remove`,
+    },
   ],
   a11y: [],
 };

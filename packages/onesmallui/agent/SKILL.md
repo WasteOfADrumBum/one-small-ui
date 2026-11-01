@@ -27,10 +27,11 @@ Index: https://one-small-ui.vercel.app/llms.txt · Structured data: https://one-
 - Motion: `<Transition show enter="fade">` sets `data-state="opening|open|closing|closed"` on its child, the same states every overlay uses. Motion tokens: `--os-duration-fast|base|slow`, `--os-ease-standard|enter|exit`.
 - Without React, `@onesmall/ui/dom` wires up `data-os-toggle`, `data-os-target` and `data-os-dismiss` attributes and dispatches `os:show/os:shown/os:hide/os:hidden` events.
 
-## Accessibility rules (the library targets WCAG 2.2 AAA — keep it that way)
+## Accessibility rules (built to WCAG 2.2 AA, AAA where measured, such as 7:1 contrast; keep it that way)
 
 - Always give form controls a label: wrap them in `<Field label="…">` (it wires hints and errors).
 - Icon-only buttons need `aria-label`. Images need `alt` (the type requires it).
 - Don't override colors with raw values; use tokens or the color props so contrast stays at 7:1.
 - Custom overlays: `useFocusTrap`, `useFocusReturn`, `useScrollLock`; announce status changes with `useAnnouncer().announce(msg)` (wrap the app in `<AnnouncerProvider>`); put `<SkipLink href="#main">` first in the page.
+- Custom floating panels: position them with `useFloating`, and cap their height with `max-block-size: var(--os-floating-available-height)` plus `overflow-y: auto` so they fit short viewports.
 - Keep toasts persistent and carousels non-autoplaying unless the user can pause them.

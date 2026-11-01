@@ -5,6 +5,12 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-01
+
+A hardening release: security fixes in development tooling, short-viewport positioning, React 18 server
+rendering, verified React and Node compatibility, and accurate documentation. No public API was removed or
+changed incompatibly.
+
 ### Added
 
 - `npm run test:consumer` installs the packed tarball into clean React 18 and React 19 apps and checks ESM and
@@ -12,9 +18,16 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   resolution, server rendering without warnings, hydration without mismatches, one React copy, CSS and a
   consumer-side `@use '@onesmall/ui/scss'`, and that no test, source or config files are published. CI runs it on
   Node 18, 20, 22 and 24.
+- The docs audit (`npm run test:a11y`) also fails on console errors and broken in-page links.
+- `docs/RELEASING.md`: the release, verification, publish, provenance and rollback steps.
 
 ### Changed
 
+- README: the component inventory lists every public component and hook (0.2–0.5 additions were missing), a
+  compatibility table, and upgrade, rollback and uninstall instructions; the installation docs page has the same.
+  Accessibility claims now say what is automated and what is not, and name the 24×44px Rating half-step targets
+  as the exception to 44px targets. The package description says "WCAG 2.2 AA, AAA contrast" instead of a
+  blanket AAA claim.
 - Node support is now stated in two parts: the published package runs on Node 18.18+ (server rendering and
   tests in consumer apps; verified in CI on 18, 20, 22 and 24), while working on this repository needs Node
   22.13+ because of Vite 8, Vitest 5 and ESLint 10 (root `engines`).
@@ -42,7 +55,6 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   other components (React 19 does not warn). Every layout effect now goes through an internal SSR-safe hook.
 - The TimePicker list was as wide as the viewport (its `100%` minimum resolved against the top layer). It now
   matches the field's width, like Combobox.
-
 - `@types/node` is now a declared devDependency and in the test tsconfig `types`, so `prepublishOnly` typechecks `test/tokens.test.tsx` on installs that omit optional peers.
 
 ## [0.5.0] - 2026-10-16

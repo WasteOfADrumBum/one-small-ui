@@ -1,8 +1,8 @@
 {
   "name": "onesmallui-monorepo",
   "private": true,
-  "version": "0.5.0",
-  "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA React + SCSS component library.",
+  "version": "0.6.0",
+  "description": "OneSmallUI (1SmUI): a futuristic, accessible (WCAG 2.2 AA, AAA contrast) React + SCSS component library.",
   "workspaces": [
     "packages/*",
     "apps/*"
