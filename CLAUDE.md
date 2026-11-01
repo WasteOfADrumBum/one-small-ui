@@ -145,8 +145,10 @@ Standing rules from the maintainer for every session:
 - `Timeline` is an `<ol>` of `TimelineItem`s with `<time dateTime>`. Status is an icon plus visually hidden text,
   never color alone. The feed variant renders absolute dates on the server and switches to relative text after
   hydration unless `now` is passed, so SSR and hydration match.
-- Known gap: `computePosition` doesn't clamp the main axis when neither side fits, so floating panels can
-  overflow very short viewports (about 320px tall). Fix it there, for every floating component, not per component.
+- Short viewports (0.6.0): `computePosition` clamps the main axis when neither side fits (not for point anchors,
+  which ContextMenu sizes itself) and reports `availableHeight` / `availableWidth`; `autoPosition` writes them to
+  `--os-floating-available-height` / `-width`. Scrollable panels cap `max-block-size` with that var (never below
+  6rem). New floating panels do the same; `test:layout` has a short-viewport section to add them to.
 
 <!-- one-small-engineering:continuity v1 -->
 

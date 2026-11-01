@@ -260,7 +260,9 @@
   color: token('text');
   box-shadow: var(--#{$prefix}-shadow-lg);
   max-width: calc(100vw - 1rem);
+  max-block-size: max(6rem, var(--#{$prefix}-floating-available-height, 100dvh));
   overflow: auto;
+  overscroll-behavior: contain;
 
   &[hidden] {
     display: none;

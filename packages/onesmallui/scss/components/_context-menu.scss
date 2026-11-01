@@ -4,8 +4,13 @@
 // The panel is `.os-floating.os-menu.os-context-menu`: Menu's own styles, placed at the pointer.
 // ContextMenuContent sets --os-context-menu-max to the taller side of the anchor, so the menu
 // fits after flipping and scrolls instead of leaving the viewport.
-.#{$prefix}-context-menu {
-  max-block-size: min(var(--#{$prefix}-context-menu-max, 100dvh), calc(100dvh - 1rem));
+// Doubled class: outranks Menu's own max-height (the same property), which loads after this file.
+.#{$prefix}-menu.#{$prefix}-context-menu {
+  max-block-size: min(
+    var(--#{$prefix}-context-menu-max, 100dvh),
+    var(--#{$prefix}-floating-available-height, 100dvh),
+    calc(100dvh - 1rem)
+  );
   // Grow from the pointer: the start corner (left in LTR, right in RTL), top or bottom after a flip.
   transform-origin: calc(50% - 50% * var(--#{$prefix}-dir, 1)) 0;
 

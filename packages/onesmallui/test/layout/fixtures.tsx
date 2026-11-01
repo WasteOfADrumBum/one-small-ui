@@ -1,6 +1,14 @@
 import type { ComponentType, CSSProperties } from 'react';
 import {
   Avatar,
+  Combobox,
+  DatePicker,
+  Menu,
+  MenuContent,
+  MenuTrigger,
+  Popover,
+  TimePicker,
+  Tooltip,
   AvatarGroup,
   CommandPalette,
   ContextMenu,
@@ -326,7 +334,50 @@ function LightboxFixture() {
   );
 }
 
+// Floating panels opened from a trigger in the middle of a short viewport, where neither side has room
+// for the whole panel. `?spot=top|center|bottom` moves the triggers; each panel must stay on screen.
+const manyOptions = Array.from({ length: 30 }, (_, i) => ({ value: `opt-${i + 1}`, label: `Option ${i + 1}` }));
+function ShortViewportFixture() {
+  const spot = new URLSearchParams(location.search).get('spot') ?? 'center';
+  const block: CSSProperties =
+    spot === 'top' ? { insetBlockStart: 8 } : spot === 'bottom' ? { insetBlockEnd: 8 } : { insetBlockStart: '45%' };
+  return (
+    <div style={{ position: 'fixed', ...block, insetInlineStart: 8, insetInlineEnd: 8, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <Menu>
+        <MenuTrigger>
+          <button type="button" data-test="sv-menu-trigger">Menu</button>
+        </MenuTrigger>
+        <MenuContent aria-label="Many actions">
+          {Array.from({ length: 20 }, (_, i) => (
+            <MenuItem key={i}>Action {i + 1}</MenuItem>
+          ))}
+        </MenuContent>
+      </Menu>
+      <Popover
+        title="Long popover"
+        content={<p data-test="sv-popover-end">{'Mission notes. '.repeat(60)}</p>}
+        
+      >
+        <button type="button" data-test="sv-popover-trigger">Popover</button>
+      </Popover>
+      <Tooltip content={'Tooltip text that wraps over several lines. '.repeat(6)}>
+        <button type="button" data-test="sv-tooltip-trigger">Tooltip</button>
+      </Tooltip>
+      <span style={{ inlineSize: 160 }} data-test="sv-combobox">
+        <Combobox options={manyOptions} aria-label="Many options" />
+      </span>
+      <span style={{ inlineSize: 160 }} data-test="sv-timepicker">
+        <TimePicker aria-label="Time" step={15} />
+      </span>
+      <span style={{ inlineSize: 180 }} data-test="sv-datepicker">
+        <DatePicker aria-label="Date" trigger="button" />
+      </span>
+    </div>
+  );
+}
+
 export const fixtures: Record<string, ComponentType> = {
+  'short-viewport': ShortViewportFixture,
   'context-menu': ContextMenuFixture,
   avatar: AvatarFixture,
   'command-palette': CommandPaletteFixture,

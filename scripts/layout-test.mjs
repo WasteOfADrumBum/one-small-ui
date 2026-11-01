@@ -418,6 +418,66 @@ for (const viewport of [
   }
 }
 
+// ---------- Short viewports: floating panels stay on screen when neither side has room ----------
+// Each panel opens from a trigger near the top, middle or bottom of a viewport too short for it. The panel
+// must stay inside the viewport, and a panel taller than the room it gets must scroll so nothing is cut off.
+const floatingPanels = [
+  { name: 'menu', open: '[data-test="sv-menu-trigger"]', scrolls: true },
+  { name: 'popover', open: '[data-test="sv-popover-trigger"]', scrolls: true },
+  { name: 'tooltip', open: '[data-test="sv-tooltip-trigger"]', hover: true },
+  { name: 'combobox', open: '[data-test="sv-combobox"] input', scrolls: true },
+  { name: 'timepicker', open: '[data-test="sv-timepicker"] input', scrolls: true },
+  { name: 'datepicker', open: '[data-test="sv-datepicker"] button', scrolls: true },
+];
+const openPanel = () =>
+  page.evaluate(async () => {
+    const el = Array.from(document.querySelectorAll('.os-floating')).find(
+      (p) => !p.hidden && p.hasAttribute('data-side') && p.getBoundingClientRect().height > 0 && getComputedStyle(p).display !== 'none',
+    );
+    if (!el) return null;
+    await Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => null)));
+    const r = el.getBoundingClientRect();
+    // The scrolling part: the panel itself or its listbox / grid wrapper.
+    const scroller = [el, ...el.querySelectorAll('*')].find((n) => n.scrollHeight > n.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(n).overflowY));
+    // Without a scroller, the panel's last piece of content must be on screen.
+    const leaves = Array.from(el.querySelectorAll('*')).filter((n) => !n.children.length && n.getBoundingClientRect().height > 0);
+    const last = leaves.at(-1)?.getBoundingClientRect();
+    const clipped = !scroller && !!last && (last.bottom > innerHeight + 0.5 || last.top < -0.5);
+    return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, height: r.height, scrolls: !!scroller, clipped };
+  });
+for (const viewport of [
+  { width: 640, height: 320 },
+  { width: 1280, height: 400 },
+  { width: 320, height: 480 },
+]) {
+  await page.setViewportSize(viewport);
+  const { width: w, height: h } = viewport;
+  for (const spot of ['top', 'center', 'bottom']) {
+    current = `short-viewport ${spot}`;
+    await page.goto(`${base}?fixture=short-viewport&spot=${spot}`, { waitUntil: 'networkidle' });
+    for (const panel of floatingPanels) {
+      const label = `short viewport ${w}×${h} ${spot} ${panel.name}`;
+      if (panel.hover) {
+        await page.hover(panel.open);
+        await page.focus(panel.open);
+      } else await page.click(panel.open);
+      await page.waitForFunction(() => Array.from(document.querySelectorAll('.os-floating')).some((p) => !p.hidden && p.hasAttribute('data-side') && p.getBoundingClientRect().height > 0), null, { timeout: 2000 }).catch(() => null);
+      await page.waitForTimeout(60);
+      const box = await openPanel();
+      check(!!box, `${label}: panel did not open`);
+      if (box) {
+        const { scrolls, clipped, height, ...rect } = box;
+        check(rect.left >= 0 && rect.top >= 0 && rect.right <= w + 0.5 && rect.bottom <= h + 0.5, `${label}: panel ${JSON.stringify(rect)} leaves the ${w}×${h} viewport`);
+        check(!clipped, `${label}: content is cut off without a scrollbar`);
+      }
+      await page.keyboard.press('Escape');
+      await page.mouse.move(0, 0);
+      await page.waitForTimeout(60);
+    }
+  }
+}
+await page.setViewportSize({ width: 1280, height: 900 });
+
 // Outside clicks, with a real browser moving focus: plain text returns focus to the trigger,
 // another control keeps it.
 await page.setViewportSize({ width: 1280, height: 900 });

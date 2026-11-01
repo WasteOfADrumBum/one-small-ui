@@ -96,7 +96,7 @@
 }
 
 .#{$prefix}-combobox__popup {
-  max-height: min(20rem, 60vh);
+  max-height: max(6rem, min(20rem, 60vh, var(--#{$prefix}-floating-available-height, 100dvh)));
   padding: 0.25rem;
   overflow-y: auto;
   border: 1px solid token('border-strong');

@@ -268,7 +268,7 @@ export const TimePicker = forwardRef<HTMLInputElement, TimePickerProps>(function
   const inputRef = useRef<HTMLInputElement | null>(null);
   const centerOnOpen = useRef(false);
   const hadError = useRef(false);
-  const { anchorRef, floatingRef } = useFloating<HTMLDivElement, HTMLDivElement>({ open, placement, offset: 6 });
+  const { anchorRef, floatingRef } = useFloating<HTMLDivElement, HTMLDivElement>({ open, placement, matchWidth: true, offset: 6 });
 
   const disabled = disabledProp ?? field?.disabled ?? false;
   const readOnly = readOnlyProp ?? field?.readOnly ?? false;

@@ -9,7 +9,8 @@
   flex-direction: column;
   min-width: 13rem;
   max-width: min(22rem, calc(100vw - 1rem));
-  max-height: calc(100dvh - 1rem);
+  // Capped to the room useFloating reports on its side (short viewports), never below 6rem.
+  max-height: max(6rem, min(calc(100dvh - 1rem), var(--#{$prefix}-floating-available-height, 100dvh)));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0.35rem;
