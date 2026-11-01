@@ -5,7 +5,6 @@ import {
   isValidElement,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   type KeyboardEvent,
@@ -25,6 +24,7 @@ import { cls } from '../utils/prefix';
 import type { OverlayAppearance } from './DialogBase';
 import { MenuContent, type MenuContentProps } from './Menu';
 import { MenuContext, mergeRefs, useMenu, useMenuRoot, type MenuAutoClose } from './MenuBase';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 interface Rect {
   top: number;
@@ -153,7 +153,7 @@ export function ContextMenu({
     const getAnchorRect = () => anchorRect.current ?? elementAnchor(triggerRef.current);
     return { getAnchorRect, anchor: { getBoundingClientRect: getAnchorRect } satisfies AnchorLike };
   }, [triggerRef]);
-  useLayoutEffect(() => setAnchor(virtual.anchor), [setAnchor, virtual]);
+  useIsomorphicLayoutEffect(() => setAnchor(virtual.anchor), [setAnchor, virtual]);
 
   const value = useMemo<ContextMenuContextValue>(
     () => ({
@@ -329,7 +329,7 @@ export const ContextMenuContent = forwardRef<HTMLDivElement, ContextMenuContentP
   const ctx = useContextMenu('ContextMenuContent');
   const local = useRef<HTMLDivElement | null>(null);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!menu.open) return;
     applyMaxSize(local.current, ctx.getAnchorRect());
     const anchor = ctx.anchorRect;

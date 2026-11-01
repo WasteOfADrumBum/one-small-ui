@@ -32,6 +32,9 @@ Standing rules from the maintainer for every session:
     use `assertive` for errors only. Outside a provider it falls back to a shared region on `<body>`.
     `ToastProvider` mounts its own provider when none is above it.
 - SSR: no `window` or `document` at module scope or during render, only in effects and event handlers.
+  Use `useIsomorphicLayoutEffect` (`hooks/useIsomorphicLayoutEffect.ts`, internal) instead of `useLayoutEffect`:
+  React 18 warns for every layout effect during SSR. `npm run test:consumer` checks this against the packed
+  tarball in React 18 and 19 apps (CI runs it on Node 18, 20, 22, 24); keep it passing.
   `test/ssr.test.tsx` renders everything in a Node environment; add new hooks and components to it.
 
 ## Icons (`packages/onesmallui/src/icons`)

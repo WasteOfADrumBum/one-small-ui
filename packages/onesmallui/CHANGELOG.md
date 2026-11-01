@@ -5,6 +5,20 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- `npm run test:consumer` installs the packed tarball into clean React 18 and React 19 apps and checks ESM and
+  CommonJS imports, the `icons` / `dom` / `tokens.json` subpaths, strict type checking with bundler and node16
+  resolution, server rendering without warnings, hydration without mismatches, one React copy, CSS and a
+  consumer-side `@use '@onesmall/ui/scss'`, and that no test, source or config files are published. CI runs it on
+  Node 18, 20, 22 and 24.
+
+### Changed
+
+- Node support is now stated in two parts: the published package runs on Node 18.18+ (server rendering and
+  tests in consumer apps; verified in CI on 18, 20, 22 and 24), while working on this repository needs Node
+  22.13+ because of Vite 8, Vitest 5 and ESLint 10 (root `engines`).
+
 ### Security
 
 - Development tooling only (the published package has no runtime dependencies, and `npm audit --omit=dev`
@@ -24,6 +38,8 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   `availableWidth`, and `autoPosition` / `useFloating` set `--os-floating-available-height` / `-width` on the panel
   for custom panels. `npm run test:layout` opens every floating component at the top, middle and bottom of
   640×320, 1280×400 and 320×480 viewports.
+- React 18 printed "useLayoutEffect does nothing on the server" while server rendering Tooltip, Timeline and
+  other components (React 19 does not warn). Every layout effect now goes through an internal SSR-safe hook.
 - The TimePicker list was as wide as the viewport (its `100%` minimum resolved against the top layer). It now
   matches the field's width, like Combobox.
 

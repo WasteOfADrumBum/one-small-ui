@@ -2,7 +2,6 @@ import {
   forwardRef,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -22,6 +21,7 @@ import { Chip } from './Chip';
 import { useFieldContext, useFieldControl } from './Field';
 import { useInputGroupSize } from './InputGroup';
 import type { ExtendedSize, Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export interface ComboboxOption {
   value: string;
@@ -134,7 +134,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
   const singleLabel = !multiple && selected[0] !== undefined ? (byValue.get(selected[0])?.label ?? '') : '';
   const inputValue = typing ? query : multiple ? '' : singleLabel;
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!el) return;
     if (open) showInTopLayer(el);

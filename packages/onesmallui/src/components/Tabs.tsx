@@ -5,7 +5,6 @@ import {
   forwardRef,
   useContext,
   useId,
-  useLayoutEffect,
   useRef,
   type HTMLAttributes,
   type KeyboardEvent,
@@ -16,6 +15,7 @@ import {
 import { useControllableState } from '../hooks/useControllableState';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 interface TabsContextValue {
   baseId: string;
@@ -93,7 +93,7 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(function TabList
   const inner = useRef<HTMLDivElement | null>(null);
 
   // Slide the glowing indicator under the active tab.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const list = inner.current;
     const active = list?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
     if (!list || !active) return;
