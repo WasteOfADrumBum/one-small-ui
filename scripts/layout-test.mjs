@@ -32,9 +32,8 @@ await new Promise((r) => server.listen(0, r));
 const base = `http://localhost:${server.address().port}/`;
 
 const browser = await chromium.launch({
-  executablePath: existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome')
-    ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
-    : undefined,
+  // PW_CHROMIUM_PATH points at a preinstalled Chromium (sandboxes without `playwright install`).
+  executablePath: process.env.PW_CHROMIUM_PATH || undefined,
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const failures = [];

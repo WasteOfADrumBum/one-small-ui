@@ -25,5 +25,19 @@
   "devDependencies": {
     "axe-core": "^4.10.3",
     "playwright": "^1.56.0"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "^10.14.0"
+    },
+    "eslint": {
+      "minimatch": "^11.0.3"
+    },
+    "@eslint/config-array": {
+      "minimatch": "^11.0.3"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.3"
+    }
   }
 }

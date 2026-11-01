@@ -5,6 +5,16 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Security
+
+- Development tooling only (the published package has no runtime dependencies, and `npm audit --omit=dev`
+  reports 0): Vitest 3 → 5 removes the critical Tinypool advisories (GHSA-5gmw-xhrv-c9v3,
+  GHSA-85c8-ppgw-ccpr) and the `@vitest/mocker` advisories (GHSA-82fw-gwwq-j7x9, GHSA-qxg6-89mg-rqv8).
+  ESLint 9 (end of life) → 10 and typescript-eslint 8.72, with `minimatch` 11 for ESLint and
+  typescript-eslint, clear the minimatch advisory (GHSA-g3hv-75wg-m249) everywhere except inside
+  `eslint-plugin-jsx-a11y`, which still requires minimatch 3 (dev-only lint, patterns come from our own
+  config). See `docs/releases/0.6.0-security.md`.
+
 ### Fixed
 
 - `@types/node` is now a declared devDependency and in the test tsconfig `types`, so `prepublishOnly` typechecks `test/tokens.test.tsx` on installs that omit optional peers.

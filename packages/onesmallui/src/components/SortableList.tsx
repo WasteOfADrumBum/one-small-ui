@@ -174,7 +174,7 @@ export function SortableList<T>({
       focusHandle(key);
       return;
     }
-    let to = index;
+    let to: number;
     if (e.key === prevKey) to = Math.max(0, index - 1);
     else if (e.key === nextKey) to = Math.min(total - 1, index + 1);
     else if (e.key === 'Home') to = 0;
