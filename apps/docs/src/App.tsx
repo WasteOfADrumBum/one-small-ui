@@ -106,7 +106,7 @@ function Nav({ route, onNavigate }: { route: string; onNavigate?: () => void }) 
 
 function Logo() {
   return (
-    <a href="#home" className="docs-logo" aria-label="OneSmallUI home">
+    <a href="#home" className="docs-logo" aria-label="1SmUI home">
       <svg viewBox="0 0 64 64" aria-hidden="true">
         <defs>
           <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
