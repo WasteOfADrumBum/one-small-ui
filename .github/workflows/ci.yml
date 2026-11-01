@@ -69,3 +69,31 @@ jobs:
           path: playwright-report/
           if-no-files-found: ignore
           retention-days: 14
+
+  # The packed tarball in clean React 18 and React 19 apps, on every Node version the published package
+  # supports at runtime (engines >=18.18). Building the repo itself needs Node 22.13+ (Vite 8, Vitest 5,
+  # ESLint 10), so the tarball is built on 22 and only the consumer side runs on the matrix version.
+  consumer:
+    name: Consumer (Node ${{ matrix.node }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22, 24]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build and pack the library
+        run: |
+          npm run build:lib
+          npm pack -w @onesmall/ui --pack-destination "$RUNNER_TEMP"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Consumer smoke test (React 18 and 19)
+        run: node scripts/consumer-smoke.mjs "$RUNNER_TEMP"/onesmall-ui-*.tgz

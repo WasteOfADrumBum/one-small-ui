@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -31,6 +30,7 @@ import { Button } from './Button';
 import { EmptyState } from './EmptyState';
 import { Spinner } from './Spinner';
 import type { Size } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 /** Props a node's link receives. Spread them onto your link component. */
 export interface TreeLinkProps {
@@ -208,7 +208,6 @@ interface TreeContextValue {
 
 const TreeContext = createContext<TreeContextValue | null>(null);
 
-const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 const EMPTY: string[] = [];
 
 const textOf = (node: TreeNode) => (node.textValue ?? textContent(node.label)).trim();
@@ -351,7 +350,7 @@ export const TreeView = forwardRef<HTMLUListElement, TreeViewProps>(function Tre
     [tabKey, selectedSet, expandedSet, checks, lazy],
   );
   const [store] = useState(() => new TreeStore(state));
-  useIsoLayoutEffect(() => store.setState(state), [store, state]);
+  useIsomorphicLayoutEffect(() => store.setState(state), [store, state]);
 
   // ---------- Lazy loading ----------
   const loaderRef = useLatestRef(loadChildren);

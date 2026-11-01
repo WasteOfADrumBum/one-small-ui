@@ -2,7 +2,6 @@ import {
   forwardRef,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,6 +23,7 @@ import type { ComboboxOption } from './Combobox';
 import { useFieldContext, useFieldControl } from './Field';
 import { focusControlOnPress } from './Input';
 import type { Color, ExtendedSize, Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 /** Every text TagInput reads to screen readers or shows inline. Override any of them to translate. */
 export interface TagInputMessages {
@@ -217,7 +217,7 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(function Tag
     if (n) announce(n.text, { politeness: n.kind === 'error' ? 'assertive' : 'polite' });
   };
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!el) return;
     if (listShown) showInTopLayer(el);

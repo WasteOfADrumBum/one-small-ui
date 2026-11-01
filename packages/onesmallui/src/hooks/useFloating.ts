@@ -1,7 +1,8 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { Placement } from '../components/types';
 import { autoPosition, type AnchorLike, type PositionOptions } from '../utils/position';
 import { useResponsiveValue, type ResponsiveValue } from './useResponsiveValue';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export interface UseFloatingOptions extends Omit<PositionOptions, 'placement' | 'arrow'> {
   open: boolean;
@@ -33,7 +34,7 @@ export function useFloating<A extends Element = HTMLElement, F extends HTMLEleme
     force((n) => n + 1);
   }, []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const anchor = virtual.current ?? anchorRef.current;
     const floating = floatingRef.current;
     if (!open || !anchor || !floating) return;

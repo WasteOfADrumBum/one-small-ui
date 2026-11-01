@@ -2,7 +2,6 @@ import {
   forwardRef,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -21,6 +20,7 @@ import { cls } from '../utils/prefix';
 import { useFieldContext } from './Field';
 import { Input } from './Input';
 import type { ExtendedSize, Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 // ---------- Pure helpers (no DOM; safe on the server and in a future DateTimePicker) ----------
 
@@ -301,7 +301,7 @@ export const TimePicker = forwardRef<HTMLInputElement, TimePickerProps>(function
     return best;
   };
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!el) return;
     if (open) showInTopLayer(el);

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { forwardRef, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { useControllableState } from '../hooks/useControllableState';
 import { useFloating } from '../hooks/useFloating';
 import type { ResponsiveValue } from '../hooks/useResponsiveValue';
@@ -22,6 +22,7 @@ import { useFieldContext, useFieldControl } from './Field';
 import { Input } from './Input';
 import { useInputGroupSize } from './InputGroup';
 import type { ExtendedSize, Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 type CalendarPassThrough = 'min' | 'max' | 'isDateDisabled' | 'months' | 'firstDayOfWeek' | 'locale' | 'color' | 'labels';
 
@@ -144,7 +145,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
     if (!next && returnFocus) requestAnimationFrame(() => triggerRef.current?.focus());
   };
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!el) return;
     if (open) showInTopLayer(el);

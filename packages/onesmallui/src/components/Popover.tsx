@@ -2,7 +2,6 @@ import {
   isValidElement,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   type CSSProperties,
   type ElementType,
@@ -28,6 +27,7 @@ import { CloseButton } from './CloseButton';
 import { appearanceProps, type OverlayAppearance } from './DialogBase';
 import { PopoverContext, type PopoverControls } from './PopoverContext';
 import type { Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export type PopoverTrigger = 'click' | 'hover' | 'focus';
 
@@ -133,14 +133,14 @@ export function Popover({
   };
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!mounted || !el) return;
     showInTopLayer(el);
     return () => hideFromTopLayer(el);
   }, [mounted, floatingRef]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (isOpen) initialFocus?.current?.focus({ preventScroll: true });
   }, [isOpen, initialFocus]);
 

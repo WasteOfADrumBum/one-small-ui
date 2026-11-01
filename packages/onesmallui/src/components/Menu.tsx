@@ -7,7 +7,6 @@ import {
   useContext,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -39,6 +38,7 @@ import {
   type MenuContextValue,
 } from './MenuBase';
 import type { Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export type { MenuAutoClose } from './MenuBase';
 
@@ -146,7 +146,7 @@ export const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function
   const root = ctx.root ?? ctx;
 
   // Show in the top layer and move focus in.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ctx.contentRef.current;
     if (!ctx.open || !el) return;
     showInTopLayer(el);

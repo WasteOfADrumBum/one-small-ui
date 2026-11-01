@@ -27,6 +27,8 @@ export default tseslint.config(
       ],
       // Still flags the DOM autoFocus attribute; a component prop named autoFocus is not that attribute.
       'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
+      // Our SSR-safe layout effect gets the same dependency checks as useLayoutEffect.
+      'react-hooks/exhaustive-deps': ['warn', { additionalHooks: 'useIsomorphicLayoutEffect' }],
     },
   },
   {

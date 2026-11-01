@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type FocusEvent,
@@ -21,6 +20,7 @@ import { hideFromTopLayer, showInTopLayer } from '../utils/position';
 import { cls } from '../utils/prefix';
 import { appearanceProps, type OverlayAppearance } from './DialogBase';
 import type { Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export interface TooltipProps {
   /** Short text, or rich content (formatting, icons). */
@@ -102,7 +102,7 @@ export function Tooltip({
   const { anchorRef, arrowRef, floatingRef } = useFloating<HTMLSpanElement, HTMLSpanElement>({ open: mounted, placement, offset });
   const { show, showNow, hide, cancel } = useTooltipState(delay, setOpen);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!mounted || !el) return;
     showInTopLayer(el);
@@ -220,7 +220,7 @@ export function TooltipProvider({ children, placement = 'top', delay = 300, appe
     }, 100);
   };
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = floatingRef.current;
     if (!mounted || !el) return;
     showInTopLayer(el);

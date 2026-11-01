@@ -4,7 +4,6 @@ import {
   forwardRef,
   isValidElement,
   useContext,
-  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -17,6 +16,7 @@ import { CheckIcon } from '../icons/CheckIcon';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import type { ThemeColor } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export type StepStatus = 'complete' | 'current' | 'upcoming' | 'error';
 
@@ -77,7 +77,7 @@ export const Stepper = forwardRef<HTMLDivElement, StepperProps>(function Stepper
   const [overflowing, setOverflowing] = useState(false);
 
   // A scrolling stepper must be reachable by keyboard (WCAG 2.1.1); only add the tab stop when it scrolls.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = scroller.current;
     if (!el) return;
     const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);

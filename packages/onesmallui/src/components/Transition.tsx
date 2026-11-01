@@ -1,8 +1,9 @@
-import { cloneElement, isValidElement, useLayoutEffect, useRef, type CSSProperties, type ReactElement, type Ref } from 'react';
+import { cloneElement, isValidElement, useRef, type CSSProperties, type ReactElement, type Ref } from 'react';
 import { useMergedRefs } from '../hooks/useMergedRefs';
 import { useTransition, type UseTransitionOptions } from '../hooks/useTransition';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export const transitionPresets = ['fade', 'scale', 'slide-up', 'slide-down', 'slide-left', 'slide-right', 'collapse'] as const;
 export type TransitionPreset = (typeof transitionPresets)[number];
@@ -35,7 +36,7 @@ export function Transition({ show, unmountOnExit, enter = 'fade', leave = enter,
   const ref = useMergedRefs(node, childRef);
 
   // `collapse` animates height, which needs the content's measured size.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = node.current;
     const opening = state === 'opening' && enter === 'collapse';
     const closing = state === 'closing' && leave === 'collapse';

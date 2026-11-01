@@ -3,7 +3,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -30,6 +29,7 @@ import { CloseButton } from './CloseButton';
 import { Dialog, type DialogAnimation } from './Dialog';
 import { EXIT_MS, type OverlayAppearance } from './DialogBase';
 import { Spinner } from './Spinner';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export interface LightboxImage {
   src: string;
@@ -122,7 +122,6 @@ const PAN_STEP = 48;
 const DOUBLE_TAP_MS = 300;
 const TAP_SLOP = 10;
 
-const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
@@ -203,7 +202,7 @@ export function Lightbox({
   const zoomed = zoom.scale > 1;
   // The latest zoom for event handlers, so quick key repeats and pointer moves never read a stale render.
   const zoomRef = useRef(zoom);
-  useIsoLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     zoomRef.current = zoom;
   });
   const applyZoom = (z: Zoom) => {
@@ -262,11 +261,11 @@ export function Lightbox({
   }, [shown, index, count, loop, images]);
 
   // An image served from cache can finish before React listens (after hydration, say).
-  useIsoLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const img = imgRef.current;
     if (!img || !image || !img.complete || status[image.src]) return;
     if (img.naturalWidth > 0) setStatus((s) => ({ ...s, [image.src]: 'loaded' }));
-  });
+  }, [image, status]);
 
   // Keep the current thumbnail in view.
   useEffect(() => {

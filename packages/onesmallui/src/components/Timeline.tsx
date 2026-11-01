@@ -5,7 +5,6 @@ import {
   isValidElement,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -26,6 +25,7 @@ import { Avatar } from './Avatar';
 import { Button } from './Button';
 import { Tooltip } from './Tooltip';
 import { VisuallyHidden } from './VisuallyHidden';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export type TimelineStatus = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'pending';
 export type TimelineLayout = 'vertical' | 'alternating' | 'horizontal';
@@ -223,7 +223,7 @@ export const Timeline = forwardRef<HTMLDivElement, TimelineProps>(function Timel
   const now = variant !== 'feed' ? null : nowProp !== undefined ? +nowProp : clientNow;
 
   // A scrolling timeline must be reachable by keyboard (WCAG 2.1.1); only add the tab stop when it scrolls.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = viewport.current;
     if (!el || layout !== 'horizontal') return;
     const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);

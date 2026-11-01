@@ -4,7 +4,6 @@ import {
   forwardRef,
   isValidElement,
   useContext,
-  useLayoutEffect,
   useRef,
   useState,
   type HTMLAttributes,
@@ -19,6 +18,7 @@ import { cls } from '../utils/prefix';
 import type { OverlayAppearance } from './DialogBase';
 import { Menu, MenuContent, MenuItem, MenuSub, MenuTrigger } from './Menu';
 import type { Placement } from './types';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 
 export type NavVariant = 'links' | 'tabs' | 'pills' | 'underline';
 
@@ -196,7 +196,7 @@ export const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   const measureRef = useRef<HTMLUListElement | null>(null);
   const [count, setCount] = useState(items.length);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!canOverflow) return;
     const root = rootRef.current;
     const measure = measureRef.current;
