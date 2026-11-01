@@ -1,7 +1,7 @@
 {
   "name": "@onesmall/ui",
-  "version": "0.5.0",
-  "description": "OneSmallUI (1SmUI): a futuristic, WCAG AAA accessible React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
+  "version": "0.6.0",
+  "description": "OneSmallUI (1SmUI): a futuristic, accessible (WCAG 2.2 AA, AAA contrast) React + TypeScript + SCSS component library with light/dark themes, utilities, drag and drop, and upload drop zones.",
   "keywords": [
     "react",
     "ui",

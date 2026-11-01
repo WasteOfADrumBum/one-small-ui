@@ -1,6 +1,6 @@
 # OneSmallUI (1SmUI)
 
-A futuristic, WCAG AAA accessible React + TypeScript + SCSS component library, published as [`@onesmall/ui`](https://www.npmjs.com/package/@onesmall/ui). Home: https://ui.onesmall.company · Docs: https://one-small-ui.vercel.app
+A futuristic, accessible (WCAG 2.2 AA, AAA contrast) React + TypeScript + SCSS component library, published as [`@onesmall/ui`](https://www.npmjs.com/package/@onesmall/ui). Home: https://ui.onesmall.company · Docs: https://one-small-ui.vercel.app
 
 | Path | What |
 | --- | --- |
@@ -9,6 +9,8 @@ A futuristic, WCAG AAA accessible React + TypeScript + SCSS component library, p
 | `scripts/` | Token generator, AAA contrast check, axe accessibility audit |
 
 ## Develop
+
+Needs Node 22.13 or newer (Vite 8, Vitest 5, ESLint 10). The published package itself runs on Node 18.18+.
 
 ```bash
 npm install
@@ -24,6 +26,7 @@ npm run lint           # ESLint with jsx-a11y strict and react-hooks
 npm test               # component tests (Vitest + Testing Library + jest-axe on every component)
 npm run build          # library (dist/) and docs site (apps/docs/dist)
 npm run test:a11y      # axe WCAG A/AA/AAA audit of every docs page, light and dark
+npm run test:consumer  # packed tarball in clean React 18 and 19 apps (ESM, CJS, types, SSR, hydration)
 ```
 
 ## Change colors
@@ -32,6 +35,9 @@ Edit `packages/onesmallui/tokens/themes.json`, then `npm run build`. The build r
 `src/tokens.ts`; `npm run check:contrast` tells you if a change breaks AAA.
 
 ## Publish to npm
+
+Maintainer only. Follow [docs/RELEASING.md](docs/RELEASING.md): version bump, checks, tarball checksum, dry run,
+then:
 
 ```bash
 npm login
