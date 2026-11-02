@@ -1,32 +1,32 @@
 {
   "stateVersion": 1,
-  "revision": 1,
-  "checkpointId": "v060-rc-9a13c9e",
+  "revision": 2,
+  "checkpointId": "v060-closeout-acceptance-draft",
   "projectId": "one-small-ui",
   "repository": "https://github.com/WasteOfADrumBum/one-small-ui",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
     "branch": "main",
     "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
-    "recordedAt": "2026-11-01T03:45:00Z"
+    "recordedAt": "2026-11-02T17:10:00Z"
   },
   "development": {
-    "milestone": "v0.6.0 release candidate (hardening release)",
+    "milestone": "v0.6.0 published; closeout and acceptance record",
     "activeTask": {
-      "id": "v060-rc",
-      "title": "Hand v0.6.0 candidate to the owner for acceptance and publication"
+      "id": "v060-closeout",
+      "title": "Close out the published 0.6.0 release and write the roadmap"
     },
-    "workingBranch": "claude/project-thread-vlqigd",
+    "workingBranch": "claude/project-thread-9t8tjt",
     "activePr": null,
     "lastCompleted": [
-      "#31 dependency security: Vitest 5 and ESLint 10; critical vitest/tinypool advisories removed; production audit 0",
-      "#32 short-viewport positioning: main-axis clamp, --os-floating-available-height caps, TimePicker width fix",
-      "#33 React 18/19 consumer smoke on the packed tarball (CI Node 18/20/22/24); SSR-safe layout effects",
-      "#34 version 0.6.0, CHANGELOG, compatibility table, docs/RELEASING.md, release notes, revised accessibility claims",
-      "Candidate artifact onesmall-ui-0.6.0.tgz packed at 9a13c9e: sha256 9390f28a27ca211f56ad76eddbec25869b02d29e32a1114b26f674ec0fecc46f, 681 files; consumer smoke 48/48"
+      "Owner published @onesmall/ui 0.6.0 to npm (2026-11-02T14:19:57Z) and created tag v0.6.0 (annotated, unsigned) and the GitHub release at 9a13c9e (owner action, checked by the agent against npm and GitHub)",
+      "npm dist.integrity equals the candidate sha512; npm tarball sha256 9390f28a27ca211f56ad76eddbec25869b02d29e32a1114b26f674ec0fecc46f; a clean rebuild from v0.6.0 reproduces it byte for byte",
+      "docs/releases/0.6.0-acceptance.md: draft owner acceptance record (owner confirmations quoted, gate evidence table, unmet items, provenance options)",
+      "docs/RELEASING.md: provenance now required (hub gate release-provenance); tags created with git tag -s",
+      "ROADMAP.md: provenance pipeline, package footprint (measured), selective consumption, theme generation, AI integration"
     ],
     "inProgress": [],
-    "nextAction": "Owner: review docs/releases/0.6.0-release-notes.md and the readiness report, decide on the jsx-a11y moderate advisory, run manual screen-reader and keyboard checks, then follow docs/RELEASING.md to publish 0.6.0 and tag v0.6.0 at 9a13c9e (or a later green main commit)."
+    "nextAction": "Owner: choose a provenance option in docs/releases/0.6.0-acceptance.md section E, approve the closeout PR, then open the hub registry PR with verifier evidence and approval for 0.6.0. Agents: no roadmap work until a scope document exists."
   },
   "decisions": {
     "made": [
@@ -58,8 +58,9 @@
       "Do not run npm audit fix --force or disable audit rules or tests."
     ],
     "unresolved": [
+      "release-provenance is not met for 0.6.0 (no npm attestation, unsigned tag); owner to choose option A, B or C in docs/releases/0.6.0-acceptance.md section E.",
+      "Hub registry still records 0.5.0 and releaseStatus not_started; needs an owner-approved registry PR.",
       "Page-block (Phase 5) scope needs an owner-written spec before any work.",
-      "Two moderate dev-only advisories (minimatch 3 inside eslint-plugin-jsx-a11y) await owner acceptance or an upstream fix; production audit is clean.",
       "Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented)."
     ]
   },
@@ -106,11 +107,26 @@
         "commit": "979381ec13d670dc6e7013cb90bb2b9e43e813fc",
         "at": "2026-11-01T02:30:00Z",
         "ciRunUrl": null
+      },
+      {
+        "command": "npm view @onesmall/ui@0.6.0 --json; npm pack @onesmall/ui@0.6.0; sha256sum",
+        "result": "pass",
+        "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
+        "at": "2026-11-02T16:55:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "clean worktree at v0.6.0: npm ci && npm run build:lib && npm pack -w @onesmall/ui (sha256 compared with npm tarball)",
+        "result": "pass",
+        "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
+        "at": "2026-11-02T17:05:00Z",
+        "ciRunUrl": null
       }
     ],
     "unverifiedChanges": [
-      "No human screen-reader (NVDA, JAWS, VoiceOver, TalkBack) or manual keyboard verification of 0.6.0 changes yet.",
-      "Short-viewport behaviour verified in Chromium only (Playwright); Firefox and Safari not exercised."
+      "Owner reported a manual acceptance pass in Chrome with Windows Narrator and accepted the live docs (2026-11-02); recorded as the owner's statement, not as agent verification. Other screen readers and browsers were not covered.",
+      "Short-viewport behaviour verified in Chromium only (Playwright); Firefox and Safari not exercised.",
+      "Branch protection for the Consumer checks could not be read from the agent session."
     ]
   },
   "handoff": {
@@ -118,17 +134,16 @@
       "tool": "Claude Code",
       "model": null
     },
-    "checkpointedAt": "2026-11-01T03:45:00Z",
+    "checkpointedAt": "2026-11-02T17:10:00Z",
     "unfinished": [
-      "npm publish 0.6.0 (owner)",
-      "Tag v0.6.0 and GitHub release (owner)",
-      "Human accessibility verification (owner or delegate)"
+      "Owner provenance decision (acceptance record section E)",
+      "Owner approval of the closeout PR",
+      "Hub registry PR for 0.6.0 (owner)"
     ],
     "blockers": [
-      "Publication and tagging need explicit owner authorization.",
-      "Accept or reject the dev-only jsx-a11y moderate advisory (owner)."
+      "Closing 0.6.0 in the hub needs the owner's provenance decision and approval."
     ],
-    "continuation": "Code for 0.6.0 is merged on main at 9a13c9e with green CI. Nothing is published. Readiness report: docs/releases/0.6.0-readiness.md. Publishing steps: docs/RELEASING.md. Do not re-run the hardening work; pick up from the owner's decisions.",
+    "continuation": "0.6.0 is published and matches 9a13c9e. Read docs/releases/0.6.0-acceptance.md for the facts and the open decision, and ROADMAP.md for future work. Do not republish, retag or implement roadmap items without a scope document.",
     "uncommittedWorkOutsideCheckpoint": "none",
     "persistedBy": "local-file"
   },
