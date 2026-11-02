@@ -47,3 +47,14 @@ npm publish -w @onesmall/ui
 `prepublishOnly` runs typecheck, lint, tests and the build first; `publishConfig.access` is `public`.
 
 The docs site deploys to https://one-small-ui.vercel.app from `apps/docs/dist` (see `vercel.json`).
+
+## Releases and roadmap
+
+- Current release: **0.6.0**, published to npm and tagged `v0.6.0` (commit `9a13c9e`) on 2026-11-02. Scope:
+  [docs/releases/0.6.0-scope.md](docs/releases/0.6.0-scope.md); readiness evidence:
+  [docs/releases/0.6.0-readiness.md](docs/releases/0.6.0-readiness.md).
+- Future work: [ROADMAP.md](ROADMAP.md). Roadmap items (page blocks and the rest) are optional and never reopen a
+  published release; each needs its own scoped release.
+- Release status, gates and evidence live in the
+  [One Small Engineering hub](https://github.com/WasteOfADrumBum/one-small-engineering) registry; development state for
+  agents lives in [.engineering/](.engineering/STATUS.md).
