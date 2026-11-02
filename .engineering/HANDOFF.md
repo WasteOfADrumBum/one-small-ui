@@ -1,27 +1,26 @@
-<!-- generated from .engineering/state.json (revision 1) -->
+<!-- generated from .engineering/state.json (revision 2) -->
 
 # Handoff: one-small-ui
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 1, `v060-rc-9a13c9e`, 2026-11-01T03:45:00Z by Claude Code
+- Checkpoint: revision 2, `v060-closeout-acceptance-draft`, 2026-11-02T17:10:00Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
 ## Continue with
 
-Code for 0.6.0 is merged on main at 9a13c9e with green CI. Nothing is published. Readiness report: docs/releases/0.6.0-readiness.md. Publishing steps: docs/RELEASING.md. Do not re-run the hardening work; pick up from the owner's decisions.
+0.6.0 is published and matches 9a13c9e. Read docs/releases/0.6.0-acceptance.md for the facts and the open decision, and ROADMAP.md for future work. Do not republish, retag or implement roadmap items without a scope document.
 
 ## Unfinished
 
-- npm publish 0.6.0 (owner)
-- Tag v0.6.0 and GitHub release (owner)
-- Human accessibility verification (owner or delegate)
+- Owner provenance decision (acceptance record section E)
+- Owner approval of the closeout PR
+- Hub registry PR for 0.6.0 (owner)
 
 ## Blockers
 
-- Publication and tagging need explicit owner authorization.
-- Accept or reject the dev-only jsx-a11y moderate advisory (owner).
+- Closing 0.6.0 in the hub needs the owner's provenance decision and approval.
 
 ## Decisions
 
@@ -37,6 +36,7 @@ Code for 0.6.0 is merged on main at 9a13c9e with green CI. Nothing is published.
 
 ## Unresolved decisions
 
+- release-provenance is not met for 0.6.0 (no npm attestation, unsigned tag); owner to choose option A, B or C in docs/releases/0.6.0-acceptance.md section E.
+- Hub registry still records 0.5.0 and releaseStatus not_started; needs an owner-approved registry PR.
 - Page-block (Phase 5) scope needs an owner-written spec before any work.
-- Two moderate dev-only advisories (minimatch 3 inside eslint-plugin-jsx-a11y) await owner acceptance or an upstream fix; production audit is clean.
 - Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented).

@@ -46,7 +46,7 @@ git checkout <candidate sha>
 npm ci && npm run build:lib
 npm login
 npm publish -w @onesmall/ui            # prepublishOnly runs check + build again
-git tag -a vx.y.z -m "@onesmall/ui x.y.z" <candidate sha> && git push origin vx.y.z
+git tag -s vx.y.z -m "@onesmall/ui x.y.z" <candidate sha> && git verify-tag vx.y.z && git push origin vx.y.z
 ```
 
 Then create the GitHub release from the tag with the release notes, and confirm:
@@ -56,12 +56,22 @@ Then create the GitHub release from the tag with the release notes, and confirm:
 - A fresh `npm install @onesmall/ui@x.y.z` in a scratch app works (`node scripts/consumer-smoke.mjs` accepts a
   downloaded tarball: `npm pack @onesmall/ui@x.y.z`).
 
-### Provenance (optional, recommended)
+### Provenance (required)
 
-npm provenance needs the publish to run in GitHub Actions with `id-token: write` and `npm publish --provenance`
-(or npm trusted publishing configured on npmjs.com for this repository). A local `npm publish` cannot attach
-provenance. If you want it, add a `workflow_dispatch` release workflow and configure trusted publishing for
-`@onesmall/ui` on npmjs.com; until then releases are published without provenance, as 0.1.0 and 0.5.0 were.
+The Engineering Hub's Definition of Done (Tier 2, gate `release-provenance`) requires npm `--provenance` or a
+signed tag wherever the channel supports it. npm supports provenance and git supports signed tags, so both apply:
+
+- **Signed tag (minimum):** create the tag with `git tag -s` (GPG or SSH signing key configured, and the key
+  added to GitHub) and check it with `git verify-tag vx.y.z`.
+- **npm provenance (target):** publish from GitHub Actions with `id-token: write` and `npm publish --provenance`,
+  or configure npm trusted publishing for `@onesmall/ui` on npmjs.com for this repository. A local `npm publish`
+  cannot attach provenance. Check it with `npm view @onesmall/ui@x.y.z dist.attestations` or
+  `npm audit signatures`.
+
+A release without either does not meet the gate, and only Joshua Small can decide to ship it anyway; record that
+decision in the release's acceptance record. 0.1.0 to 0.6.0 were published without provenance and with unsigned
+tags; see [releases/0.6.0-acceptance.md](releases/0.6.0-acceptance.md). npm attestations can't be added to an
+existing version, and released tags are never moved.
 
 ## Rollback
 
