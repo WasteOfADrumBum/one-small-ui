@@ -5,6 +5,12 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-03
+
+### Changed
+
+- Prepare a patch release using npm trusted publishing with build provenance. No component API changes.
+
 ## [0.6.0] - 2026-11-01
 
 A hardening release: security fixes in development tooling, short-viewport positioning, React 18 server
