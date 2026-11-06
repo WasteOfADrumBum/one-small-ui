@@ -75,7 +75,9 @@ Publishing needs the maintainer. Agents may run the dry run.
 
 1. Merge the release PR to `main` and wait for **CI gate** and both CodeQL legs on that merge commit.
 2. Actions → **Publish package** → Run workflow on `main` with `candidate_sha` (full SHA of the merge commit),
-   `expected_version`, and `dry_run` left on.
+   `expected_version`, and `dry_run` left on. The candidate must be the head of the ref the run is dispatched on:
+   every checkout uses the run's own commit, so no input selects code to run. If `main` has moved on, the run
+   refuses; release the newer head instead.
 3. The run, without any registry credentials:
    - validates the inputs and that the candidate is on `main` with matching versions everywhere;
    - finds the candidate's CI and CodeQL runs on `main` through the API and requires the latest attempt of each
@@ -84,8 +86,8 @@ Publishing needs the maintainer. Agents may run the dry run.
      `scripts/test/release-lib.test.mjs`);
    - downloads that run's `package` artifact and checks its manifest (commit, run, version, name, sha256 and
      sha512), then uploads it as `release-package` before any candidate code runs;
-   - rebuilds the candidate in a separate read-only job with the same Node version, and the release tooling
-     (from the workflow's ref, not the candidate) requires identical bytes;
+   - rebuilds the candidate in a separate read-only job with the same Node version, after the verified artifact is
+     stored, and a job that runs no candidate build code requires identical bytes;
    - runs the consumer matrix on that tarball and `npm publish --dry-run`.
 
    The run summary and the `release-package` artifact (tarball, manifest, `release-evidence.json`, kept 90 days)

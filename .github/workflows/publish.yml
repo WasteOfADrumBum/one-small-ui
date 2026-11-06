@@ -3,7 +3,7 @@ name: Publish package
 # Release verification and (optionally) publication of @onesmall/ui for one exact candidate commit.
 #
 #   Actions → "Publish package" → Run workflow on main:
-#     candidate_sha     full 40-character SHA of a commit on main
+#     candidate_sha     full 40-character SHA of the commit being released: the head of the ref you run it on
 #     expected_version  the version you intend to publish, e.g. 0.6.1 (must equal the candidate's package.json)
 #     dry_run           true (default): verify everything, publish nothing
 #
@@ -24,7 +24,7 @@ on:
   workflow_dispatch:
     inputs:
       candidate_sha:
-        description: Full 40-character commit SHA on main to verify (and publish)
+        description: Full 40-character SHA of the commit to release (must be the head of the ref this runs on)
         required: true
         type: string
       expected_version:
@@ -63,7 +63,6 @@ jobs:
       CANDIDATE: ${{ inputs.candidate_sha }}
       VERSION: ${{ inputs.expected_version }}
     steps:
-      # The verification code is the workflow's own ref (main for a real release), never the candidate's.
       - name: Check out the release tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -75,6 +74,15 @@ jobs:
           node-version: '22'
       - name: Validate inputs
         run: node tools/scripts/release-verify.mjs inputs --sha "$CANDIDATE" --version "$VERSION"
+      # The candidate is always the commit this run was dispatched on, so every checkout below uses the run's own
+      # ref and no input ever selects code to check out. Dispatch on main right after the release merge; if main
+      # has moved on, the confirmation below fails instead of releasing a different commit.
+      - name: Candidate is the dispatched commit
+        run: |
+          if [ "$CANDIDATE" != "$GITHUB_SHA" ]; then
+            echo "::error::candidate_sha $CANDIDATE is not the commit this run was dispatched on ($GITHUB_SHA). Run the workflow on the ref whose head is the candidate."
+            exit 1
+          fi
       - name: Refuse publication outside main
         if: ${{ !inputs.dry_run && github.ref != 'refs/heads/main' }}
         run: |
@@ -84,7 +92,6 @@ jobs:
       - name: Check out the candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.candidate_sha }}
           persist-credentials: false
           fetch-depth: 0
           path: candidate
@@ -139,7 +146,6 @@ jobs:
       - name: Check out the candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.candidate_sha }}
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:

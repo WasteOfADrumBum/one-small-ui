@@ -26,7 +26,7 @@ agent.
 
 ## 3. Publish (maintainer)
 
-Run **Publish package** again on `main` with the same `candidate_sha` and `dry_run` off. It publishes the
+Run **Publish package** again on `main` (still at the candidate) with the same `candidate_sha` and `dry_run` off. It publishes the
 verified tarball with npm provenance through trusted publishing (no token) and checks the registry integrity.
 The one-time npm and environment setup is in [ci-cd.md](ci-cd.md#releasing). Then tag:
 
