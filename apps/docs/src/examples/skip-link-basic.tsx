@@ -1,9 +1,11 @@
 import { SkipLink } from '@onesmall/ui';
 
 // Put it first in the page. Tab into this preview to reveal it.
+// The demo clips it (os-overflow-hidden) so it stays hidden inside the preview;
+// on a real page it sits off-screen above the viewport.
 export default function Example() {
   return (
-    <div className="os-relative os-grid os-gap-3 os-pt-6">
+    <div className="os-relative os-overflow-hidden os-grid os-gap-3 os-pt-6">
       <SkipLink href="#flight-plan">Skip to flight plan</SkipLink>
       <nav aria-label="Demo site">
         <ul className="os-flex os-flex-wrap os-gap-4 os-list-unstyled os-mb-0">
