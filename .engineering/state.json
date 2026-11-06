@@ -1,32 +1,35 @@
 {
   "stateVersion": 1,
-  "revision": 2,
-  "checkpointId": "v060-closeout-acceptance-draft",
+  "revision": 3,
+  "checkpointId": "ci-cd-evidence-pr",
   "projectId": "one-small-ui",
   "repository": "https://github.com/WasteOfADrumBum/one-small-ui",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
-    "branch": "main",
-    "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
-    "recordedAt": "2026-11-02T17:10:00Z"
+    "branch": "claude/project-thread-mv5bx9",
+    "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773",
+    "recordedAt": "2026-11-06T00:40:00Z"
   },
   "development": {
-    "milestone": "v0.6.0 published; closeout and acceptance record",
+    "milestone": "0.6.1 release candidate on main (unpublished); CI/CD hardening",
     "activeTask": {
-      "id": "v060-closeout",
-      "title": "Close out the published 0.6.0 release and write the roadmap"
+      "id": "ci-cd-evidence",
+      "title": "Bring CI/CD to an evidence-backed standard (one consolidated PR)"
     },
-    "workingBranch": "claude/project-thread-9t8tjt",
+    "workingBranch": "claude/project-thread-mv5bx9",
     "activePr": null,
     "lastCompleted": [
-      "Owner published @onesmall/ui 0.6.0 to npm (2026-11-02T14:19:57Z) and created tag v0.6.0 (annotated, unsigned) and the GitHub release at 9a13c9e (owner action, checked by the agent against npm and GitHub)",
-      "npm dist.integrity equals the candidate sha512; npm tarball sha256 9390f28a27ca211f56ad76eddbec25869b02d29e32a1114b26f674ec0fecc46f; a clean rebuild from v0.6.0 reproduces it byte for byte",
-      "docs/releases/0.6.0-acceptance.md: draft owner acceptance record (owner confirmations quoted, gate evidence table, unmet items, provenance options)",
-      "docs/RELEASING.md: provenance now required (hub gate release-provenance); tags created with git tag -s",
-      "ROADMAP.md: provenance pipeline, package footprint (measured), selective consumption, theme generation, AI integration"
+      "Baseline: CI run 41840159196 on ee62089 took 4m28s wall; Playwright (a11y) was the critical path; 8 independent builds; mutable action tags; publish.yml rebuilt the package and did not require browser CI",
+      "ci.yml: one build and pack per run (package artifact with sha256/sha512 manifest), CI gate check, concurrency, timeouts, SHA-pinned actions, Security job (audit-deps, npm audit signatures, actionlint, zizmor, gitleaks with sha256-verified downloads), Firefox and WebKit behaviour checks",
+      "publish.yml: exact-candidate gating (scripts/release-verify.mjs + release-lib.mjs, 8 policy tests), consumes only the verified CI artifact, byte-identical rebuild check, dry_run default true, OIDC provenance publish in environment npm-publish",
+      "codeql.yml, dependabot.yml (7/30-day cooldown), security/audit-exceptions.json, ESLint security rules for library source",
+      "Fix: Escape or cancel in a nested Dialog no longer closes its parent (DialogBase); regression tests in test/behavior.test.tsx",
+      "Docs: security headers and CSP in vercel.json, build-info.json, canonical URL, not-found route, docs-smoke.yml; docs/ci-cd.md"
     ],
-    "inProgress": [],
-    "nextAction": "Owner: choose a provenance option in docs/releases/0.6.0-acceptance.md section E, approve the closeout PR, then open the hub registry PR with verifier evidence and approval for 0.6.0. Agents: no roadmap work until a scope document exists."
+    "inProgress": [
+      "Open the consolidated PR, get CI green, independent review, merge, dry run, docs smoke"
+    ],
+    "nextAction": "Check the PR from claude/project-thread-mv5bx9 and its CI. After merge: dispatch Publish package with dry_run true for the merge SHA and record the run; confirm docs-smoke passed on the production deploy. Owner: add the main ruleset and the npm-publish environment (docs/ci-cd.md#releasing)."
   },
   "decisions": {
     "made": [
@@ -50,6 +53,20 @@
         "decidedBy": "agent",
         "humanRef": null,
         "recordedAt": "2026-11-01T03:20:00Z"
+      },
+      {
+        "id": "ci-gate-single-check",
+        "summary": "main is protected on one aggregate check, CI gate; publish.yml verifies every mandatory job itself, so job renames can't silently drop a requirement.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-05T15:00:00Z"
+      },
+      {
+        "id": "release-artifact-reuse",
+        "summary": "Releases publish the tarball CI built for the exact candidate, after an independent byte-identical rebuild; no rebuild-and-publish.",
+        "decidedBy": "agent",
+        "humanRef": null,
+        "recordedAt": "2026-11-05T15:00:00Z"
       }
     ],
     "constraints": [
@@ -61,7 +78,9 @@
       "release-provenance is not met for 0.6.0 (no npm attestation, unsigned tag); owner to choose option A, B or C in docs/releases/0.6.0-acceptance.md section E.",
       "Hub registry still records 0.5.0 and releaseStatus not_started; needs an owner-approved registry PR.",
       "Page-block (Phase 5) scope needs an owner-written spec before any work.",
-      "Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented)."
+      "Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented).",
+      "main has no branch protection or ruleset; agent tools cannot configure it. Owner: ruleset requiring PRs and the CI gate check, no force push or deletion.",
+      "npm-publish environment protection and the npm trusted publisher (environment npm-publish) are owner settings; not verified."
     ]
   },
   "verification": {
@@ -121,12 +140,42 @@
         "commit": "9a13c9e22d094a95364262a1ae89f666febac892",
         "at": "2026-11-02T17:05:00Z",
         "ciRunUrl": null
+      },
+      {
+        "command": "npm run check (local, Node 22: 720 tests, 8 script tests)",
+        "result": "pass",
+        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "at": "2026-11-05T19:40:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "npm run build; npm run package:check (local)",
+        "result": "pass",
+        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "at": "2026-11-05T19:45:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "npm run test:browsers (local, Chromium, 26 checks)",
+        "result": "pass",
+        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "at": "2026-11-05T17:30:00Z",
+        "ciRunUrl": null
+      },
+      {
+        "command": "node scripts/consumer-smoke.mjs (local, Node 22, 56 checks)",
+        "result": "pass",
+        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "at": "2026-11-05T16:30:00Z",
+        "ciRunUrl": null
       }
     ],
     "unverifiedChanges": [
       "Owner reported a manual acceptance pass in Chrome with Windows Narrator and accepted the live docs (2026-11-02); recorded as the owner's statement, not as agent verification. Other screen readers and browsers were not covered.",
       "Short-viewport behaviour verified in Chromium only (Playwright); Firefox and Safari not exercised.",
-      "Branch protection for the Consumer checks could not be read from the agent session."
+      "Branch protection for the Consumer checks could not be read from the agent session.",
+      "actionlint, zizmor, gitleaks, CodeQL, Firefox and WebKit checks and the full a11y run had not run when this checkpoint was written; see the PR's CI.",
+      "docs-smoke.mjs had not run against the live site (the agent container cannot reach it)."
     ]
   },
   "handoff": {
@@ -134,16 +183,17 @@
       "tool": "Claude Code",
       "model": null
     },
-    "checkpointedAt": "2026-11-02T17:10:00Z",
+    "checkpointedAt": "2026-11-06T00:40:00Z",
     "unfinished": [
-      "Owner provenance decision (acceptance record section E)",
-      "Owner approval of the closeout PR",
-      "Hub registry PR for 0.6.0 (owner)"
+      "PR CI green, independent review, merge",
+      "Post-merge Publish package dry run and docs smoke",
+      "Owner: main ruleset, npm-publish environment, npm trusted publisher",
+      "Owner provenance decision for 0.6.0 (acceptance record section E)"
     ],
     "blockers": [
-      "Closing 0.6.0 in the hub needs the owner's provenance decision and approval."
+      "Branch protection and environment protection need the repository owner."
     ],
-    "continuation": "0.6.0 is published and matches 9a13c9e. Read docs/releases/0.6.0-acceptance.md for the facts and the open decision, and ROADMAP.md for future work. Do not republish, retag or implement roadmap items without a scope document.",
+    "continuation": "Read docs/ci-cd.md. The PR from claude/project-thread-mv5bx9 holds the CI/CD work; check its CI and review state on GitHub before continuing. Never publish, tag or change dist-tags; the dry run is safe.",
     "uncommittedWorkOutsideCheckpoint": "none",
     "persistedBy": "local-file"
   },

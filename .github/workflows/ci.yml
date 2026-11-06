@@ -1,48 +1,121 @@
 name: CI
 
+# Job graph (docs/ci-cd.md has the full picture and local commands):
+#   check (ubuntu, windows) ─────────────────────────────┐
+#   Build and package ──┬── Playwright (a11y)           │
+#                       └── Consumer (Node 18|20|22|24) ├── CI gate  ← the one required status check
+#   Playwright (layout), Browsers (firefox|webkit) ──────┤
+#   Security ─────────────────────────────────────────────┘
+# Every job runs on every change (no path filters), so docs-only PRs never leave a required check pending.
+
 on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  # Superseded PR runs are cancelled; runs on main and merge queue runs always finish (the release gate reads them).
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: '22'
+  npm_config_fund: 'false'
+  npm_config_audit: 'false'
+  npm_config_fetch_retries: '3'
+  npm_config_fetch_timeout: '60000'
+
 jobs:
+  # Native checks on both operating systems: contrast, typecheck, lint, unit/component tests, release-gate tests.
+  # Windows also builds and packs, because the build scripts must stay portable (the maintainer develops there).
   check:
+    name: check (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - name: Install
         run: npm ci
-      - name: Check (contrast, typecheck, lint, tests)
+      - name: Check (contrast, typecheck, lint, tests, release-gate tests)
         run: npm run check
-      - name: Build (library and docs)
-        run: npm run build
+      - name: Build and pack natively (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          npm run build
+          npm run package:check -- --out "$RUNNER_TEMP/package"
 
-  # Browser checks run on Ubuntu only. Each suite is its own job, so "Playwright (layout)" and
-  # "Playwright (a11y)" are stable names for branch protection.
+  # The one build of the library and docs. The tarball and its manifest (digest, commit, run) are the artifact
+  # every later job and the release workflow use; nothing downstream rebuilds or repacks it.
+  build:
+    name: Build and package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build library and docs
+        run: npm run build
+      - name: Pack and validate the package (publint, attw, contents, digest)
+        run: npm run package:check -- --out artifacts
+      - name: Upload package artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: package
+          path: |
+            artifacts/*.tgz
+            artifacts/package-manifest.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload docs site
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docs-dist
+          path: apps/docs/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  # Browser checks in Chromium. Layout bundles its own fixtures from source, so it starts at once; a11y audits
+  # the built docs from the build job. "Playwright (layout)" / "Playwright (a11y)" names are kept stable.
   playwright:
     name: Playwright (${{ matrix.suite }})
+    needs: build
     strategy:
       fail-fast: false
       matrix:
         suite: [layout, a11y]
     # Playwright 1.56 cannot install browsers on the ubuntu-latest image (ubuntu26.04); pin a supported one.
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - name: Install
         run: npm ci
@@ -50,50 +123,195 @@ jobs:
         id: pw
         run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
       # Runs on a cache hit too: the browser download is skipped but the OS packages still install.
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Build (library and docs)
-        run: npm run build
+      - name: Download docs site
+        if: matrix.suite == 'a11y'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docs-dist
+          path: apps/docs/dist
       - name: Test (${{ matrix.suite }})
-        run: npm run test:${{ matrix.suite }}
+        env:
+          SUITE: ${{ matrix.suite }}
+        run: npm run "test:$SUITE"
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report-${{ matrix.suite }}
           path: playwright-report/
           if-no-files-found: ignore
           retention-days: 14
 
-  # The packed tarball in clean React 18 and React 19 apps, on every Node version the published package
-  # supports at runtime (engines >=18.18). Building the repo itself needs Node 22.13+ (Vite 8, Vitest 5,
-  # ESLint 10), so the tarball is built on 22 and only the consumer side runs on the matrix version.
+  # Targeted Firefox and WebKit checks for the browser-sensitive behaviour (dialog, top layer, focus, keyboard).
+  browsers:
+    name: Browsers (${{ matrix.browser }})
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ matrix.browser }}-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install ${{ matrix.browser }}
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: npx playwright install --with-deps "$BROWSER"
+      - name: Test (${{ matrix.browser }})
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: npm run test:browsers -- "--browser=$BROWSER"
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browsers-report-${{ matrix.browser }}
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # The built tarball (not the workspace) in clean React 18 and 19 apps, on every Node version the package supports
+  # at runtime (engines >=18.18). Only the smoke script is checked out: no repo install, no rebuild. The digest
+  # from the build job's manifest is enforced before anything is installed.
   consumer:
     name: Consumer (Node ${{ matrix.node }})
+    needs: build
     strategy:
       fail-fast: false
       matrix:
         node: [18, 20, 22, 24]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
-          cache: npm
-      - name: Install
-        run: npm ci
-      - name: Build and pack the library
-        run: |
-          npm run build:lib
-          npm pack -w @onesmall/ui --pack-destination "$RUNNER_TEMP"
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+          sparse-checkout: scripts/consumer-smoke.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: package
+          path: ${{ runner.temp }}/package
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
       - name: Consumer smoke test (React 18 and 19)
-        run: node scripts/consumer-smoke.mjs "$RUNNER_TEMP"/onesmall-ui-*.tgz
+        env:
+          PACKAGE_DIR: ${{ runner.temp }}/package
+        run: |
+          file=$(node -p "require(process.env.PACKAGE_DIR + '/package-manifest.json').filename")
+          sha=$(node -p "require(process.env.PACKAGE_DIR + '/package-manifest.json').sha256")
+          node scripts/consumer-smoke.mjs "$PACKAGE_DIR/$file" "--sha256=$sha"
+
+  # Dependency advisories (whole tree and runtime tree, exceptions reviewed in security/), registry signatures,
+  # workflow lint (actionlint) and workflow security (zizmor), and secret scanning of the git history (gitleaks).
+  # Tool binaries are pinned by version and verified by sha256 before they run.
+  security:
+    name: Security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      ACTIONLINT_VERSION: 1.7.12
+      ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+      ZIZMOR_VERSION: 1.31.1
+      ZIZMOR_SHA256: 58e878eb2dbd2c6183c105e1ac28c14f7dd1eca44a783f1fe2a69647d012c410
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          # Node 24 bundles npm 11, whose Sigstore client verifies current provenance bundles; npm 10 reports
+          # EMISSINGSIGNATUREKEY for packages published with them.
+          node-version: '24'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Dependency advisories (all and runtime)
+        run: npm run audit:deps
+      # The registry intermittently serves attestations whose key isn't yet in its published key list
+      # (EMISSINGSIGNATUREKEY, a different package each time). Only that error is retried; an invalid or missing
+      # signature fails at once, and three misses in a row fail the job.
+      - name: Registry signatures and provenance of installed packages
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit signatures > signatures.log 2>&1; then cat signatures.log; exit 0; fi
+            cat signatures.log
+            grep -q EMISSINGSIGNATUREKEY signatures.log || exit 1
+            echo "::warning::npm audit signatures: registry key list incomplete (attempt $attempt); retrying"
+            sleep $((attempt * 20))
+          done
+          exit 1
+      - name: Install pinned tools
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin"
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 3 --max-time 120 -o actionlint.tgz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tgz" | sha256sum -c -
+          tar -xzf actionlint.tgz -C bin actionlint
+          curl -fsSL --retry 3 --max-time 120 -o gitleaks.tgz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
+          tar -xzf gitleaks.tgz -C bin gitleaks
+          echo "zizmor==${ZIZMOR_VERSION} --hash=sha256:${ZIZMOR_SHA256}" > zizmor-req.txt
+          python3 -m pip install --quiet --no-deps --require-hashes --only-binary=:all: --target "$RUNNER_TEMP/zizmor" -r zizmor-req.txt
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          echo "$RUNNER_TEMP/zizmor/bin" >> "$GITHUB_PATH"
+      - name: Workflow lint (actionlint)
+        run: actionlint -color
+      - name: Workflow security (zizmor)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: zizmor --persona=regular --min-severity=low .github
+      - name: Secret scan of the git history (gitleaks)
+        run: gitleaks git --no-banner --redact --exit-code 1 .
+
+  # The single required status check. It fails unless every mandatory job succeeded: failure, cancellation,
+  # a skip or a missing result all fail it. Branch protection and the release gate both key on this name.
+  gate:
+    name: CI gate
+    if: ${{ always() }}
+    needs: [check, build, playwright, browsers, consumer, security]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: All mandatory jobs succeeded
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        shell: node {0}
+        run: |
+          const needs = JSON.parse(process.env.NEEDS);
+          const expected = ["check", "build", "playwright", "browsers", "consumer", "security"];
+          let bad = 0;
+          for (const name of expected) {
+            const result = needs[name]?.result ?? "missing";
+            console.log(`${result === "success" ? "ok  " : "FAIL"} ${name}: ${result}`);
+            if (result !== "success") bad++;
+          }
+          process.exit(bad ? 1 : 0);

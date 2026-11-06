@@ -1,0 +1,4 @@
+{
+  "$comment": "Advisories accepted after review. Each entry needs: id (GHSA id), package, scope (\"dev\" = build/test tooling only, \"runtime\" = reaches consumers), rationale, owner, reviewBy (YYYY-MM-DD). scripts/audit-deps.mjs fails on any advisory not listed here and on any entry past its reviewBy date. Keep this list empty when possible.",
+  "exceptions": []
+}

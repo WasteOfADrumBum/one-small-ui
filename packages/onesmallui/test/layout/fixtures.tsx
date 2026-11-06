@@ -39,6 +39,7 @@ import {
   type LightboxImage,
 } from '../../src';
 import { HomeIcon, SettingsIcon, UserIcon } from '../../src/icons';
+import { CompatFixture } from './compat';
 
 // Solid-color SVGs with explicit intrinsic sizes: the aspect ratios that used to stretch avatars.
 const svg = (w: number, h: number) =>
@@ -389,4 +390,5 @@ export const fixtures: Record<string, ComponentType> = {
   'empty-states': EmptyStatesFixture,
   sidebar: SidebarFixture,
   timeline: TimelineFixture,
+  compat: CompatFixture,
 };

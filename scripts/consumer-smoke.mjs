@@ -3,11 +3,15 @@
 // declarations (bundler and node16 resolution), server rendering and hydration without mismatches, a single
 // React copy, and that no development or private files are published.
 //
-//   node scripts/consumer-smoke.mjs [path/to/onesmall-ui-x.y.z.tgz] [--react=18,19]
+//   node scripts/consumer-smoke.mjs [path/to/onesmall-ui-x.y.z.tgz] [--react=18,19] [--sha256=<hex>]
+//
+// With --sha256 (CI passes the digest from the package manifest) the tarball is refused unless it matches,
+// so the consumer jobs test exactly the artifact the build job produced.
 //
 // Without a tarball it packs packages/onesmallui (run `npm run build:lib` first). Needs network access for
 // npm install. Works on Node 18+ so CI can run it on every Node version the package supports at runtime.
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
@@ -38,7 +42,13 @@ if (!tarball) {
   tarball = join(out, json[0].filename);
 }
 tarball = resolve(tarball);
-console.log(`Node ${process.version} · tarball ${tarball}`);
+const digest = createHash('sha256').update(readFileSync(tarball)).digest('hex');
+console.log(`Node ${process.version} · tarball ${tarball} · sha256 ${digest}`);
+const expected = args.find((a) => a.startsWith('--sha256='))?.slice(9);
+if (expected && expected.toLowerCase() !== digest) {
+  console.error(`Tarball digest ${digest} does not match the expected ${expected}; refusing to test it.`);
+  process.exit(1);
+}
 
 const failures = [];
 let passed = 0;
@@ -63,7 +73,7 @@ for (const major of majors) {
   console.log(`\nReact ${major}`);
   const app = mkdtempSync(join(tmpdir(), `os-consumer-r${major}-`));
   writeFileSync(join(app, 'package.json'), JSON.stringify({ name: `consumer-r${major}`, private: true, version: '0.0.0' }, null, 2));
-  run('npm', ['install', '--no-package-lock', '--loglevel=error', tarball, `react@${major}`, `react-dom@${major}`, `@types/react@${typesFor[major]}`, `@types/react-dom@${typesFor[major]}`, 'typescript@~5.9', `jsdom@${jsdomRange}`, 'sass', 'esbuild'], app);
+  run('npm', ['install', '--no-package-lock', '--loglevel=error', tarball, `react@${major}`, `react-dom@${major}`, `@types/react@${typesFor[major]}`, `@types/react-dom@${typesFor[major]}`, 'typescript@~5.9', 'ts-min@npm:typescript@5.0', `jsdom@${jsdomRange}`, 'sass', 'esbuild'], app);
 
   const installed = JSON.parse(readFileSync(join(app, 'node_modules', 'react', 'package.json'), 'utf8')).version;
   check(installed.startsWith(`${major}.`), `installs beside react ${installed} with no peer conflict`);
@@ -214,6 +224,13 @@ export const bad = <Button notAProp />;
       check(false, `types: ${label}: ${String(e.message).slice(0, 900)}`);
     }
   }
+  // The README promises TypeScript 5.x: the oldest 5.x must read the declarations too.
+  try {
+    run('node', [join('node_modules', 'ts-min', 'bin', 'tsc'), '-p', 'tsconfig.json'], app, { quiet: true });
+    check(true, 'types: TypeScript 5.0 (oldest supported) reads the declarations, bundler resolution');
+  } catch (e) {
+    check(false, `types: TypeScript 5.0: ${String(e.message).slice(0, 900)}`);
+  }
 
   // CSS and SCSS entrypoints.
   const cssPath = join(app, 'node_modules', '@onesmall', 'ui', 'dist', 'onesmallui.css');
@@ -241,6 +258,29 @@ export const bad = <Button notAProp />;
     check(one.length * 10 < all.length && !one.includes('lightbox'), `tree shaking: Button alone is ${(one.length / 1024).toFixed(1)} kB of ${(all.length / 1024).toFixed(1)} kB (minified, React external)`);
   } catch (e) {
     check(false, `tree shaking: ${String(e.message).slice(0, 600)}`);
+  }
+
+  // Production app bundle the way a consumer writes it: documented CSS import plus components, React
+  // bundled in. The metafile shows every input, so a second React copy or a private path would show up.
+  writeFileSync(
+    join(app, 'prod.jsx'),
+    `import '@onesmall/ui/styles.css';\nimport { createRoot } from 'react-dom/client';\nimport { Button, Dialog } from '@onesmall/ui';\nimport { CheckIcon } from '@onesmall/ui/icons';\ncreateRoot(document.getElementById('root')).render(<><Button><CheckIcon /> Go</Button><Dialog open={false} onClose={() => {}} title="T">x</Dialog></>);\n`,
+  );
+  try {
+    run('npx', ['esbuild', 'prod.jsx', '--bundle', '--minify', '--format=esm', '--platform=browser', '--jsx=automatic', '--define:process.env.NODE_ENV="production"', '--outdir=prod', '--metafile=prod-meta.json', '--log-level=error'], app, { quiet: true });
+    const meta = JSON.parse(readFileSync(join(app, 'prod-meta.json'), 'utf8'));
+    const inputs = Object.keys(meta.inputs).map((p) => p.split('\\').join('/'));
+    const reactRoots = new Set(inputs.filter((p) => /node_modules\/react(-dom)?\//.test(p)).map((p) => p.slice(0, p.lastIndexOf('node_modules/')) + p.match(/node_modules\/(react(-dom)?)\//)[0]));
+    const nested = inputs.filter((p) => /@onesmall\/ui\/node_modules\//.test(p));
+    const libInputs = inputs.filter((p) => p.includes('@onesmall/ui/'));
+    const privatePaths = libInputs.filter((p) => !/@onesmall\/ui\/dist\//.test(p));
+    const cssOut = Object.keys(meta.outputs).find((o) => o.endsWith('.css'));
+    const css = cssOut ? readFileSync(join(app, cssOut), 'utf8') : '';
+    check(reactRoots.size === 2 && nested.length === 0, `production bundle: one react and one react-dom copy (${[...reactRoots].join(', ')})`);
+    check(libInputs.length > 0 && privatePaths.length === 0, `production bundle: library code comes only from dist/${privatePaths.length ? `: ${privatePaths.slice(0, 3).join(', ')}` : ''}`);
+    check(css.includes('.os-btn') && css.includes('--os-primary'), "production bundle: import '@onesmall/ui/styles.css' resolves and is emitted");
+  } catch (e) {
+    check(false, `production bundle: ${String(e.message).slice(0, 600)}`);
   }
 
   if (!keep) rmSync(app, { recursive: true, force: true });

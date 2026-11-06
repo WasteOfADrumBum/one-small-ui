@@ -1,0 +1,61 @@
+name: Docs smoke
+
+# Read-only checks of the live docs after Vercel deploys production (Vercel reports deployments to GitHub,
+# which triggers deployment_status). Vercel's own previews sit behind Vercel Authentication, so the public
+# custom domain is what gets tested; the run waits until it serves the deployed commit. Run it by hand with
+# workflow_dispatch to check the live site at any time. It never deploys or changes anything.
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Commit the site should serve (optional, full SHA)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Docs smoke (production)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    # Job-level, so preview deployments (skipped by the `if`) never cancel a production check; a newer production
+    # deployment does replace an older one's check.
+    concurrency:
+      group: docs-smoke-production
+      cancel-in-progress: true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Smoke test https://ui.onesmall.company
+        env:
+          EXPECTED_SHA: ${{ github.event_name == 'deployment_status' && github.event.deployment.sha || inputs.expected_sha }}
+        run: |
+          if [ -n "$EXPECTED_SHA" ]; then
+            npm run test:docs-smoke -- https://ui.onesmall.company --sha "$EXPECTED_SHA" --wait 600
+          else
+            npm run test:docs-smoke -- https://ui.onesmall.company
+          fi
