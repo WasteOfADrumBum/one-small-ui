@@ -253,8 +253,19 @@ jobs:
         run: npm ci
       - name: Dependency advisories (all and runtime)
         run: npm run audit:deps
+      # The registry intermittently serves attestations whose key isn't yet in its published key list
+      # (EMISSINGSIGNATUREKEY, a different package each time). Only that error is retried; an invalid or missing
+      # signature fails at once, and three misses in a row fail the job.
       - name: Registry signatures and provenance of installed packages
-        run: npm audit signatures
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit signatures > signatures.log 2>&1; then cat signatures.log; exit 0; fi
+            cat signatures.log
+            grep -q EMISSINGSIGNATUREKEY signatures.log || exit 1
+            echo "::warning::npm audit signatures: registry key list incomplete (attempt $attempt); retrying"
+            sleep $((attempt * 20))
+          done
+          exit 1
       - name: Install pinned tools
         run: |
           set -euo pipefail
