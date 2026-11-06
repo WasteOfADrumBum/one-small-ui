@@ -6,3 +6,4 @@ coverage
 *.tgz
 .claude/
 playwright-report
+artifacts

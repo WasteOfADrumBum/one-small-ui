@@ -11,6 +11,13 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 - Prepare a patch release using npm trusted publishing with build provenance. No component API changes.
 
+### Fixed
+
+- Nested dialogs: Escape (or the browser closing) in a dialog rendered inside another `Dialog` or `Drawer` no
+  longer closes the outer one too. React passes a nested `<dialog>`'s cancel and close events up through its
+  ancestors' handlers; each dialog now reacts only to its own. Found by the new Firefox/WebKit/Chromium
+  behaviour checks (`npm run test:browsers`).
+
 ## [0.6.0] - 2026-11-01
 
 A hardening release: security fixes in development tooling, short-viewport positioning, React 18 server

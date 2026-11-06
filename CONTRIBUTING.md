@@ -43,4 +43,9 @@ npm run typecheck
 npm test                 # Vitest + Testing Library + axe (add tests in packages/onesmallui/test/<area>.test.tsx)
 npm run build
 npm run test:a11y        # axe A/AA/AAA on every docs page, light and dark (ROUTES=menu,nav to filter)
+npm run test:browsers    # overlay and keyboard behaviour (--browser=firefox|webkit too)
+npm run package:check    # pack once and check the tarball (after npm run build)
+npm run audit:deps       # dependency advisories; exceptions in security/audit-exceptions.json
 ```
+
+CI, the release workflow and recovery steps are described in [docs/ci-cd.md](docs/ci-cd.md).

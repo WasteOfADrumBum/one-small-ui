@@ -5,33 +5,18 @@ everything up to the publish command and record evidence; they never publish, ta
 
 ## 1. Prepare the candidate (builder)
 
-1. All release PRs merged to `main`; CI green on the candidate commit (`check` on Ubuntu and Windows,
-   `Playwright (layout)`, `Playwright (a11y)`, `Consumer (Node 18|20|22|24)`).
+1. All release PRs merged to `main`; the **CI gate** check and both CodeQL legs green on the candidate commit.
 2. Versions match in `package.json`, `packages/onesmallui/package.json` and `apps/docs/package.json`
    (`npm version <x.y.z> -w @onesmall/ui --no-git-tag-version`, then the other two by hand, then `npm install`
    to refresh the lockfile).
 3. `packages/onesmallui/CHANGELOG.md`: move `[Unreleased]` to `[x.y.z] - YYYY-MM-DD`.
-4. Clean install and full checks:
+4. Run the **Publish package** workflow with `dry_run` on (procedure and evidence in [ci-cd.md](ci-cd.md#releasing)).
+   It checks the exact candidate's CI, takes the tarball CI built, confirms a rebuild is byte-identical, runs the
+   consumer matrix on it and `npm publish --dry-run`. Record the run URL, sha256 and sha512 `integrity` from its
+   summary; the integrity is what `npm view @onesmall/ui@x.y.z dist.integrity` must show after publishing.
 
-   ```bash
-   npm ci
-   npm run check
-   npm run build
-   npm run test:layout
-   npm run test:a11y
-   npm audit && npm audit --omit=dev
-   ```
-
-5. Pack and record the checksum, then run the consumer test against that exact file:
-
-   ```bash
-   npm pack -w @onesmall/ui --pack-destination ./release
-   node -e "const c=require('crypto'),f=require('fs').readdirSync('release').find(n=>n.endsWith('.tgz'));console.log(f, c.createHash('sha512').update(require('fs').readFileSync('release/'+f)).digest('base64'), c.createHash('sha256').update(require('fs').readFileSync('release/'+f)).digest('hex'))"
-   node scripts/consumer-smoke.mjs release/onesmall-ui-x.y.z.tgz
-   npm publish -w @onesmall/ui --dry-run
-   ```
-
-   The sha512 (base64) is the `integrity` npm will show after publishing (`npm view @onesmall/ui@x.y.z dist.integrity`).
+   The same checks run locally: `npm ci && npm run check && npm run build && npm run package:check`, then
+   `npm run test:consumer -- artifacts/onesmall-ui-x.y.z.tgz --sha256=<hex>`.
 
 ## 2. Verify (independent verifier)
 
@@ -41,11 +26,11 @@ agent.
 
 ## 3. Publish (maintainer)
 
+Run **Publish package** again on `main` with the same `candidate_sha` and `dry_run` off. It publishes the
+verified tarball with npm provenance through trusted publishing (no token) and checks the registry integrity.
+The one-time npm and environment setup is in [ci-cd.md](ci-cd.md#releasing). Then tag:
+
 ```bash
-git checkout <candidate sha>
-npm ci && npm run build:lib
-npm login
-npm publish -w @onesmall/ui            # prepublishOnly runs check + build again
 git tag -s vx.y.z -m "@onesmall/ui x.y.z" <candidate sha> && git verify-tag vx.y.z && git push origin vx.y.z
 ```
 

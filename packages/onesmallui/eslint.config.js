@@ -40,6 +40,27 @@ export default tseslint.config(
     },
   },
   {
+    // Unsafe rendering and URL handling in shipped code. Static markup strings are allowed; anything built
+    // from values goes through DOM APIs (textContent, setAttribute) instead. CodeQL covers data flow.
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-script-url': 'error',
+      'no-restricted-syntax': [
+        'error',
+        { selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']", message: 'Render markup as React elements; dangerouslySetInnerHTML is not allowed in the library.' },
+        {
+          selector: "AssignmentExpression[left.property.name=/^(innerHTML|outerHTML)$/]:not([right.type='Literal']):not([right.type='TemplateLiteral'][right.expressions.length=0])",
+          message: 'Only static markup may be assigned to innerHTML/outerHTML; build dynamic content with DOM APIs.',
+        },
+        { selector: "CallExpression[callee.property.name=/^(insertAdjacentHTML|write|writeln)$/]", message: 'Use DOM APIs instead of HTML string insertion.' },
+        { selector: "CallExpression[callee.property.name='createContextualFragment']", message: 'Use DOM APIs instead of HTML string parsing.' },
+      ],
+    },
+  },
+  {
     files: ['test/**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.browser, ...globals.node, ...globals.vitest } },
   },

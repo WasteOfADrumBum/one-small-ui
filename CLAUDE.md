@@ -155,6 +155,20 @@ Standing rules from the maintainer for every session:
 
 <!-- one-small-engineering:continuity v1 -->
 
+## CI/CD (0.6.1)
+
+- `docs/ci-cd.md` is the reference. `main` is protected on one check, **CI gate**; when adding a CI job, add it
+  to the gate's `needs` and, if releases must require it, to `POLICY` in `scripts/release-verify.mjs`.
+- Pin every action to a full commit SHA with a version comment; pass inputs and matrix values to shell through
+  `env`, never `${{ }}` inside `run`; keep `persist-credentials: false` and per-job permissions.
+- The release workflow publishes only the tarball CI built for the exact candidate and checked by
+  `scripts/package-artifact.mjs`. Never rebuild-and-publish or consume PR artifacts in a privileged job.
+- Advisories fail `npm run audit:deps`; accept one only through `security/audit-exceptions.json` with an owner and
+  review date.
+- Library source may not use `dangerouslySetInnerHTML`, dynamic `innerHTML`, `eval` or `new Function` (ESLint).
+- Overlay behaviour that depends on the browser engine goes in the `compat` layout fixture and
+  `scripts/browser-compat.mjs` (run in Chromium, Firefox and WebKit).
+
 ## Engineering Hub continuity (v1)
 
 This project is governed by https://github.com/WasteOfADrumBum/one-small-engineering. The full contract is `standards/agent-continuity.md` there. In short:

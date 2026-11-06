@@ -12,7 +12,7 @@ import {
   type CommandItem,
 } from '@onesmall/ui';
 import { componentDocs, groups } from './site/componentDocs';
-import { useHashRoute } from './site/router';
+import { NOT_FOUND, useHashRoute } from './site/router';
 import { Home } from './pages/Home';
 import { GettingStarted } from './pages/GettingStarted';
 import { Theming } from './pages/Theming';
@@ -145,7 +145,7 @@ export function App() {
   }, [route]);
 
   const doc = componentDocs.find((d) => `components/${d.slug}` === route);
-  const title = doc?.name ?? guides.find((g) => g.path === route)?.label;
+  const title = doc?.name ?? guides.find((g) => g.path === route)?.label ?? (route === NOT_FOUND ? 'Page not found' : undefined);
   useEffect(() => {
     document.title = title ? `${title} · OneSmallUI` : 'OneSmallUI · 1SmUI';
   }, [title]);
@@ -158,6 +158,16 @@ export function App() {
   else if (route === 'theming') page = <Theming />;
   else if (route === 'utilities') page = <Utilities />;
   else if (route === 'accessibility') page = <Accessibility />;
+  else if (route === NOT_FOUND)
+    page = (
+      <section className="docs-not-found">
+        <h1>Page not found</h1>
+        <p>There is no documentation page at this address. It may have been renamed or removed.</p>
+        <p>
+          <a href="#home">Go to the home page</a> or <a href="#getting-started">read Getting started</a>.
+        </p>
+      </section>
+    );
   else page = <Home />;
 
   return (

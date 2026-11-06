@@ -14,18 +14,26 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint -w @onesmall/ui",
     "test": "npm run test -w @onesmall/ui",
-    "check": "npm run check:contrast && npm run typecheck && npm run lint && npm test",
+    "check": "npm run check:contrast && npm run typecheck && npm run lint && npm test && npm run test:scripts",
     "check:contrast": "node scripts/check-contrast.mjs",
     "test:a11y": "node scripts/a11y-audit.mjs",
     "test:layout": "node scripts/layout-test.mjs",
-    "test:consumer": "node scripts/consumer-smoke.mjs"
+    "test:consumer": "node scripts/consumer-smoke.mjs",
+    "test:browsers": "node scripts/browser-compat.mjs",
+    "test:scripts": "node --test scripts/test/release-lib.test.mjs",
+    "test:docs-smoke": "node scripts/docs-smoke.mjs",
+    "package:check": "node scripts/package-artifact.mjs",
+    "audit:deps": "node scripts/audit-deps.mjs",
+    "release:verify": "node scripts/release-verify.mjs"
   },
   "engines": {
     "node": ">=22.13"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "axe-core": "^4.10.3",
-    "playwright": "^1.56.0"
+    "playwright": "^1.56.0",
+    "publint": "0.3.25"
   },
   "overrides": {
     "eslint-plugin-jsx-a11y": {

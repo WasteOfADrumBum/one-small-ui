@@ -1,0 +1,31 @@
+# Keeps the SHA-pinned actions and the npm lockfile current. Updates wait a week after release (cooldown) so a
+# compromised or broken release has time to be caught upstream; grouped to keep the PR count low.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+    commit-message:
+      prefix: deps

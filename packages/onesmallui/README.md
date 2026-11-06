@@ -26,9 +26,9 @@ Peer dependencies: `react` and `react-dom` 18 or 19.
 | --- | --- | --- |
 | React | 18 and 19 (`^18 \|\| ^19`) | CI installs the packed tarball into clean React 18 and 19 apps (`npm run test:consumer`): ESM, CommonJS, types, server rendering without warnings, hydration without mismatches |
 | Node (your app: SSR, tests, builds) | 18.18 and newer | The same consumer test on Node 18, 20, 22 and 24 |
-| TypeScript | 5.x; `moduleResolution` `bundler`, `node16` or `nodenext` | Strict type check in the consumer test (`.d.ts` for `import`, `.d.cts` for `require`) |
-| Browsers | Current evergreen browsers (Chrome, Edge, Firefox, Safari). Floating panels use the top layer (Popover API) where available and fall back to `position: fixed` | Playwright layout and axe checks run in Chromium only |
-| Bundlers | Anything that reads `exports` (Vite, webpack 5, Next.js, esbuild, Parcel); tree-shakeable | esbuild bundle in the consumer test: `Button` alone is about 2 kB |
+| TypeScript | 5.x; `moduleResolution` `bundler`, `node16` or `nodenext` | Strict type check in the consumer test with the current TypeScript and 5.0 (`.d.ts` for `import`, `.d.cts` for `require`); Are the Types Wrong runs on every package build |
+| Browsers | Current evergreen browsers (Chrome, Edge, Firefox, Safari). Floating panels use the top layer (Popover API) where available and fall back to `position: fixed` | Layout and axe checks run in Chromium; dialog, popover, combobox, menu and tooltip behaviour is also checked in Firefox and WebKit (Playwright engines, not branded Safari) |
+| Bundlers | Anything that reads `exports` (Vite, webpack 5, Next.js, esbuild, Parcel); tree-shakeable | Only esbuild is tested: a tree-shaking check (`Button` alone is about 2 kB) and a production app bundle with the stylesheet, checking a single React copy. Other bundlers are expected to work but are not tested |
 
 Working on this repository (not using the package) needs Node 22.13 or newer, because of Vite 8, Vitest 5 and
 ESLint 10.

@@ -122,11 +122,16 @@ export function useDialogLifecycle({
     'data-modal': modal ? undefined : 'false',
     'data-backdrop': backdrop === 'static' ? 'static' : backdrop ? undefined : 'none',
     'data-shake': shake || undefined,
+    // React propagates the synthetic cancel and close events of a nested <dialog> through its ancestors'
+    // handlers, so a dialog only reacts to events of its own element: Escape in a nested dialog closes that
+    // dialog, not every dialog around it.
     onCancel: (e: SyntheticEvent<HTMLDialogElement>) => {
+      if (e.target !== e.currentTarget) return;
       e.preventDefault();
       onCloseRef.current();
     },
-    onClose: () => {
+    onClose: (e: SyntheticEvent<HTMLDialogElement>) => {
+      if (e.target !== e.currentTarget) return;
       // The browser closed it on its own (e.g. a repeated Escape): sync state.
       if (openRef.current) {
         setClosedNatively(true);
@@ -135,7 +140,7 @@ export function useDialogLifecycle({
     },
     onKeyDown: (e: KeyboardEvent<HTMLDialogElement>) => {
       // Non-modal dialogs don't get a cancel event.
-      if (!modal && e.key === 'Escape' && !e.defaultPrevented) {
+      if (!modal && e.key === 'Escape' && !e.defaultPrevented && (e.target as Element).closest?.('dialog') === e.currentTarget) {
         e.preventDefault();
         onCloseRef.current();
       }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node ../../scripts/build-llms.mjs",
+    "build": "tsc --noEmit && vite build && node ../../scripts/build-llms.mjs && node ../../scripts/build-info.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
