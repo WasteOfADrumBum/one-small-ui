@@ -12,7 +12,7 @@
 // files; no secret-looking strings; size budget; `'use client'` banner on the JS entrypoints.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,7 +63,9 @@ if (packInfo) check(packInfo.integrity === integrity, 'integrity matches what np
 
 // ---------- Contents ----------
 const unpacked = mkdtempSync(join(tmpdir(), 'os-artifact-'));
-const tar = run('tar', ['-xzf', tarball, '-C', unpacked]);
+// Relative paths only: GNU tar (Git Bash on Windows) reads "D:\\..." as a remote host.
+copyFileSync(tarball, join(unpacked, 'artifact.tgz'));
+const tar = run('tar', ['-xzf', 'artifact.tgz'], unpacked);
 if (!tar.ok) throw new Error(`tar failed\n${tar.out}`);
 const pkgRoot = join(unpacked, 'package');
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)]));
