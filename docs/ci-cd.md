@@ -82,8 +82,10 @@ Publishing needs the maintainer. Agents may run the dry run.
      to be complete and green, with every mandatory job present and successful, and the **CI gate** check run to
      come from GitHub Actions for that same run (`scripts/release-verify.mjs`, policy tested in
      `scripts/test/release-lib.test.mjs`);
-   - downloads that run's `package` artifact, checks its manifest and digest, rebuilds the candidate with the
-     same Node version and requires identical bytes;
+   - downloads that run's `package` artifact and checks its manifest (commit, run, version, name, sha256 and
+     sha512), then uploads it as `release-package` before any candidate code runs;
+   - rebuilds the candidate in a separate read-only job with the same Node version, and the release tooling
+     (from the workflow's ref, not the candidate) requires identical bytes;
    - runs the consumer matrix on that tarball and `npm publish --dry-run`.
 
    The run summary and the `release-package` artifact (tarball, manifest, `release-evidence.json`, kept 90 days)

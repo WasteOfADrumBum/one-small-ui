@@ -196,6 +196,12 @@ if (command === 'inputs') {
   if (manifest.checks !== 'passed') errors.push('artifact manifest records failed package checks');
   if (tarball.split(/[\\/]/).pop() !== manifest.filename) errors.push(`tarball name differs from the manifest (${manifest.filename})`);
   if (digest !== manifest.sha256) errors.push(`tarball sha256 ${digest} differs from the manifest ${manifest.sha256}`);
+  // Values from the manifest reach later jobs (file paths, setup-node), so they must have their expected shape.
+  if (manifest.filename !== `onesmall-ui-${version}.tgz`) errors.push(`unexpected tarball name ${manifest.filename}`);
+  const integrity = `sha512-${createHash('sha512').update(readFileSync(tarball)).digest('base64')}`;
+  if (manifest.integrity !== integrity) errors.push(`manifest integrity ${manifest.integrity} differs from the tarball's ${integrity}`);
+  if (!/^v?\d+\.\d+\.\d+$/.test(manifest.build?.node ?? '')) errors.push(`manifest Node version "${manifest.build?.node}" is not an exact version`);
+  if (opt('run-id') && String(manifest.run?.id) !== opt('run-id')) errors.push(`artifact was built by run ${manifest.run?.id}, not the verified run ${opt('run-id')}`);
   if (opt('rebuilt')) {
     // Digest computed here, by the release tooling, not taken from anything the candidate's scripts wrote.
     const rebuilt = sha256(opt('rebuilt'));
@@ -203,7 +209,7 @@ if (command === 'inputs') {
     else console.log(`  ok   independent rebuild reproduces the artifact byte for byte (${rebuilt})`);
   }
   out('sha256', digest);
-  out('integrity', manifest.integrity);
+  out('integrity', integrity);
   out('filename', manifest.filename);
   out('node', manifest.build?.node ?? '');
   console.log(`Artifact ${manifest.filename} sha256 ${digest} from run ${manifest.run?.id} attempt ${manifest.run?.attempt}`);
