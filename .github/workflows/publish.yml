@@ -316,8 +316,13 @@ jobs:
         with:
           node-version: '24'
           registry-url: https://registry.npmjs.org
-      - name: Install supported npm CLI (trusted publishing needs npm 11.5+)
-        run: npm install --global npm@11.21.0
+      # Trusted publishing needs npm 11.5.1 or newer; Node 24 bundles it. Checked rather than installed ad hoc.
+      - name: npm CLI supports trusted publishing
+        run: |
+          v=$(npm --version)
+          echo "npm $v"
+          node -e 'const [a,b,c]=process.argv[1].split(".").map(Number); process.exit(a>11||(a===11&&(b>5||(b===5&&c>=1)))?0:1)' "$v" \
+            || { echo "::error::npm $v cannot use trusted publishing (needs 11.5.1+)"; exit 1; }
       - name: Verify the tarball and that the version is new
         env:
           FILE: ${{ needs.verify.outputs.filename }}
