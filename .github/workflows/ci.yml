@@ -290,15 +290,14 @@ jobs:
       - name: All mandatory jobs succeeded
         env:
           NEEDS: ${{ toJSON(needs) }}
+        shell: node {0}
         run: |
-          node -e '
-            const needs = JSON.parse(process.env.NEEDS);
-            const expected = ["check", "build", "playwright", "browsers", "consumer", "security"];
-            let bad = 0;
-            for (const name of expected) {
-              const result = needs[name]?.result ?? "missing";
-              console.log(`${result === "success" ? "ok  " : "FAIL"} ${name}: ${result}`);
-              if (result !== "success") bad++;
-            }
-            process.exit(bad ? 1 : 0);
-          '
+          const needs = JSON.parse(process.env.NEEDS);
+          const expected = ["check", "build", "playwright", "browsers", "consumer", "security"];
+          let bad = 0;
+          for (const name of expected) {
+            const result = needs[name]?.result ?? "missing";
+            console.log(`${result === "success" ? "ok  " : "FAIL"} ${name}: ${result}`);
+            if (result !== "success") bad++;
+          }
+          process.exit(bad ? 1 : 0);
