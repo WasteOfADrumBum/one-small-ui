@@ -1,0 +1,2 @@
+# The CSP in vercel.json pins the hash of the inline script in this file; keep its bytes identical on every OS.
+apps/docs/index.html text eol=lf

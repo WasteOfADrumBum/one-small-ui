@@ -25,7 +25,7 @@ const missing = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/scri
   .map((m) => `'sha256-${createHash('sha256').update(m[1]).digest('base64')}'`)
   .filter((hash) => !csp.includes(hash));
 if (missing.length) {
-  console.error(`vercel.json Content-Security-Policy is missing ${missing.join(', ')} for the inline script(s) in index.html.`);
+  console.error(`vercel.json Content-Security-Policy is missing ${missing.join(', ')} for the inline script(s) in index.html. Update the hash in vercel.json (and check that index.html has LF line endings; see .gitattributes).`);
   process.exit(1);
 }
 console.log(`build-info.json: ${version} @ ${commit}; inline scripts match the CSP`);
