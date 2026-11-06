@@ -57,7 +57,14 @@ const opt = (name) => {
 };
 const errors = [];
 const warnings = [];
-const out = (key, value) => process.env.GITHUB_OUTPUT && appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
+// Step outputs feed later jobs, so only single-token values (digests, ids, file names, versions) are written:
+// a newline from API or artifact data could otherwise inject another output.
+const OUTPUT_RE = /^[A-Za-z0-9._+/=:-]{1,200}$/;
+const out = (key, value) => {
+  const v = String(value);
+  if (!OUTPUT_RE.test(v)) throw new Error(`refusing to write output ${key}: unexpected value ${JSON.stringify(v).slice(0, 80)}`);
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${v}\n`);
+};
 const summary = (md) => process.env.GITHUB_STEP_SUMMARY && appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${md}\n`);
 const sha256 = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
 const json = (file) => JSON.parse(readFileSync(file, 'utf8'));
@@ -182,7 +189,7 @@ if (command === 'inputs') {
   evidence.warnings = warnings;
   evidence.errors = errors;
   if (opt('evidence')) writeFileSync(opt('evidence'), `${JSON.stringify(evidence, null, 2)}\n`);
-  if (ciRunId) out('ci_run_id', ciRunId);
+  if (ciRunId && !errors.length) out('ci_run_id', ciRunId);
   finish('Required checks');
 } else if (command === 'artifact') {
   const sha = opt('sha');
@@ -208,10 +215,12 @@ if (command === 'inputs') {
     if (rebuilt !== manifest.sha256) errors.push(`independent rebuild produced ${rebuilt}, CI artifact is ${manifest.sha256} (not reproducible; investigate before releasing)`);
     else console.log(`  ok   independent rebuild reproduces the artifact byte for byte (${rebuilt})`);
   }
-  out('sha256', digest);
-  out('integrity', integrity);
-  out('filename', manifest.filename);
-  out('node', manifest.build?.node ?? '');
+  if (!errors.length) {
+    out('sha256', digest);
+    out('integrity', integrity);
+    out('filename', manifest.filename);
+    out('node', manifest.build.node);
+  }
   console.log(`Artifact ${manifest.filename} sha256 ${digest} from run ${manifest.run?.id} attempt ${manifest.run?.attempt}`);
   finish('Artifact identity');
 } else {

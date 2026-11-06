@@ -124,6 +124,6 @@ await browser.close();
 console.log(`\n${origin}: ${passed} passed, ${failures.length} failed`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   const { appendFileSync } = await import('node:fs');
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Docs smoke: ${origin}\n\nCommit: \`${info?.commit ?? 'unknown'}\` · ${passed} passed, ${failures.length} failed\n${failures.map((f) => `- ❌ ${f}`).join('\n')}\n`);
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Docs smoke: ${origin}\n\nCommit: \`${/^[0-9a-f]{40}$/.test(info?.commit ?? '') ? info.commit : 'unknown'}\` · ${passed} passed, ${failures.length} failed\n${failures.map((f) => `- ❌ ${f.replace(/[\r\n`<>]/g, ' ')}`).join('\n')}\n`);
 }
 process.exit(failures.length ? 1 : 0);
