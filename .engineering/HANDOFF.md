@@ -1,23 +1,23 @@
-<!-- generated from .engineering/state.json (revision 3) -->
+<!-- generated from .engineering/state.json (revision 4) -->
 
 # Handoff: one-small-ui
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 3, `ci-cd-evidence-pr`, 2026-11-06T00:40:00Z by Claude Code
+- Checkpoint: revision 4, `ci-cd-merged-dry-run`, 2026-11-06T05:35:00Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
 ## Continue with
 
-Read docs/ci-cd.md. The PR from claude/project-thread-mv5bx9 holds the CI/CD work; check its CI and review state on GitHub before continuing. Never publish, tag or change dist-tags; the dry run is safe.
+Read docs/ci-cd.md. CI/CD work is merged (acc4dbc). The dry run for 0.6.1 passed; a real publish needs the owner settings first. Never publish, tag or change dist-tags; the dry run is safe.
 
 ## Unfinished
 
-- PR CI green, independent review, merge
-- Post-merge Publish package dry run and docs smoke
 - Owner: main ruleset, npm-publish environment, npm trusted publisher
 - Owner provenance decision for 0.6.0 (acceptance record section E)
+- Owner: decide and run the 0.6.1 publication (not authorized for agents)
+- Optional: make Firefox/WebKit OS dependency install resilient to slow apt mirrors
 
 ## Blockers
 
@@ -45,3 +45,4 @@ Read docs/ci-cd.md. The PR from claude/project-thread-mv5bx9 holds the CI/CD wor
 - Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented).
 - main has no branch protection or ruleset; agent tools cannot configure it. Owner: ruleset requiring PRs and the CI gate check, no force push or deletion.
 - npm-publish environment protection and the npm trusted publisher (environment npm-publish) are owner settings; not verified.
+- Browsers (firefox/webkit) jobs depend on the runner's apt mirror via 'playwright install --with-deps'; one 20-minute timeout on main (run 42140582429 attempt 1). Re-run recovers; a durable fix is open.
