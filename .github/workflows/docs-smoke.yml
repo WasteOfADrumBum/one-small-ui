@@ -17,16 +17,17 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: docs-smoke
-  cancel-in-progress: true
-
 jobs:
   smoke:
     name: Docs smoke (production)
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    # Job-level, so preview deployments (skipped by the `if`) never cancel a production check; a newer production
+    # deployment does replace an older one's check.
+    concurrency:
+      group: docs-smoke-production
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

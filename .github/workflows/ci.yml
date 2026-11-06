@@ -55,6 +55,7 @@ jobs:
         run: npm run check
       - name: Build and pack natively (Windows)
         if: runner.os == 'Windows'
+        shell: bash
         run: |
           npm run build
           npm run package:check -- --out "$RUNNER_TEMP/package"
