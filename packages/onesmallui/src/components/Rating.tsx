@@ -193,7 +193,12 @@ export const Rating = forwardRef<HTMLElement, RatingProps>(function Rating(
               {' '}*
             </span>
           )}
-          {control.required && <span className={cls('sr-only')}> (required)</span>}
+          {control.required && (
+            <>
+              {' '}
+              <span className={cls('sr-only')}>(required)</span>
+            </>
+          )}
         </legend>
       )}
       <span className={cls('rating__items')} onPointerLeave={() => setHover(null)}>

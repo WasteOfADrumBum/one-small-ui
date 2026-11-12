@@ -155,7 +155,12 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(function Field(
           {' '}*
         </span>
       )}
-      {required && <span className={cls('sr-only')}> (required)</span>}
+      {required && (
+        <>
+          {' '}
+          <span className={cls('sr-only')}>(required)</span>
+        </>
+      )}
     </label>
   );
 
