@@ -393,7 +393,13 @@ export const SidebarItem = forwardRef<HTMLElement, SidebarItemProps>(function Si
         )
       )}
       <span className={cls('sidebar__label')}>{children}</span>
-      {badge != null && <span className={cls('sidebar__badge')}>{badge}</span>}
+      {badge != null && (
+        <>
+          {/* A real space keeps the label and badge apart in the accessible name ("Messages 2 new"). */}
+          {' '}
+          <span className={cls('sidebar__badge')}>{badge}</span>
+        </>
+      )}
     </>
   );
 

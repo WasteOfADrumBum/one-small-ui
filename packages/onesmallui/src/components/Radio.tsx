@@ -91,7 +91,12 @@ export function RadioGroup({
               {' '}*
             </span>
           )}
-          {required && <span className={cls('sr-only')}> (required)</span>}
+          {required && (
+            <>
+              {' '}
+              <span className={cls('sr-only')}>(required)</span>
+            </>
+          )}
         </legend>
         {hint && (
           <p id={hintId} className={cls('field__hint')}>
