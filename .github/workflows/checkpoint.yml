@@ -1,0 +1,45 @@
+# Checks .engineering/state.json against the Engineering Hub's checkpoint schema, so an invalid checkpoint fails in
+# the PR that introduces it instead of showing as "invalid" in the hub aggregate later (hub roadmap E9).
+# The hub repository is public: it is checked out read-only at a pinned commit, with no hub credential here.
+# Bump HUB_REF when the hub's schema changes (scripts/state/lib.mjs, schemas/project-state.schema.json).
+name: Checkpoint contract
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: checkpoint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint:
+    name: Checkpoint contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: WasteOfADrumBum/one-small-engineering
+          ref: c43013139e95aaa38a87e367a42ebbe6367b64c7 # HUB_REF
+          path: .hub
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Validate .engineering/state.json
+        run: |
+          if [ ! -f .engineering/state.json ]; then
+            echo "No .engineering/state.json yet; nothing to check."
+            exit 0
+          fi
+          node .hub/scripts/state/cli.mjs validate .engineering/state.json
+          echo "Checkpoint is valid."
