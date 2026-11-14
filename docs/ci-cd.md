@@ -130,6 +130,21 @@ not-found page) and that missing files 404.
 - **Compromised dependency or action**: pin back in a PR (Dependabot cooldowns give a week of margin), rotate
   anything the job could reach, and check the affected runs' logs.
 
+## TypeScript 7
+
+The library and docs compile and type-check with TypeScript 7 (`typescript` ~7.0 in each workspace). Two tools still
+need TypeScript's JavaScript API, which TypeScript 7 does not ship: typescript-eslint (lint) and rollup-plugin-dts
+(bundling the `.d.ts` files). npm installs a separate TypeScript 5.9 copy at the repository root to satisfy their peer
+ranges, and both resolve that copy, so lint and type bundling run on TypeScript 5.9 while `tsc` runs on 7. Nothing is
+turned off.
+
+TypeScript 7 also checks side-effect imports, so `test/styles.d.ts` and `apps/docs/src/styles.d.ts` declare the SCSS
+imports that Vite compiles.
+
+Recheck periodically: once typescript-eslint's peer range includes TypeScript 7 (`npm view typescript-eslint
+peerDependencies`), let lint use TypeScript 7 and drop the root 5.9 copy (rollup-plugin-dts can then use
+`@typescript/typescript6`).
+
 ## Limits
 
 - Real Safari, mobile browsers and assistive technology are not exercised; WebKit and Firefox are Playwright

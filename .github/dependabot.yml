@@ -27,10 +27,5 @@ updates:
       dev-tooling:
         dependency-type: development
         update-types: [minor, patch]
-    # TypeScript 7 is deferred: typescript-eslint does not accept it yet (peer range
-    # stops below 6.1). Remove this once they do; see the Hub readiness notes.
-    ignore:
-      - dependency-name: typescript
-        versions: ['>=7.0.0']
     commit-message:
       prefix: deps
