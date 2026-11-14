@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "types": ["vite/client"],
-    "baseUrl": ".",
     "paths": {
       "@onesmall/ui": ["../../packages/onesmallui/src/index.ts"],
       "@onesmall/ui/dom": ["../../packages/onesmallui/src/dom/index.ts"],
