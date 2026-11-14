@@ -32,7 +32,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "axe-core": "^4.10.3",
-    "playwright": "^1.64.1",
+    "playwright": "^1.65.0",
     "publint": "0.3.25"
   },
   "overrides": {
