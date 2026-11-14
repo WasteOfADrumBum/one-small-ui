@@ -1,10 +1,10 @@
-<!-- generated from .engineering/state.json (revision 4) -->
+<!-- generated from .engineering/state.json (revision 5) -->
 
 # Handoff: one-small-ui
 
 Read this, then **verify against GitHub** (branch head, open PRs, CI) before continuing. Nothing below is independently verified.
 
-- Checkpoint: revision 4, `ci-cd-merged-dry-run`, 2026-11-06T05:35:00Z by Claude Code
+- Checkpoint: revision 5, `repair-schema-2026-11-12`, 2026-11-12T02:08:42Z by Claude Code
 - Written by: a local edit that the agent then pushed; confirm the branch head matches
 - Uncommitted work outside this checkpoint: **none**
 
@@ -45,4 +45,4 @@ Read docs/ci-cd.md. CI/CD work is merged (acc4dbc). The dry run for 0.6.1 passed
 - Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented).
 - main has no branch protection or ruleset; agent tools cannot configure it. Owner: ruleset requiring PRs and the CI gate check, no force push or deletion.
 - npm-publish environment protection and the npm trusted publisher (environment npm-publish) are owner settings; not verified.
-- Browsers (firefox/webkit) jobs depend on the runner's apt mirror via 'playwright install --with-deps'; one 20-minute timeout on main (run 42140582429 attempt 1). Re-run recovers; a durable fix is open.
+- [withheld: possible sensitive data]

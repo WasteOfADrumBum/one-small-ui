@@ -1,14 +1,14 @@
 {
   "stateVersion": 1,
-  "revision": 4,
-  "checkpointId": "ci-cd-merged-dry-run",
+  "revision": 5,
+  "checkpointId": "repair-schema-2026-11-12",
   "projectId": "one-small-ui",
   "repository": "https://github.com/WasteOfADrumBum/one-small-ui",
   "hub": "https://github.com/WasteOfADrumBum/one-small-engineering",
   "recorded": {
     "branch": "main",
     "commit": "acc4dbcbc5ca386a7cb0ed4fffc9127cb19ed37c",
-    "recordedAt": "2026-11-06T05:35:00Z"
+    "recordedAt": "2026-11-12T02:08:42Z"
   },
   "development": {
     "milestone": "0.6.1 release candidate on main (unpublished); CI/CD hardening merged",
@@ -19,16 +19,17 @@
     "workingBranch": "main",
     "activePr": null,
     "lastCompleted": [
-      "Baseline: CI run 41840159196 on ee62089 took 4m28s wall; Playwright (a11y) was the critical path; 8 independent builds; mutable action tags; publish.yml rebuilt the package and did not require browser CI",
+      "Baseline: CI run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/41840159196 on ee62089 took 4m28s wall; Playwright (a11y) was the critical path; 8 independent builds; mutable action tags; publish.yml rebuilt the package and did not require browser CI",
       "ci.yml: one build and pack per run (package artifact with sha256/sha512 manifest), CI gate check, concurrency, timeouts, SHA-pinned actions, Security job (audit-deps, npm audit signatures, actionlint, zizmor, gitleaks with sha256-verified downloads), Firefox and WebKit behaviour checks",
       "publish.yml: exact-candidate gating (scripts/release-verify.mjs + release-lib.mjs, 8 policy tests), consumes only the verified CI artifact, byte-identical rebuild check, dry_run default true, OIDC provenance publish in environment npm-publish",
       "codeql.yml, dependabot.yml (7/30-day cooldown), security/audit-exceptions.json, ESLint security rules for library source",
       "Fix: Escape or cancel in a nested Dialog no longer closes its parent (DialogBase); regression tests in test/behavior.test.tsx",
       "Docs: security headers and CSP in vercel.json, build-info.json, canonical URL, not-found route, docs-smoke.yml; docs/ci-cd.md",
-      "PR #38 merged as acc4dbc (merge commit). PR head 2446d47: CI run 42139132826 all 13 jobs green, CodeQL green.",
-      "main CI run 42140582429 on acc4dbc: attempt 1 Browsers (webkit) timed out at 20 min in 'playwright install --with-deps' (Azure apt mirror ~5 s per package); attempt 2 (re-run failed jobs) green. CodeQL run 42140582385 green.",
-      "Docs smoke run 42140672027 on the production deploy of acc4dbc: 48 passed, 0 failed (https://ui.onesmall.company).",
-      "Publish package dry run 42168165923 on acc4dbc (dry_run true): required checks passed, artifact identity passed, independent rebuild byte-identical, consumer Node 18/20/22/24 passed, npm publish --dry-run passed, 'Publish to npm' skipped. Tarball onesmall-ui-0.6.1.tgz sha256 b400fe818061bf1d2e3e294ce9fd9c5518233ee5f3576ab60a98c6bb6ba64727, npm shasum 4c04fef1ee83710499ac6494d17a02f1ad0c402b. release-package artifact 13480281270 (90 days).",
+      "PR #38 merged as acc4dbc (merge commit). PR head 2446d47: CI run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42139132826 all 13 jobs green, CodeQL green.",
+      "main CI run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42140582429 on acc4dbc: attempt 1 Browsers (webkit) timed out at 20 min in 'playwright install --with-deps' (Azure apt mirror ~5 s per package); attempt 2 (re-run failed jobs) green. CodeQL run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42140582385 green.",
+      "Docs smoke run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42140672027 on the production deploy of acc4dbc: 48 passed, 0 failed (https://ui.onesmall.company).",
+      "Publish package dry run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42168165923 on acc4dbc (dry_run true): required checks passed, artifact identity passed, independent rebuild byte-identical, consumer Node 18/20/22/24 passed, npm publish --dry-run passed, 'Publish to npm' skipped.",
+      "Tarball onesmall-ui-0.6.1.tgz sha256 b400fe818061bf1d2e3e294ce9fd9c5518233ee5f3576ab60a98c6bb6ba64727, npm shasum 4c04fef1ee83710499ac6494d17a02f1ad0c402b. release-package artifact (90 days).",
       "npm registry after the dry run: dist-tags latest 0.6.0; versions 0.0.0-stage, 0.1.0, 0.5.0, 0.6.0 (no 0.6.1). No publish, tag, release or dist-tag change was made."
     ],
     "inProgress": [],
@@ -84,7 +85,7 @@
       "Scrollable Popover bodies without focusable content are not keyboard-scrollable in Safari (known limitation, documented).",
       "main has no branch protection or ruleset; agent tools cannot configure it. Owner: ruleset requiring PRs and the CI gate check, no force push or deletion.",
       "npm-publish environment protection and the npm trusted publisher (environment npm-publish) are owner settings; not verified.",
-      "Browsers (firefox/webkit) jobs depend on the runner's apt mirror via 'playwright install --with-deps'; one 20-minute timeout on main (run 42140582429 attempt 1). Re-run recovers; a durable fix is open."
+      "Browsers (firefox/webkit) jobs depend on the runner's apt mirror via 'playwright install --with-deps'; one 20-minute timeout on main (run https://github.com/WasteOfADrumBum/one-small-ui/actions/runs/42140582429 attempt 1). Re-run recovers; a durable fix is open."
     ]
   },
   "verification": {
@@ -146,30 +147,30 @@
         "ciRunUrl": null
       },
       {
-        "command": "npm run check (local, Node 22: 720 tests, 8 script tests)",
+        "command": "npm run check (local, Node 22: 720 tests, 8 script tests) (run on ee62089 + uncommitted branch changes)",
         "result": "pass",
-        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "commit": null,
         "at": "2026-11-05T19:40:00Z",
         "ciRunUrl": null
       },
       {
-        "command": "npm run build; npm run package:check (local)",
+        "command": "npm run build; npm run package:check (local) (run on ee62089 + uncommitted branch changes)",
         "result": "pass",
-        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "commit": null,
         "at": "2026-11-05T19:45:00Z",
         "ciRunUrl": null
       },
       {
-        "command": "npm run test:browsers (local, Chromium, 26 checks)",
+        "command": "npm run test:browsers (local, Chromium, 26 checks) (run on ee62089 + uncommitted branch changes)",
         "result": "pass",
-        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "commit": null,
         "at": "2026-11-05T17:30:00Z",
         "ciRunUrl": null
       },
       {
-        "command": "node scripts/consumer-smoke.mjs (local, Node 22, 56 checks)",
+        "command": "node scripts/consumer-smoke.mjs (local, Node 22, 56 checks) (run on ee62089 + uncommitted branch changes)",
         "result": "pass",
-        "commit": "ee62089ac616c2b3fd1fbbe6c7a24e9d067cc773 + uncommitted branch changes",
+        "commit": null,
         "at": "2026-11-05T16:30:00Z",
         "ciRunUrl": null
       },
@@ -228,7 +229,7 @@
       "tool": "Claude Code",
       "model": null
     },
-    "checkpointedAt": "2026-11-06T05:35:00Z",
+    "checkpointedAt": "2026-11-12T02:08:42Z",
     "unfinished": [
       "Owner: main ruleset, npm-publish environment, npm trusted publisher",
       "Owner provenance decision for 0.6.0 (acceptance record section E)",

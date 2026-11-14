@@ -5,6 +5,16 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Accessible names: `SidebarItem` badges and the "(required)" text on `Field`, `Radio` and `Rating` labels now
+  have a real space before them, so screen readers read "Messages 2 new" and "Service (required)" instead of
+  running the words together. Found when jsdom 30 started computing names the way browsers do.
+
+### Changed
+
+- Tests run on jsdom 30 (dev dependency only).
+
 ## [0.6.1] - 2026-11-03
 
 ### Changed
