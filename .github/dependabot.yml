@@ -23,6 +23,11 @@ updates:
       default-days: 7
       semver-major-days: 30
     open-pull-requests-limit: 5
+    # @types/node follows the oldest Node the package supports (engines: >=22.13), so the types
+    # never offer an API that a supported runtime lacks. Raise it by hand together with engines.
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       dev-tooling:
         dependency-type: development
