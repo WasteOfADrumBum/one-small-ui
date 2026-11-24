@@ -10,6 +10,7 @@ const doc: ComponentDoc = {
   examples: [
     { name: 'breadcrumb-basic', title: 'Page hierarchy and current page' },
     { name: 'breadcrumb-separators', title: 'Dividers', description: 'Built-in `chevron`, `slash`, `dot` and `arrow`, or any text or node.' },
+    { name: 'breadcrumb-router', title: 'Router links with as and render', description: 'Client-side navigation with Next.js Link, React Router and any link component.' },
   ],
   props: [
     {
@@ -25,7 +26,9 @@ const doc: ComponentDoc = {
         { name: 'href', type: 'string', description: 'Link to the ancestor page.' },
         { name: 'current', type: 'boolean', description: 'The current page: plain text with aria-current="page".' },
         { name: 'icon', type: 'ReactNode', description: 'Leading decorative icon.' },
-        { name: 'linkProps', type: 'AnchorHTMLAttributes', description: 'Extra props for the link (e.g. for a router).' },
+        { name: 'linkProps', type: 'AnchorHTMLAttributes', description: 'Extra props for the link.' },
+        { name: 'as', type: 'ElementType', default: "'a'", description: 'Link element or component, e.g. a router link that takes href.' },
+        { name: 'render', type: '(props) => ReactElement', description: 'Full control over the link: spread every prop onto your element. Wins over as.' },
       ],
     },
   ],

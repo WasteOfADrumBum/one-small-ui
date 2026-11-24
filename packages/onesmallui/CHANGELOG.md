@@ -5,6 +5,14 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- Router-aware links: `Button` (with `href`) and `BreadcrumbItem` take `as`, a link element or component such
+  as Next.js `Link`, and `render` for full control, the same shape as `SidebarItem`. Client-side routers can
+  now navigate without a full page load. New `ButtonLinkRenderProps` and `BreadcrumbLinkRenderProps` types.
+- Docs: Theming shows how to set the font tokens and how to run OneSmallUI beside a layered library such as
+  Chakra UI v3 while an app moves over.
+
 ### Fixed
 
 - Accessible names: `SidebarItem` badges and the "(required)" text on `Field`, `Radio` and `Rating` labels now

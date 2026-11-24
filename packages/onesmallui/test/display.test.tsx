@@ -1,3 +1,4 @@
+import type { AnchorHTMLAttributes } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
@@ -210,6 +211,44 @@ describe('Breadcrumb', () => {
     expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toHaveAttribute('data-separator', 'slash');
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
     expect(screen.getByText('Page')).toHaveAttribute('aria-current', 'page');
+    await expectNoAxeViolations(container);
+  });
+
+  it('routes item links through `as` or `render`', async () => {
+    const RouterLink = ({ href, children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+      <a href={href} data-router="yes" {...props}>
+        {children}
+      </a>
+    );
+    const { container } = render(
+      <Breadcrumb>
+        <BreadcrumbItem href="/" as={RouterLink}>
+          Home
+        </BreadcrumbItem>
+        <BreadcrumbItem
+          href="/work"
+          linkProps={{ className: 'extra' }}
+          render={({ children, ...props }) => (
+            <a {...props} data-rendered="yes">
+              {children}
+            </a>
+          )}
+        >
+          Work
+        </BreadcrumbItem>
+        <BreadcrumbItem current as={RouterLink}>
+          Task
+        </BreadcrumbItem>
+      </Breadcrumb>,
+    );
+    const home = screen.getByRole('link', { name: 'Home' });
+    expect(home).toHaveAttribute('data-router', 'yes');
+    expect(home).toHaveClass('os-breadcrumb__link');
+    const work = screen.getByRole('link', { name: 'Work' });
+    expect(work).toHaveAttribute('data-rendered', 'yes');
+    expect(work).toHaveAttribute('href', '/work');
+    expect(work).toHaveClass('os-breadcrumb__link', 'extra');
+    expect(screen.queryByRole('link', { name: 'Task' })).toBeNull();
     await expectNoAxeViolations(container);
   });
 });
