@@ -21,6 +21,12 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   now navigate without a full page load. New `ButtonLinkRenderProps` and `BreadcrumbLinkRenderProps` types.
 - Docs: Theming shows how to set the font tokens and how to run OneSmallUI beside a layered library such as
   Chakra UI v3 while an app moves over.
+- Icons: `BarChartIcon`, `BookOpenIcon`, `BotIcon`, `BriefcaseIcon`, `CalendarCheckIcon`, `FolderIcon`, `GaugeIcon`,
+  `GraduationCapIcon`, `HistoryIcon`, `KeyIcon`, `LaptopIcon`, `LayoutDashboardIcon`, `ListChecksIcon`, `LockIcon`,
+  `LogOutIcon`, `MailIcon`, `NotebookIcon`, `PaletteIcon`, `PanelLeftIcon`, `PlusCircleIcon`, `SaveIcon`,
+  `TargetIcon` and `UndoIcon`: 23 original glyphs on the same 24×24 stroked grid, for app shells and task
+  managers (navigation, accounts, reports, history). `UndoIcon` is `RefreshIcon` mirrored. The set now has 70
+  icons.
 
 ### Fixed
 
