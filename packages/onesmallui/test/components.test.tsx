@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createRef, forwardRef, useState, type AnchorHTMLAttributes } from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
@@ -62,6 +62,56 @@ describe('Button', () => {
   it('renders a link with href', () => {
     render(<Button href="/docs">Docs</Button>);
     expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', '/docs');
+  });
+
+  it('renders a link through `as`, passing href, ref and classes', () => {
+    const RouterLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function RouterLink(
+      { href, children, ...props },
+      ref,
+    ) {
+      return (
+        <a ref={ref} href={href} data-router="yes" {...props}>
+          {children}
+        </a>
+      );
+    });
+    const ref = createRef<HTMLAnchorElement>();
+    render(
+      <Button as={RouterLink} href="/work" ref={ref} active variant="soft">
+        Work
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: 'Work' });
+    expect(link).toHaveAttribute('data-router', 'yes');
+    expect(link).toHaveAttribute('href', '/work');
+    expect(link).toHaveAttribute('aria-current', 'page');
+    expect(link).toHaveClass('os-btn');
+    expect(link).toHaveAttribute('data-variant', 'soft');
+    expect(ref.current).toBe(link);
+  });
+
+  it('hands every prop to `render`, which wins over `as`', async () => {
+    const onClick = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const { container } = render(
+      <Button
+        href="/learn"
+        as="span"
+        onClick={onClick}
+        render={({ href, children, ...props }) => (
+          <a {...props} href={href} data-rendered="yes">
+            {children}
+          </a>
+        )}
+      >
+        Learn
+      </Button>,
+    );
+    const link = screen.getByRole('link', { name: 'Learn' });
+    expect(link).toHaveAttribute('data-rendered', 'yes');
+    expect(link).toHaveClass('os-btn');
+    await userEvent.click(link);
+    expect(onClick).toHaveBeenCalledOnce();
+    await expectNoAxeViolations(container);
   });
 });
 

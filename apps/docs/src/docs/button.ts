@@ -19,6 +19,7 @@ const doc: ComponentDoc = {
     { name: 'button-colors', title: 'Colors', description: 'Every color pairing is verified at 7:1 contrast or better in both themes.' },
     { name: 'button-sizes', title: 'Sizes, icons, loading, links and full width' },
     { name: 'button-shapes-states', title: 'Shapes and states', description: 'Pill and square shapes; active, disabled and toggled (aria-pressed) states.' },
+    { name: 'button-router', title: 'Router links with as and render', description: 'Link buttons navigate client-side with Next.js Link, React Router and any link component.' },
     { name: 'button-classes', title: 'Plain HTML elements', description: 'Classes and data attributes work on <button>, <a> and <input> without React.' },
   ],
   props: [
@@ -37,6 +38,8 @@ const doc: ComponentDoc = {
         { name: 'iconOnly', type: 'boolean', description: 'Square button. Give it an aria-label.' },
         { name: 'fullWidth', type: 'boolean', description: 'Stretch to the container width.' },
         { name: 'href', type: 'string', description: 'Renders an <a> instead of a <button>.' },
+        { name: 'as', type: 'ElementType', default: "'a'", description: 'With href: link element or component, e.g. a router link that takes href.' },
+        { name: 'render', type: '(props) => ReactElement', description: 'With href: full control over the link; spread every prop onto your element. Wins over as.' },
       ],
     },
   ],

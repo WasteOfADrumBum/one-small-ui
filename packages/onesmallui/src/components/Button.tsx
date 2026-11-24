@@ -1,4 +1,14 @@
-import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  type AnchorHTMLAttributes,
+  type ButtonHTMLAttributes,
+  type ElementType,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { cx } from '../utils/cx';
 import { cls } from '../utils/prefix';
 import { Spinner } from './Spinner';
@@ -46,14 +56,37 @@ interface ButtonOwnProps {
   children?: ReactNode;
 }
 
+/** Every prop a link button passes on: spread them all onto your link element. */
+export interface ButtonLinkRenderProps {
+  href: string;
+  ref: Ref<HTMLAnchorElement>;
+  className: string;
+  children: ReactNode;
+  'aria-current'?: 'page';
+  'aria-disabled'?: true;
+  [prop: string]: unknown;
+}
+
+interface ButtonLinkProps {
+  href: string;
+  /**
+   * Link element or component, e.g. Next.js `Link` or a router link that takes `href`. Default `a`.
+   * Use it so client-side routers navigate without a full page load.
+   */
+  as?: ElementType;
+  /** Full control over the link element: receives every prop to spread. Wins over `as`. */
+  render?: (props: ButtonLinkRenderProps) => ReactElement;
+}
+
 export type ButtonProps = ButtonOwnProps &
   (
-    | (Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> & { href?: undefined })
-    | (Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'color'> & { href: string })
+    | (Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> & { href?: undefined; as?: undefined; render?: undefined })
+    | (Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'color' | 'href'> & ButtonLinkProps)
   );
 
 /**
- * Buttons trigger actions. Pass `href` to render a link that looks like a button.
+ * Buttons trigger actions. Pass `href` to render a link that looks like a button, plus `as` or
+ * `render` to route it through a client-side router's link component.
  *
  * Styled via `.os-btn` plus `data-variant`, `data-color` and `data-size`, so you
  * can also use the classes directly on any element.
@@ -113,17 +146,22 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
   );
 
   if ('href' in rest && rest.href !== undefined) {
-    const anchorProps = rest as AnchorHTMLAttributes<HTMLAnchorElement>;
+    const { as, render, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & ButtonLinkProps;
+    const linkProps = {
+      'aria-current': active ? ('page' as const) : undefined,
+      ...anchorProps,
+      ...shared,
+      'aria-disabled': loading || undefined,
+    };
+    if (render) {
+      // The ref is only passed through for the caller to spread onto its element, never read here.
+      return render({ ...linkProps, ref: ref as Ref<HTMLAnchorElement>, children: content } as ButtonLinkRenderProps);
+    }
+    const Tag: ElementType = as ?? 'a';
     return (
-      <a
-        ref={ref as Ref<HTMLAnchorElement>}
-        aria-current={active ? 'page' : undefined}
-        {...anchorProps}
-        {...shared}
-        aria-disabled={loading || undefined}
-      >
+      <Tag ref={ref} {...linkProps}>
         {content}
-      </a>
+      </Tag>
     );
   }
 
