@@ -113,8 +113,9 @@ export function Theming() {
       <h2 id="alongside">Alongside another UI library</h2>
       <p>
         You can move an app over one screen at a time. While both libraries load, put OneSmallUI in its own cascade layer
-        so neither library's element resets restyle the other's components. Chakra UI v3 already uses the layers{' '}
-        <code>reset, base, tokens, recipes</code>; slot OneSmallUI after its reset and before the rest:
+        so the other library's reset can't strip OneSmallUI components and its components keep their own styles. Chakra
+        UI v3 already uses the layers <code>reset, base, tokens, recipes</code>; slot OneSmallUI after its reset and
+        before the rest:
       </p>
       <Code
         language="css"
@@ -122,9 +123,11 @@ export function Theming() {
         code={`@layer reset, onesmall, base, tokens, recipes;\n@import '@onesmall/ui/styles.css' layer(onesmall);`}
       />
       <p>
-        OneSmallUI components use their own classes, so they keep their look; the other library's later layers keep its
-        components intact. Point the other library's color tokens at the <code>--os-*</code> variables so both share one
-        palette during the move, and drop the layer line once the old library is gone.
+        OneSmallUI components use their own classes, so they keep their look, and the other library's later layers keep
+        its components intact. OneSmallUI's element defaults (paragraph and heading spacing, underlined links) do reach
+        the other library's plain elements that set no style of their own, so expect small spacing changes on screens
+        not yet moved. Point the other library's color tokens at the <code>--os-*</code> variables, or match them, so
+        both share one palette during the move, and drop the layer line once the old library is gone.
       </p>
 
       <h2 id="scss">SCSS variables</h2>
