@@ -16,6 +16,11 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
   3:1 on every surface, prints every failing pair with its ratio and target, never replaces a color you passed
   (it offers the nearest passing color instead), and exits non-zero with `--strict`. `--from` re-checks an edited
   `themes.json`. See "Generate a company theme" on the Theming page.
+- Router-aware links: `Button` (with `href`) and `BreadcrumbItem` take `as`, a link element or component such
+  as Next.js `Link`, and `render` for full control, the same shape as `SidebarItem`. Client-side routers can
+  now navigate without a full page load. New `ButtonLinkRenderProps` and `BreadcrumbLinkRenderProps` types.
+- Docs: Theming shows how to set the font tokens and how to run OneSmallUI beside a layered library such as
+  Chakra UI v3 while an app moves over.
 
 ### Fixed
 
