@@ -33,7 +33,14 @@ describe('Icons', () => {
     expect(container.querySelector('svg')).toHaveAttribute('data-spin', '');
     expect(createIcon('Dot', <circle cx="12" cy="12" r="2" />).displayName).toBe('DotIcon');
     const names = Object.keys(Icons).filter((k) => /^[A-Z]\w+Icon$/.test(k));
-    expect(names).toHaveLength(47);
+    expect(names).toHaveLength(70);
+    const appIcons = [
+      'BarChartIcon', 'BookOpenIcon', 'BotIcon', 'BriefcaseIcon', 'CalendarCheckIcon', 'FolderIcon', 'GaugeIcon',
+      'GraduationCapIcon', 'HistoryIcon', 'KeyIcon', 'LaptopIcon', 'LayoutDashboardIcon', 'ListChecksIcon', 'LockIcon',
+      'LogOutIcon', 'MailIcon', 'NotebookIcon', 'PaletteIcon', 'PanelLeftIcon', 'PlusCircleIcon', 'SaveIcon',
+      'TargetIcon', 'UndoIcon',
+    ];
+    for (const n of appIcons) expect(names).toContain(n);
     for (const n of names) expect((Icons as unknown as Record<string, { displayName?: string }>)[n].displayName).toBe(n);
   });
 

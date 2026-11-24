@@ -5,6 +5,15 @@ All notable changes to `@onesmall/ui` are documented here. This project follows
 
 ## [Unreleased]
 
+### Added
+
+- Icons: `BarChartIcon`, `BookOpenIcon`, `BotIcon`, `BriefcaseIcon`, `CalendarCheckIcon`, `FolderIcon`, `GaugeIcon`,
+  `GraduationCapIcon`, `HistoryIcon`, `KeyIcon`, `LaptopIcon`, `LayoutDashboardIcon`, `ListChecksIcon`, `LockIcon`,
+  `LogOutIcon`, `MailIcon`, `NotebookIcon`, `PaletteIcon`, `PanelLeftIcon`, `PlusCircleIcon`, `SaveIcon`,
+  `TargetIcon` and `UndoIcon`: 23 original glyphs on the same 24×24 stroked grid, for app shells and task
+  managers (navigation, accounts, reports, history). `UndoIcon` is `RefreshIcon` mirrored. The set now has 70
+  icons.
+
 ### Fixed
 
 - Accessible names: `SidebarItem` badges and the "(required)" text on `Field`, `Radio` and `Rating` labels now
