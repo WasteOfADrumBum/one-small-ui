@@ -73,6 +73,9 @@ Standing rules from the maintainer for every session:
   keys from the themes. `build-tokens.mjs` generates `scss/abstracts/_themes.scss`, `_motion.scss` and
   `src/tokens.ts` (`themes`, `motion`). `check-contrast.mjs` checks themes only. `test/tokens.test.tsx`
   guards this.
+- The contrast pair list is `CONTRAST_PAIRS` in `tokens-lib.mjs`, shared by `check-contrast.mjs` and the company
+  theme generator (`generate-theme.mjs`, logic in `theme-lib.mjs`, tests in `scripts/test/theme-lib.test.mjs`).
+  Change pairs there only. The generator never replaces a color the caller passed; it suggests one instead.
 - In SCSS use `dur('fast'|'base'|'slow'|'slower')` and `ease('standard'|'enter'|'exit'|'emphasized')`. In TS,
   use `motion.duration.*`. Never hardcode durations.
 

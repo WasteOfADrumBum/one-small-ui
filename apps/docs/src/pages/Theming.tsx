@@ -159,6 +159,62 @@ export function Theming() {
           </tbody>
         </table>
       </div>
+
+      <h2 id="company-theme">Generate a company theme</h2>
+      <p>
+        Setting <code>--os-primary</code> by hand leaves its hover, soft, text and <code>on-</code> colors to you, in both
+        modes. The theme generator starts from your brand colors instead: it derives every related token for light and
+        dark, keeps the library&apos;s status colors, surfaces and text unless you override them, and checks the result
+        with the same pair list as <code>npm run check:contrast</code>, plus primary, secondary and accent at 3:1 on
+        every surface. It has no dependencies and runs from a clone of this repository.
+      </p>
+      <Code
+        language="bash"
+        title="Terminal"
+        code={`npm run theme:generate -- \\
+  --primary '#0c5d56' --secondary '#92310a' --accent '#9333ea' \\
+  --out src/theme
+
+# Optional: --primary-dark (and -dark for every color), --neutral,
+# --success/--warning/--danger/--info, --set dark.bg=#101216, --config brand.json`}
+      />
+      <p>
+        Colors you pass are never replaced. Derived tokens are moved in lightness until they pass. When a color you passed
+        can&apos;t pass, the report prints every failing pair with its ratio and target and offers the nearest passing
+        color separately, for you to accept or not. It only reports success when every pair passes.
+      </p>
+      <Code
+        language="bash"
+        title="Report"
+        code={`Contrast: 92 pairs per mode (text 7:1, UI boundaries 3:1)
+  light: 91 pass, 1 fail
+  FAIL light: on-accent (#ffffff) on accent (#9333ea) = 5.38 < 7
+  dark: 92 pass, 0 fail
+
+Colors you gave that cannot pass as given (kept as given, not replaced):
+  light accent #9333ea: on-accent on accent reaches 5.38:1, needs 7:1;
+  nearest passing: #8113d5 (to use it: --accent '#8113d5')
+
+Result: 1 pair(s) fail. This theme does not meet the contrast targets yet.`}
+      />
+      <p>
+        It writes three files to <code>--out</code>: an editable <code>themes.json</code> with both palettes,{' '}
+        <code>theme.css</code> with <code>[data-os-theme="light"]</code> and <code>[data-os-theme="dark"]</code> blocks,
+        and <code>_theme.scss</code> with <code>$theme-light</code> and <code>$theme-dark</code> maps. Use the CSS or the
+        Sass, not both. After editing <code>themes.json</code>, run{' '}
+        <code>npm run theme:generate -- --from src/theme/themes.json --out src/theme</code> to check it again and rewrite
+        the CSS and Sass. Add <code>--strict</code> in CI to exit with an error while any pair fails.
+      </p>
+      <Code language="tsx" title="main.tsx" code={`import '@onesmall/ui/styles.css';\nimport './theme/theme.css'; // after the library`} />
+      <Code
+        language="scss"
+        title="app.scss"
+        code={`@use 'theme/theme' as brand;
+@use '@onesmall/ui/scss' with (
+  $theme-light: brand.$theme-light,
+  $theme-dark: brand.$theme-dark
+);`}
+      />
     </article>
   );
 }
