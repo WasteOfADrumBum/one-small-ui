@@ -1,4 +1,13 @@
-import { createContext, forwardRef, useContext, type AnchorHTMLAttributes, type HTMLAttributes, type ReactNode } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  type AnchorHTMLAttributes,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { ArrowRightIcon } from '../icons/ArrowRightIcon';
 import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { cx } from '../utils/cx';
@@ -47,10 +56,22 @@ export interface BreadcrumbItemProps extends Omit<HTMLAttributes<HTMLLIElement>,
   /** Extra props for the link. */
   linkProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
   onClick?: AnchorHTMLAttributes<HTMLAnchorElement>['onClick'];
+  /** Link element or component, e.g. Next.js `Link` or a router link that takes `href`. Default `a`. */
+  as?: ElementType;
+  /** Full control over the link element: receives every prop to spread. Wins over `as`. */
+  render?: (props: BreadcrumbLinkRenderProps) => ReactElement;
+}
+
+/** Every prop a breadcrumb link passes on: spread them all onto your link element. */
+export interface BreadcrumbLinkRenderProps {
+  href: string;
+  className: string;
+  children: ReactNode;
+  [prop: string]: unknown;
 }
 
 export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(function BreadcrumbItem(
-  { href, current, icon, linkProps, onClick, className, children, ...rest },
+  { href, current, icon, linkProps, onClick, as, render, className, children, ...rest },
   ref,
 ) {
   const { separator } = useContext(BreadcrumbContext);
@@ -65,15 +86,18 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(fun
       {children}
     </>
   );
+  const renderLink = (props: { href: string; className: string; [prop: string]: unknown }) => {
+    if (render) return render({ ...props, children: content });
+    const Tag: ElementType = as ?? 'a';
+    return <Tag {...props}>{content}</Tag>;
+  };
   return (
     <li ref={ref} className={cx(cls('breadcrumb__item'), className)} data-current={current || undefined} {...rest}>
       <span className={cls('breadcrumb__separator')} aria-hidden="true">
         {sep}
       </span>
       {href && !current ? (
-        <a href={href} onClick={onClick} {...linkProps} className={cx(cls('breadcrumb__link'), linkProps?.className)}>
-          {content}
-        </a>
+        renderLink({ href, onClick, ...linkProps, className: cx(cls('breadcrumb__link'), linkProps?.className) })
       ) : (
         <span className={cls('breadcrumb__page')} aria-current={current ? 'page' : undefined}>
           {content}
