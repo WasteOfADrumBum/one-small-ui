@@ -1,5 +1,6 @@
 // Installs the packed @onesmall/ui tarball into clean, throwaway apps (one per React major) and checks what
-// a consumer relies on: ESM and CommonJS entrypoints, the icons / dom / tokens subpaths, CSS and SCSS, type
+// a consumer relies on: ESM and CommonJS entrypoints, the icons / dom / tokens subpaths, CSS and SCSS (also with
+// a theme from scripts/generate-theme.mjs), type
 // declarations (bundler and node16 resolution), server rendering and hydration without mismatches, a single
 // React copy, and that no development or private files are published.
 //
@@ -243,6 +244,23 @@ export const bad = <Button notAProp />;
     check(out.includes('.os-btn') && out.includes('.x'), 'SCSS: @use "@onesmall/ui/scss" compiles in a consumer');
   } catch (e) {
     check(false, `SCSS: ${String(e.message).slice(0, 600)}`);
+  }
+
+  // Company theme (scripts/generate-theme.mjs): the generated CSS bundles after styles.css, and the generated
+  // Sass maps configure the library's $theme-light / $theme-dark.
+  try {
+    run('node', [join(root, 'scripts', 'generate-theme.mjs'), '--primary', '#0c5d56', '--out', join(app, 'brand')], app, { quiet: true });
+    writeFileSync(join(app, 'brand.css'), `@import '@onesmall/ui/styles.css';\n@import './brand/theme.css';\n`);
+    run('npx', ['esbuild', 'brand.css', '--bundle', '--outfile=brand-out.css', '--log-level=error'], app, { quiet: true });
+    const bundled = readFileSync(join(app, 'brand-out.css'), 'utf8');
+    const themeAt = bundled.search(/\[data-os-theme="?light"?\],\s*\.os-scheme-light/);
+    check(themeAt > bundled.lastIndexOf('.os-btn') && /--os-primary: #0c5d56/.test(bundled.slice(themeAt)), 'company theme: generated theme.css bundles after styles.css');
+    writeFileSync(join(app, 'brand.scss'), `@use 'brand/theme' as brand;\n@use '@onesmall/ui/scss' with ($theme-light: brand.$theme-light, $theme-dark: brand.$theme-dark);\n`);
+    run('npx', ['sass', '--load-path=node_modules', '--pkg-importer=node', 'brand.scss', 'brand-scss.css'], app, { quiet: true });
+    const compiled = readFileSync(join(app, 'brand-scss.css'), 'utf8');
+    check(compiled.includes('.os-btn') && compiled.includes('--os-primary: #0c5d56') && !compiled.includes('--os-primary: #00557a'), 'company theme: generated Sass maps configure @onesmall/ui/scss');
+  } catch (e) {
+    check(false, `company theme: ${String(e.message).slice(0, 600)}`);
   }
 
   // Tree shaking: a bundle that imports only Button must not carry the rest of the library.

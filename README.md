@@ -34,6 +34,10 @@ npm run test:consumer  # packed tarball in clean React 18 and 19 apps (ESM, CJS,
 Edit `packages/onesmallui/tokens/themes.json`, then `npm run build`. The build regenerates the SCSS maps and
 `src/tokens.ts`; `npm run check:contrast` tells you if a change breaks AAA.
 
+For a company theme on top of the library, `npm run theme:generate -- --primary '#0c5d56' --out my-theme` derives
+every related token from brand colors, checks the same pairs, and writes `themes.json`, `theme.css` and
+`_theme.scss` (`--help` lists the options; see "Generate a company theme" on the Theming docs page).
+
 ## Publish to npm
 
 Maintainer only. Follow [docs/RELEASING.md](docs/RELEASING.md): version bump, checks, tarball checksum, dry run,

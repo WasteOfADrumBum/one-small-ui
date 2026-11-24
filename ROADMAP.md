@@ -104,6 +104,12 @@ download cost, not a runtime cost.
 
 ## 3. Company theme generation (P1)
 
+**Status: implemented** on branch `feat/theme-generator`, not yet released. `npm run theme:generate`
+(`scripts/generate-theme.mjs`, logic in `scripts/theme-lib.mjs`) meets the criteria below; the pair list moved to
+`scripts/tokens-lib.mjs`; fixtures and tests are in `scripts/test/`; the consumer smoke loads the generated CSS and
+Sass; the Theming docs page has "Generate a company theme". Still open: a package bin, so consumers can run it
+without cloning the repository.
+
 **Current capability.**
 
 - One token source: `packages/onesmallui/tokens/themes.json`, with `light` and `dark` palettes of 52 tokens each
