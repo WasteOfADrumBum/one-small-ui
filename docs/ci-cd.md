@@ -36,6 +36,10 @@ Security ───────────────────────�
   reflow, served with the production security headers from `vercel.json`.
 - **Browsers (firefox / webkit)**: `npm run test:browsers` checks native dialog and nested modals, Escape, focus
   containment and return, scroll lock, top-layer popovers, the combobox and menu keyboard patterns and tooltips.
+  CI installs each browser with `scripts/playwright-install.sh`: the binary first, then OS libraries only if it
+  does not already launch (fallback fonts omitted; full `install-deps` if it still will not launch). A timed-out
+  attempt runs in its own session and is killed as root, then the script waits until the dpkg locks are free.
+  Downloaded packages are cached in `~/.cache/playwright-apt`.
 - **Consumer**: installs the exact `package` tarball (sha256 enforced) into clean React 18 and 19 apps on each
   Node version: ESM and CJS imports, SSR, strict type checks with current TypeScript and 5.0, and an esbuild
   production bundle with the stylesheet that must contain one React copy.
