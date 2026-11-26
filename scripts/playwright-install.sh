@@ -41,43 +41,37 @@ stop_session() {
   fi
 }
 
-# PIDs holding an fcntl/flock on the given files, from /proc/locks. One PID per line.
+# PIDs holding a lock on the given files, one per line.
+# lslocks is used (as root when sudo is available) because apt-get is root and a
+# user-level read of /proc/locks does not resolve those paths. Device numbers in
+# /proc/locks also disagree with userspace st_dev on some runners.
 lock_holder_pids() {
-  python3 - "$@" <<'PY'
-import os
-import sys
-
-want = set()
-for path in sys.argv[1:]:
-    try:
-        st = os.stat(path)
-    except FileNotFoundError:
-        continue
-    want.add((f"{os.major(st.st_dev):x}", f"{os.minor(st.st_dev):x}", str(st.st_ino)))
-try:
-    lines = open("/proc/locks", encoding="utf-8").read().splitlines()
-except FileNotFoundError:
-    sys.exit(0)
-seen = []
-for line in lines:
-    parts = line.split()
-    if len(parts) < 6 or not parts[4].isdigit():
-        continue
-    devino = parts[5].split(":")
-    if len(devino) != 3:
-        continue
-    key = (devino[0].lower(), devino[1].lower(), devino[2])
-    if key in want and parts[4] not in seen:
-        seen.append(parts[4])
-print("\n".join(seen))
-PY
+  command -v lslocks >/dev/null 2>&1 || return 0
+  local -a cmd=(lslocks -n -u -o 'PID,PATH')
+  if command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+    cmd=(sudo -n lslocks -n -u -o 'PID,PATH')
+  fi
+  local joined
+  joined=$(printf '%s\n' "$@")
+  "${cmd[@]}" 2>/dev/null | awk -v files="$joined" '
+    BEGIN {
+      n = split(files, want, "\n")
+      for (i = 1; i <= n; i++) if (want[i] != "") ok[want[i]] = 1
+    }
+    {
+      pid = $1
+      path = $2
+      for (i = 3; i <= NF; i++) path = path " " $i
+      if (pid ~ /^[0-9]+$/ && (path in ok) && !seen[pid]++) print pid
+    }
+  ' || true
 }
 
 # After a timed-out attempt, apt-get may still hold the locks (it outlived timeout).
 # Poll, and kill whoever still holds them, until they are free or the wait is used up.
 release_apt_locks() {
   [ "$on_apt_runner" = true ] || return 0
-  command -v python3 >/dev/null 2>&1 || return 0
+  command -v lslocks >/dev/null 2>&1 || return 0
   local -a files=(
     /var/lib/dpkg/lock-frontend
     /var/lib/dpkg/lock
@@ -240,18 +234,24 @@ self_test() {
     echo "ok  font packages dropped"
   fi
 
-  if ! command -v python3 >/dev/null 2>&1; then
-    echo "python3 is required to read /proc/locks" >&2
+  if ! command -v python3 >/dev/null 2>&1 || ! command -v lslocks >/dev/null 2>&1; then
+    echo "python3 and lslocks are required to see apt locks" >&2
     failed=1
   else
     local lock_file lock_pid holders
     lock_file=$(mktemp)
     python3 -c 'import fcntl, os, sys, time; fd = os.open(sys.argv[1], os.O_RDWR); fcntl.lockf(fd, fcntl.LOCK_EX); time.sleep(30)' "$lock_file" &
     lock_pid=$!
-    sleep 0.3
-    holders=$(lock_holder_pids "$lock_file")
+    holders=""
+    local _wait
+    for _wait in $(seq 1 25); do
+      holders=$(lock_holder_pids "$lock_file")
+      [ -n "$holders" ] && break
+      sleep 0.2
+    done
     if [ "$holders" != "$lock_pid" ]; then
       echo "lock scan expected ${lock_pid}, got [${holders}]" >&2
+      lslocks -n -u -o PID,PATH >&2 || true
       failed=1
     else
       echo "ok  lock holder found"
