@@ -128,13 +128,13 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      # OS packages for the browser; scripts/playwright-install.sh keeps them here so a slow mirror is hit once.
+      # Debs fetched when the browser does not already launch. scripts/playwright-install.sh keeps them here.
       - name: Cache browser OS packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/playwright-apt
           key: playwright-apt-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      # Runs on a cache hit too: the browser download is skipped but the OS packages still install.
+      # Runs on a cache hit too: a cached browser still has to launch; missing libraries install from these debs.
       - name: Install Chromium
         run: scripts/playwright-install.sh chromium
       - name: Download docs site
@@ -184,7 +184,7 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ matrix.browser }}-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      # OS packages for the browser; scripts/playwright-install.sh keeps them here so a slow mirror is hit once.
+      # Debs fetched when the browser does not already launch. scripts/playwright-install.sh keeps them here.
       - name: Cache browser OS packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
